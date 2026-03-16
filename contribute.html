@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contribuer - Ressources IAI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .contrib-hero {
+            padding: 4rem 0;
+            background-color: var(--bg-dark);
+            color: white;
+            text-align: center;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            transition: border-color var(--transition-fast);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .file-upload-zone {
+            border: 2px dashed var(--border);
+            padding: 2rem;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .file-upload-zone:hover {
+            border-color: var(--primary-light);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+        .file-upload-zone svg {
+            width: 48px;
+            height: 48px;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+    </style>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="page-fade-in">
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
+                <img src="assets/logoiai.png"  alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+            </a>
+            <div class="nav-links">
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-item">Accueil</a></li>
+                    <li><a href="exams.html" class="nav-item">Examens</a></li>
+                    <li><a href="search.html" class="nav-item">Rechercher</a></li>
+                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="theme-toggle" title="Basculer le thème" style="margin-right: 0.5rem;">
+                        <!-- Moon icon default -->
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <a href="login.html" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+                    <a href="login.html" class="btn btn-primary" style="padding: 0.5rem 1rem;">S'inscrire</a>
+                    <!-- Profil is hidden by default, shown via JS if logged in -->
+                    <a href="profile.html" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
+                </div>
+            </div>
+            <button class="mobile-menu-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </nav>
+
+    <header class="contrib-hero">
+        <div class="container">
+            <h1>Partagez Vos Ressources</h1>
+            <p style="color: rgba(255,255,255,0.7); max-width: 600px; margin: 1rem auto 0;">Aidez la communauté en partageant vos anciens examens, résumés de cours et projets. Votre contribution sera créditée sur votre profil.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="form-container">
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; color: var(--primary);">Ajouter un Document</h2>
+            <form action="backend/upload.php" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Titre du Document</label>
+                    <input type="text" name="title" class="form-control" placeholder="Ex: Examen Final Algorithmique 2023" required>
+                </div>
+                
+                <div class="form-group" style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label>Niveau</label>
+                        <select name="level" class="form-control" required>
+                            <option value="">Sélectionner</option>
+                            <option value="L1">Licence 1</option>
+                            <option value="L2">Licence 2</option>
+                            <option value="L3_GLSI">Licence 3 GLSI</option>
+                            <option value="L3_ASR">Licence 3 ASR</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Catégorie</label>
+                        <select name="category" class="form-control" required>
+                            <option value="exam">Examen</option>
+                            <option value="course">Cours</option>
+                            <option value="assignment">Devoir / TP</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Fichier (PDF, DOCX, ZIP)</label>
+                    <div class="file-upload-zone" onclick="document.getElementById('fileInput').click()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p>Cliquez ou glissez-déposez votre fichier ici</p>
+                        <input type="file" id="fileInput" name="document" style="display: none;" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Uploader le Document</button>
+            </form>
+        </div>
+    </main>
+<script src="js/main.js"></script>
+</body>
+</html>

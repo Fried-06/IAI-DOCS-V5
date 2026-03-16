@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banque d'Examens - Ressources IAI</title>
+    <link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="page-fade-in">
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
+                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+            </a>
+            <div class="nav-links">
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-item">Accueil</a></li>
+                    <li><a href="exams.html" class="nav-item">Examens</a></li>
+                    <li><a href="search.html" class="nav-item">Rechercher</a></li>
+                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="theme-toggle" title="Basculer le thème" style="margin-right: 0.5rem;">
+                        <!-- Moon icon default -->
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <a href="login.html" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+                    <a href="login.html" class="btn btn-primary" style="padding: 0.5rem 1rem;">S'inscrire</a>
+                    <!-- Profil is hidden by default, shown via JS if logged in -->
+                    <a href="profile.html" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
+                </div>
+            </div>
+            <button class="mobile-menu-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </nav>
+    <header class="section" style="background-color: var(--primary); color: white; text-align: center; padding: 4rem 0;">
+        <div class="container">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Banque Centrale des Examens</h1>
+            <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto; opacity: 0.9;">Parcourez tous les partiels et examens classés par année, quel que soit votre niveau.</p>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 0;">
+        <div class="subject-layout">
+            <!-- Sidebar Filters -->
+            <aside class="sidebar">
+                <div class="sidebar-title">Filtrer par Année</div>
+                <div class="year-list">
+                    <button class="year-btn active">Toutes les Années</button>
+                    <button class="year-btn">2026</button>
+                    <button class="year-btn">2025</button>
+                    <button class="year-btn">2024</button>
+                    <button class="year-btn">2023</button>
+                    <button class="year-btn">2022</button>
+                    <button class="year-btn">2021</button>
+                    <button class="year-btn">2020</button>
+                </div>
+            </aside>
+
+            <!-- Exam List -->
+            <div class="subject-content">
+                <h2 style="color: var(--primary); margin-bottom: 2rem;">Tous les Examens</h2>
+                
+                <div class="grid grid-cols-2">
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <span class="tag">Session Principale</span>
+                            <div class="exam-meta">2025 • L1</div>
+                        </div>
+                        <h3 class="exam-title" style="margin-top: 1rem;">Algorithmique et Programmation</h3>
+                        <p class="exam-meta" style="margin-bottom: 1.5rem;">Épreuve de 3h, inclut des arbres et des pointeurs en C.</p>
+                        <a href="subjects/L1/semestre1/algorithmique.html" class="btn btn-outline">Voir Fiche Matière</a>
+                    </div>
+                    
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <span class="tag">Rattrapage</span>
+                            <div class="exam-meta">2024 • L2</div>
+                        </div>
+                        <h3 class="exam-title" style="margin-top: 1rem;">Cryptographie</h3>
+                        <p class="exam-meta" style="margin-bottom: 1.5rem;">RSA, AES et hachage. Examen de session d'automne.</p>
+                        <a href="subjects/L2/semestre3/cryptographie.html" class="btn btn-outline">Voir Fiche Matière</a>
+                    </div>
+
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <span class="tag">Partiel Mi-Semestre</span>
+                            <div class="exam-meta">2023 • L3 GLSI</div>
+                        </div>
+                        <h3 class="exam-title" style="margin-top: 1rem;">Génie Logiciel</h3>
+                        <p class="exam-meta" style="margin-bottom: 1.5rem;">Conception UML et patrons de conception.</p>
+                        <a href="subjects/L3/GLSI/semestre5/genie-logiciel.html" class="btn btn-outline">Voir Fiche Matière</a>
+                    </div>
+
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <span class="tag">Examen Pratique</span>
+                            <div class="exam-meta">2026 • L3 ASR</div>
+                        </div>
+                        <h3 class="exam-title" style="margin-top: 1rem;">Administration Cisco CCNA 3</h3>
+                        <p class="exam-meta" style="margin-bottom: 1.5rem;">Configuration OSPF avancée et routage dynamique sur Packet Tracer.</p>
+                        <a href="subjects/L3/ASR/semestre5/ccna3.html" class="btn btn-outline">Voir Fiche Matière</a>
+                    </div>
+                    
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <span class="tag">Session Principale</span>
+                            <div class="exam-meta">2022 • L2</div>
+                        </div>
+                        <h3 class="exam-title" style="margin-top: 1rem;">Programmation Web 2 (PHP)</h3>
+                        <p class="exam-meta" style="margin-bottom: 1.5rem;">Création de formulaires, sessions utilisateurs et BD MySQL.</p>
+                        <a href="subjects/L2/semestre3/programmation-web-2.html" class="btn btn-outline">Voir Fiche Matière</a>
+                    </div>
+                    
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <span class="tag">Examen Final</span>
+                            <div class="exam-meta">2021 • L1</div>
+                        </div>
+                        <h3 class="exam-title" style="margin-top: 1rem;">Mathématiques Discrètes</h3>
+                        <p class="exam-meta" style="margin-bottom: 1.5rem;">Logique, ensembles, dénombrement et relations.</p>
+                        <a href="subjects/L1/semestre1/mathematiques-discretes.html" class="btn btn-outline">Voir Fiche Matière</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="js/main.js"></script>
+</body>
+</html>
