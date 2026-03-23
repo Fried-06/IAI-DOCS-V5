@@ -3,6 +3,86 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ═══════════════════════════════════════════════════════
+    // AUTH STATE CHECK — Dynamic navbar based on session
+    // ═══════════════════════════════════════════════════════
+    (function checkAuthState() {
+        fetch('/backend/session_check.php')
+            .then(res => res.json())
+            .then(data => {
+                // Find all nav-actions containers on the page
+                const navActions = document.querySelectorAll('.nav-actions');
+                navActions.forEach(container => {
+                    // Find existing buttons
+                    const loginBtn = container.querySelector('.auth-login-btn');
+                    const registerBtn = container.querySelector('.auth-register-btn');
+                    const profileBtn = container.querySelector('#btn-profil');
+
+                    if (data.logged_in) {
+                        // Hide login/register buttons
+                        if (loginBtn) loginBtn.style.display = 'none';
+                        if (registerBtn) registerBtn.style.display = 'none';
+                        if (profileBtn) profileBtn.style.display = 'none';
+
+                        // Check if avatar already injected
+                        if (container.querySelector('.nav-avatar-group')) return;
+
+                        // Create avatar + logout group
+                        const avatarGroup = document.createElement('div');
+                        avatarGroup.className = 'nav-avatar-group';
+                        avatarGroup.style.cssText = 'display:flex;align-items:center;gap:0.75rem;';
+
+                        // Avatar link (goes to profile)
+                        const avatarLink = document.createElement('a');
+                        avatarLink.href = '/profile.php';
+                        avatarLink.className = 'nav-avatar-link';
+                        avatarLink.title = data.username;
+                        avatarLink.style.cssText = 'display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;';
+
+                        const avatarCircle = document.createElement('div');
+                        avatarCircle.className = 'nav-avatar-circle';
+                        avatarCircle.textContent = data.initials;
+                        avatarCircle.style.cssText = 'width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--cyan,#00e5c4),var(--purple,#a855f7));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;letter-spacing:0.02em;box-shadow:0 0 12px rgba(0,229,196,0.3);';
+
+                        const userName = document.createElement('span');
+                        userName.textContent = data.username;
+                        userName.className = 'nav-username';
+                        userName.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text,#c8ddf2);';
+
+                        avatarLink.appendChild(avatarCircle);
+                        avatarLink.appendChild(userName);
+
+                        // Logout button
+                        const logoutBtn = document.createElement('a');
+                        logoutBtn.href = '/backend/logout.php';
+                        logoutBtn.className = 'btn btn-outline nav-logout-btn';
+                        logoutBtn.style.cssText = 'padding:0.4rem 0.8rem;font-size:0.8rem;border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:6px;text-decoration:none;transition:all 0.3s;';
+                        logoutBtn.textContent = 'Déconnexion';
+                        logoutBtn.addEventListener('mouseenter', () => {
+                            logoutBtn.style.background = 'rgba(255,100,100,0.15)';
+                            logoutBtn.style.borderColor = '#ff6b6b';
+                        });
+                        logoutBtn.addEventListener('mouseleave', () => {
+                            logoutBtn.style.background = 'transparent';
+                            logoutBtn.style.borderColor = 'rgba(255,100,100,0.3)';
+                        });
+
+                        avatarGroup.appendChild(avatarLink);
+                        avatarGroup.appendChild(logoutBtn);
+                        container.appendChild(avatarGroup);
+                    } else {
+                        // Not logged in — buttons already visible by default
+                        if (loginBtn) loginBtn.style.display = '';
+                        if (registerBtn) registerBtn.style.display = '';
+                    }
+                });
+            })
+            .catch(() => {
+                // If fetch fails (e.g. no PHP server), keep default buttons visible
+            });
+    })();
+
     // 1. Fake Online Users Simulator
     const onlineIndicator = document.getElementById('online-count');
     
@@ -95,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- PHASE 7: SCROLL REVEAL (IntersectionObserver) ---
 document.addEventListener("DOMContentLoaded", () => {
     // Add page-fade-in to body on load (HTML script handles this usually, but guaranteeing it here too)
-    document.body.classList.add("page-fade-in");
+    // document.body.classList.add("page-fade-in");
 
     // Add .reveal-up to cards automatically if not present
     const cards = document.querySelectorAll(".level-card, .exam-card, .resource-card, .subject-header");
@@ -299,11 +379,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const sr12Observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add("sr-visible");
+                entry.target.classList.remove("scroll-reveal-hidden");
                 sr12Observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.08 });
 
-    document.querySelectorAll(".scroll-reveal").forEach(el => sr12Observer.observe(el));
+    document.querySelectorAll(".scroll-reveal").forEach(el => {
+        el.classList.add("scroll-reveal-hidden");
+        sr12Observer.observe(el);
+    });
 });

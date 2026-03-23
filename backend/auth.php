@@ -1,46 +1,106 @@
 <?php
-// backend/auth.php - Skeleton for Authentication
+// backend/auth.php - Real Authentication with MySQL database
 
 session_start();
+require_once __DIR__ . '/db.php';
+
+// Helper: set session variables
+function setSession($userId, $userName, $userEmail) {
+    $_SESSION['user_id'] = $userId;
+    $_SESSION['user_name'] = $userName;
+    $_SESSION['user_email'] = $userEmail;
+    $_SESSION['logged_in'] = true;
+    
+    // Dynamically calculate upload count
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM documents WHERE user_id = ? AND status = 'published'");
+        $stmt->execute([$userId]);
+        $_SESSION['upload_count'] = $stmt->fetchColumn();
+    } catch (\PDOException $e) {
+        $_SESSION['upload_count'] = 0;
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $action = $_POST['action'] ?? '';
+    $pdo = getDB();
 
     if ($action === 'register') {
-        $name = $_POST['name'] ?? '';
-        $email = $_POST['email'] ?? '';
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $confirm_password = $_POST['confirm_password'] ?? '';
 
-        if ($password !== $confirm_password) {
-            die("Erreur: Les mots de passe ne correspondent pas.");
+        // Validations
+        if (empty($name) || empty($email) || empty($password)) {
+            echo "<script>alert('Erreur: Tous les champs sont obligatoires.'); window.history.back();</script>";
+            exit;
         }
 
-        // TODO: Validate data, hash password, and insert into database
-        // $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        // DB Insert...
+        if ($password !== $confirm_password) {
+            echo "<script>alert('Erreur: Les mots de passe ne correspondent pas.'); window.history.back();</script>";
+            exit;
+        }
 
-        // Simulate success and create session
-        $_SESSION['user_name'] = $name;
-        $_SESSION['user_email'] = $email;
-        $_SESSION['logged_in'] = true;
+        if (strlen($password) < 4) {
+            echo "<script>alert('Erreur: Le mot de passe doit contenir au moins 4 caractères.'); window.history.back();</script>";
+            exit;
+        }
 
-        header("Location: ../profile.html");
-        exit();
+        // Check if email already exists in DB
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            echo "<script>alert('Erreur: Cet email est déjà utilisé.'); window.history.back();</script>";
+            exit;
+        }
+
+        // Create new user in DB
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $insertStmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'student')");
+        
+        if ($insertStmt->execute([$name, $email, $hash])) {
+            $newUserId = $pdo->lastInsertId();
+            
+            // Set session
+            setSession($newUserId, $name, $email);
+
+            header("Location: ../index.html");
+            exit();
+        } else {
+            echo "<script>alert('Erreur lors de la création du compte.'); window.history.back();</script>";
+            exit;
+        }
 
     } elseif ($action === 'login') {
-        $email = $_POST['email'] ?? '';
+        $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        // TODO: Query database, verify password
-        // if (password_verify($password, $db_hashed_password)) { ... }
+        if (empty($email) || empty($password)) {
+            echo "<script>alert('Erreur: Email et mot de passe requis.'); window.history.back();</script>";
+            exit;
+        }
 
-        // Simulate successful login
-        $_SESSION['user_name'] = "Étudiant Dev 1"; // Mock name
-        $_SESSION['user_email'] = $email;
-        $_SESSION['logged_in'] = true;
+        // Find user by email
+        $stmt = $pdo->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
-        header("Location: ../profile.html");
+        if (!$user) {
+            echo "<script>alert('Erreur: Aucun compte trouvé avec cet email.'); window.history.back();</script>";
+            exit;
+        }
+
+        if (!password_verify($password, $user['password'])) {
+            echo "<script>alert('Erreur: Mot de passe incorrect.'); window.history.back();</script>";
+            exit;
+        }
+
+        // Set session
+        setSession($user['id'], $user['name'], $user['email']);
+
+        header("Location: ../index.html");
         exit();
     }
 } else {

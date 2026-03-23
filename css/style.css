@@ -34,6 +34,17 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+  /* New Phase 12 Variables */
+  --bg: #020617;
+  --bg2: #071021;
+  --muted: #94a3b8;
+  --cyan: #00e5c4;
+  --purple: #a855f7;
+  --pink: #ff4d8d;
+  --amber: #fbbf24;
+  --green: #22d37a;
+  --border2: rgba(255,255,255,0.08);
+  --text: #ffffff;
 }
 
 * {
@@ -728,7 +739,7 @@ main {
   }
 }
 
- 
+
 /* --- Dark Mode Variables --- */
 body.dark {
   --text-main: #f9fafb;
@@ -740,6 +751,11 @@ body.dark {
   --primary-light: #93c5fd;
   --primary-dark: #3b82f6;
   --secondary: #111111;
+  
+  /* Phase 12 Dark Mappings (same as root as it's already a dark theme) */
+  --bg: #020617;
+  --bg2: #050b18;
+  --border2: rgba(255,255,255,0.05);
 }
 
 body.dark .navbar, body.dark .footer {
@@ -1628,11 +1644,12 @@ code, pre, .timeline-step, .hero-badge, .stat-label {
 
 /* ── Hero Entry Animations ── */
 .anim-fade-up {
-  opacity: 0;
-  transform: translateY(25px);
+  opacity: 1; /* Base state is visible in case animation fails */
+  transform: translateY(0);
   animation: animFadeUp 0.8s ease-out forwards;
 }
 @keyframes animFadeUp {
+  from { opacity: 0; transform: translateY(25px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -1771,9 +1788,14 @@ code, pre, .timeline-step, .hero-badge, .stat-label {
    ═══════════════════════════════════════════ */
 
 .scroll-reveal {
+  opacity: 1; /* Fallback to visible */
+  transform: translateY(0);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+/* When no js, hide by setting a custom class, or let JS add the hidden state */
+.scroll-reveal-hidden {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
 }
 .scroll-reveal.sr-visible {
   opacity: 1;
@@ -1795,4 +1817,75 @@ code, pre, .timeline-step, .hero-badge, .stat-label {
   .why-grid { grid-template-columns: 1fr; }
   .hero-cta { flex-direction: column; align-items: center; }
   .hero-cta .btn-glass { width: 100%; max-width: 300px; justify-content: center; }
+}
+
+/* ═══════════════════════════════════════════
+   STEP 8: ENHANCED CARD MICRO-INTERACTIONS
+   ═══════════════════════════════════════════ */
+
+/* Glow hover effect for level cards */
+.level-card:hover {
+  box-shadow: var(--shadow-hover), 0 0 30px rgba(0,229,196,0.08);
+}
+
+/* Enhanced exam card hover */
+.exam-card:hover {
+  box-shadow: var(--shadow-hover), 0 0 20px rgba(0,229,196,0.06);
+  border-top-color: #00e5c4;
+}
+
+/* Shimmer animation for badges */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Subtle glow pulse */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,229,196,0.1); }
+  50% { box-shadow: 0 0 25px rgba(0,229,196,0.2); }
+}
+
+/* Card entrance animation */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   STEP 9: PAGE TRANSITION STYLES
+   ═══════════════════════════════════════════ */
+/* Removed page-fade-in to avoid body flickering to blank */
+
+/* ═══════════════════════════════════════════
+   STEP 11: NAV AVATAR RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+.nav-avatar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .nav-avatar-group {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  .nav-username {
+    display: none;
+  }
 }

@@ -1,0 +1,23 @@
+{
+  "name": "iai-docs/platform",
+  "description": "IAI DOCS Dynamic Educational Platform",
+  "type": "project",
+  "require": {
+    "php": "^8.0",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-json": "*",
+    "ext-session": "*"
+  },
+  "authors": [
+    {
+      "name": "IAI Contributor",
+      "email": "contact@iai-docs.com"
+    }
+  ],
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  }
+}

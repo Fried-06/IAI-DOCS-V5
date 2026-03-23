@@ -1,0 +1,12 @@
+# Python Requirements for IAI DOCS
+# Generated for Production Dependencies
+
+# Core Sphinx Documentation Setup
+sphinx>=7.0.0
+furo>=2023.0.0
+myst-parser>=2.0.0
+sphinx-togglebutton>=0.3.2
+
+# Document Processing (PDF/DOCX Extraction)
+pymupdf>=1.23.0
+markitdown>=0.0.1

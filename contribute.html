@@ -6,6 +6,7 @@
     <title>Contribuer - Ressources IAI</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         .contrib-hero {
             padding: 4rem 0;
@@ -21,72 +22,61 @@
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
         }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
         .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-main);
+            display: block; margin-bottom: 0.5rem;
+            font-weight: 500; color: var(--text-main);
         }
         .form-control {
-            width: 100%;
-            padding: 0.75rem;
+            width: 100%; padding: 0.75rem;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             font-family: inherit;
             transition: border-color var(--transition-fast);
+            background: var(--bg-card);
+            color: var(--text-main);
         }
         .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
+            outline: none; border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
+        .form-row { display: flex; gap: 1rem; }
+        .form-row > div { flex: 1; }
         .file-upload-zone {
-            border: 2px dashed var(--border);
-            padding: 2rem;
-            text-align: center;
-            border-radius: var(--radius-sm);
-            color: var(--text-muted);
-            cursor: pointer;
+            border: 2px dashed var(--border); padding: 2rem;
+            text-align: center; border-radius: var(--radius-sm);
+            color: var(--text-muted); cursor: pointer;
             transition: all var(--transition-fast);
         }
         .file-upload-zone:hover {
             border-color: var(--primary-light);
             background-color: rgba(37, 99, 235, 0.05);
         }
-        .file-upload-zone svg {
-            width: 48px;
-            height: 48px;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
+        .file-upload-zone svg { width: 48px; height: 48px; color: var(--primary); margin-bottom: 1rem; }
+        .file-name-display { margin-top: 0.5rem; font-size: 0.85rem; color: var(--primary); font-weight: 500; }
     </style>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body class="page-fade-in">
     <nav class="navbar">
         <div class="container nav-container">
             <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
-                <img src="assets/logoiai.png"  alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 60px; width: auto; object-fit: contain;">
             </a>
             <div class="nav-links">
                 <ul class="nav-menu">
                     <li><a href="index.html" class="nav-item">Accueil</a></li>
-                    <li><a href="exams.html" class="nav-item">Examens</a></li>
-                    <li><a href="search.html" class="nav-item">Rechercher</a></li>
+                    <li><a href="exams.php" class="nav-item">Examens</a></li>
+                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
+                    <li><a href="contributors.php" class="nav-item">Contributeurs</a></li>
                     <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
                 </ul>
                 <div class="nav-actions">
                     <button class="theme-toggle" id="theme-toggle" title="Basculer le thème" style="margin-right: 0.5rem;">
-                        <!-- Moon icon default -->
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                     </button>
-                    <a href="login.html" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
-                    <a href="login.html" class="btn btn-primary" style="padding: 0.5rem 1rem;">S'inscrire</a>
-                    <!-- Profil is hidden by default, shown via JS if logged in -->
-                    <a href="profile.html" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
+                    <a href="login.html" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+                    <a href="login.html" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
+                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
                 </div>
             </div>
             <button class="mobile-menu-btn">
@@ -105,39 +95,61 @@
     <main class="container">
         <div class="form-container">
             <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; color: var(--primary);">Ajouter un Document</h2>
-            <form action="backend/upload.php" method="POST" enctype="multipart/form-data">
+            <form action="backend/upload.php" method="POST" enctype="multipart/form-data" id="uploadForm">
                 <div class="form-group">
                     <label>Titre du Document</label>
-                    <input type="text" name="title" class="form-control" placeholder="Ex: Examen Final Algorithmique 2023" required>
+                    <input type="text" name="title" class="form-control" placeholder="Ex: Examen Final Algorithmique 2024" required>
                 </div>
-                
-                <div class="form-group" style="display: flex; gap: 1rem;">
-                    <div style="flex: 1;">
+
+                <div class="form-group">
+                    <label>Description (optionnel)</label>
+                    <textarea name="description" class="form-control" rows="2" placeholder="Brève description du contenu..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
                         <label>Niveau</label>
-                        <select name="level" class="form-control" required>
-                            <option value="">Sélectionner</option>
-                            <option value="L1">Licence 1</option>
-                            <option value="L2">Licence 2</option>
-                            <option value="L3_GLSI">Licence 3 GLSI</option>
-                            <option value="L3_ASR">Licence 3 ASR</option>
+                        <select name="level_id" id="levelSelect" class="form-control" required>
+                            <option value="">Chargement...</option>
                         </select>
                     </div>
-                    <div style="flex: 1;">
-                        <label>Catégorie</label>
-                        <select name="category" class="form-control" required>
-                            <option value="exam">Examen</option>
-                            <option value="course">Cours</option>
-                            <option value="assignment">Devoir / TP</option>
+                    <div class="form-group">
+                        <label>Semestre</label>
+                        <select name="semester_id" id="semesterSelect" class="form-control" required disabled>
+                            <option value="">← Sélect. un niveau</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Matière</label>
+                        <select name="subject_id" id="subjectSelect" class="form-control" required disabled>
+                            <option value="">← Sélect. un semestre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="type_id" id="typeSelect" class="form-control" required>
+                            <option value="">Chargement...</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Fichier (PDF, DOCX, ZIP)</label>
+                    <label>Année</label>
+                    <select name="year_id" id="yearSelect" class="form-control" required>
+                        <option value="">Chargement...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Fichier (PDF, DOCX)</label>
                     <div class="file-upload-zone" onclick="document.getElementById('fileInput').click()">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                         <p>Cliquez ou glissez-déposez votre fichier ici</p>
-                        <input type="file" id="fileInput" name="document" style="display: none;" required>
+                        <div class="file-name-display" id="fileNameDisplay"></div>
+                        <input type="file" id="fileInput" name="document" accept=".pdf,.docx" style="display: none;" required>
                     </div>
                 </div>
 
@@ -145,6 +157,88 @@
             </form>
         </div>
     </main>
-<script src="js/main.js"></script>
+
+    <script src="js/main.js"></script>
+    <script>
+        // ============================
+        // Dynamic Cascading Dropdowns
+        // ============================
+        const API = '/backend/form_options.php';
+        const levelSelect = document.getElementById('levelSelect');
+        const semesterSelect = document.getElementById('semesterSelect');
+        const subjectSelect = document.getElementById('subjectSelect');
+        const typeSelect = document.getElementById('typeSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+        async function loadOptions(url) {
+            const res = await fetch(url);
+            return res.json();
+        }
+
+        function populateSelect(select, items, valueKey, labelKey, placeholder) {
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item[valueKey];
+                opt.textContent = item[labelKey];
+                select.appendChild(opt);
+            });
+            select.disabled = false;
+        }
+
+        // Load levels on page load
+        loadOptions(API + '?type=levels').then(data => {
+            populateSelect(levelSelect, data, 'id', 'name', 'Sélectionner le niveau');
+        });
+
+        // Load types on page load
+        loadOptions(API + '?type=types').then(data => {
+            populateSelect(typeSelect, data, 'id', 'name', 'Sélectionner le type');
+        });
+
+        // Load years on page load
+        loadOptions(API + '?type=years').then(data => {
+            populateSelect(yearSelect, data, 'id', 'year', 'Sélectionner l\'année');
+        });
+
+        // Level → load semesters
+        levelSelect.addEventListener('change', function() {
+            const levelId = this.value;
+            semesterSelect.innerHTML = '<option value="">Chargement...</option>';
+            semesterSelect.disabled = true;
+            subjectSelect.innerHTML = '<option value="">← Sélect. un semestre</option>';
+            subjectSelect.disabled = true;
+
+            if (!levelId) return;
+
+            loadOptions(API + '?type=semesters&level_id=' + levelId).then(data => {
+                populateSelect(semesterSelect, data, 'id', 'name', 'Sélectionner le semestre');
+            });
+        });
+
+        // Semester → load subjects
+        semesterSelect.addEventListener('change', function() {
+            const semesterId = this.value;
+            subjectSelect.innerHTML = '<option value="">Chargement...</option>';
+            subjectSelect.disabled = true;
+
+            if (!semesterId) return;
+
+            loadOptions(API + '?type=subjects&semester_id=' + semesterId).then(data => {
+                if (data.length === 0) {
+                    subjectSelect.innerHTML = '<option value="">Aucune matière active</option>';
+                } else {
+                    populateSelect(subjectSelect, data, 'id', 'name', 'Sélectionner la matière');
+                }
+            });
+        });
+
+        // Show selected filename
+        fileInput.addEventListener('change', function() {
+            fileNameDisplay.textContent = this.files[0] ? '📎 ' + this.files[0].name : '';
+        });
+    </script>
 </body>
 </html>

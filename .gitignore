@@ -1,0 +1,49 @@
+# ===========================
+# IAI DOCS - .gitignore
+# ===========================
+
+# PHP / Composer
+vendor/
+composer.lock
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.eggs/
+*.egg-info/
+
+# Sphinx build output (generated, not tracked)
+Docs/_build/
+
+# Uploads (user content)
+uploads/
+
+# JSON flat-file databases (legacy, migrated to MySQL)
+backend/database.json
+backend/users.json
+backend/notifications.json
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+server.log
+
+# Temporary test files
+*.tmp
+test.pdf
+test.docx
+test3.docx
+dummy.pdf
+test_input.md

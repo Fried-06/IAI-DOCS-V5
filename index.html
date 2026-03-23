@@ -1,472 +1,1368 @@
 <!DOCTYPE html>
+
+
 <html lang="fr">
+
+
 <head>
+
+
     <meta charset="UTF-8">
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
     <title>Ressources IAI - Hub de Connaissances</title>
+
+
     <link rel="stylesheet" href="css/style.css">
+
+
     <!-- Google Fonts -->
+
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
+
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+
 </head>
+
+
 <body class="page-fade-in">
 
+
+
+
+
     <!-- Preloader -->
+
+
     <div id="preloader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-out;">
+
+
         <video id="loading-video" src="assets/animated_logo2.mp4" muted playsinline style="width: 100vw; height: 100vh; object-fit: cover;"></video>
+
+
     </div>
+
+
     <script>
+
+
         if (sessionStorage.getItem('visited')) {
+
+
             document.getElementById('preloader').style.display = 'none';
+
+
         } else {
+
+
             const preloader = document.getElementById('preloader');
+
+
             const video = document.getElementById('loading-video');
+
+
             
+
+
             // Allow clicking to dismiss if auto-play is blocked
+
+
             preloader.addEventListener('click', dismissPreloader);
 
+
+
+
+
             // Attempt to play
+
+
             video.play().catch(() => {
+
+
                 // If blocked by browser policy, dismiss after a short delay
+
+
                 setTimeout(dismissPreloader, 3000);
+
+
             });
+
+
+
+
 
             video.addEventListener('ended', dismissPreloader);
 
+
+
+
+
             function dismissPreloader() {
+
+
                 preloader.style.opacity = '0';
+
+
                 setTimeout(() => {
+
+
                     preloader.style.display = 'none';
+
+
                     sessionStorage.setItem('visited', 'true');
+
+
                 }, 500);
+
+
             }
+
+
             
+
+
             // Fallback timeout just in case it hangs
+
+
             setTimeout(dismissPreloader, 8000);
+
+
         }
+
+
     </script>
 
+
+
+
+
     <!-- Navbar -->
+
+
     <nav class="navbar">
+
+
         <div class="container nav-container">
+
+
             <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
-                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+
+
+                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 60px; width: auto; object-fit: contain;">
+
+
             </a>
+
+
             <div class="nav-links">
+
+
                 <ul class="nav-menu">
+
+
                     <li><a href="index.html" class="nav-item">Accueil</a></li>
-                    <li><a href="exams.html" class="nav-item">Examens</a></li>
-                    <li><a href="search.html" class="nav-item">Rechercher</a></li>
+
+
+                    <li><a href="exams.php" class="nav-item">Examens</a></li>
+
+
+                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
+
+
+                    <li><a href="contributors.php" class="nav-item">Contributeurs</a></li>
+
+
                     <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+
+
                 </ul>
+
+
                 <div class="nav-actions">
+
+
                     <button class="theme-toggle" id="theme-toggle" title="Basculer le thème" style="margin-right: 0.5rem;">
+
+
                         <!-- Moon icon default -->
+
+
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+
+
                     </button>
-                    <a href="login.html" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
-                    <a href="login.html" class="btn btn-primary" style="padding: 0.5rem 1rem;">S'inscrire</a>
+
+
+                    <a href="login.html" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+
+
+                    <a href="login.html" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
+
+
                     <!-- Profil is hidden by default, shown via JS if logged in -->
-                    <a href="profile.html" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
+
+
+                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
+
+
                 </div>
+
+
             </div>
+
+
             <button class="mobile-menu-btn">
+
+
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+
+
             </button>
+
+
         </div>
+
+
     </nav>
 
+
+
+
+
     <main>
-        <!-- ═══ HERO SECTION — Modern AI Startup ═══ -->
+
+
+        <!-- ââ¢ââ¢ââ¢ HERO SECTION ââ¬â Modern AI Startup ââ¢ââ¢ââ¢ -->
+
+
         <section class="hero-v12" id="hero">
+
+
             <!-- Animated grid background -->
+
+
             <div class="hero-grid"></div>
+
+
             <!-- Radial glow orbs -->
+
+
             <div class="hero-glow hero-glow-1"></div>
+
+
             <div class="hero-glow hero-glow-2"></div>
+
+
             <div class="hero-glow hero-glow-3"></div>
+
+
             <!-- Mouse spotlight -->
+
+
             <div class="hero-spotlight" id="hero-spotlight"></div>
 
+
+
+
+
             <div class="container hero-v12-content">
+
+
                 <span class="hero-badge anim-fade-up" style="animation-delay:0.1s">
+
+
                     <span class="hero-badge-dot"></span>
+
+
                     Plateforme Académique Open Source
+
+
                 </span>
+
+
                 <h1 class="hero-title anim-fade-up" style="animation-delay:0.25s">
+
+
                     Le Wikipédia de l'<br><span class="gradient-text">IAI-TOGO</span>
+
+
                 </h1>
+
+
                 <p class="hero-subtitle anim-fade-up" style="animation-delay:0.45s">
+
+
                     Accédez aux anciens examens, devoirs et cours structurés des années académiques précédentes de manière centralisée.
+
+
                 </p>
+
+
                 <div class="hero-cta anim-fade-up" style="animation-delay:0.6s">
+
+
                     <a href="pages/L1/index.html" class="btn-glass btn-glass-primary hero-float">
+
+
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+
+
                         Parcourir les Cours
+
+
                     </a>
-                    <a href="search.html" class="btn-glass btn-glass-outline hero-float" style="animation-delay:0.15s">
+
+
+                    <a href="search.php" class="btn-glass btn-glass-outline hero-float" style="animation-delay:0.15s">
+
+
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+
+
                         Explorer les Examens
+
+
                     </a>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
 
-        <!-- ═══ STATISTICS ROW ═══ -->
+
+
+
+
+        <!-- ââ¢ââ¢ââ¢ STATISTICS ROW ââ¢ââ¢ââ¢ -->
+
+
         <section class="stats-section scroll-reveal">
+
+
             <div class="container">
+
+
                 <div class="stats-grid">
+
+
                     <div class="stat-item">
+
+
                         <span class="stat-number" data-target="500">0</span><span class="stat-suffix">+</span>
+
+
                         <span class="stat-label">Examens</span>
+
+
                     </div>
+
+
                     <div class="stat-item">
+
+
                         <span class="stat-number" data-target="120">0</span><span class="stat-suffix">+</span>
+
+
                         <span class="stat-label">Cours</span>
+
+
                     </div>
+
+
                     <div class="stat-item">
+
+
                         <span class="stat-number" data-target="300">0</span><span class="stat-suffix">+</span>
-                        <span class="stat-label">Étudiants</span>
+
+
+                        <span class="stat-label">àâ°tudiants</span>
+
+
                     </div>
+
+
                     <div class="stat-item">
+
+
                         <span class="stat-number" data-target="75">0</span><span class="stat-suffix">+</span>
+
+
                         <span class="stat-label">Matières</span>
+
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
+
+
+
+
 
         <!-- Academic Levels Section -->
+
+
         <section class="section scroll-reveal">
+
+
             <div class="container">
+
+
                 <h2 class="section-title">Niveaux Académiques</h2>
+
+
                 
+
+
                 <div class="grid grid-cols-4">
+
+
                     <!-- L1 -->
+
+
                     <a href="pages/L1/index.html" class="level-card level-l1">
+
+
                         <div class="level-card-img"><img src="assets/l1_cover.png" alt="L1"></div>
+
+
                         <div class="level-icon">
+
+
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
                                 <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+
+
                                 <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+
+
                             </svg>
+
+
                         </div>
+
+
                         <div>
+
+
                             <div class="level-title">Licence 1</div>
+
+
                             <div class="level-desc">Algorithmique, C, Maths Discrètes...</div>
+
+
                         </div>
+
+
                     </a>
+
+
+
+
 
                     <!-- L2 -->
+
+
                     <a href="pages/L2/index.html" class="level-card level-l2">
+
+
                         <div class="level-card-img"><img src="assets/l2_cover.png" alt="L2"></div>
+
+
                         <div class="level-icon">
+
+
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+
+
                                 <line x1="16" y1="2" x2="16" y2="6"></line>
+
+
                                 <line x1="8" y1="2" x2="8" y2="6"></line>
+
+
                                 <line x1="3" y1="10" x2="21" y2="10"></line>
+
+
                             </svg>
+
+
                         </div>
+
+
                         <div>
+
+
                             <div class="level-title">Licence 2</div>
+
+
                             <div class="level-desc">Merise, Prog Web 2, Réseaux...</div>
+
+
                         </div>
+
+
                     </a>
+
+
+
+
 
                     <!-- L3 GLSI -->
+
+
                     <a href="pages/L3/GLSI/index.html" class="level-card level-glsi">
+
+
                         <div class="level-card-img"><img src="assets/glsi_cover.png" alt="GLSI"></div>
+
+
                         <div class="level-icon">
+
+
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
                                 <polyline points="16 18 22 12 16 6"></polyline>
+
+
                                 <polyline points="8 6 2 12 8 18"></polyline>
+
+
                             </svg>
+
+
                         </div>
+
+
                         <div>
+
+
                             <div class="level-title">Licence 3 GLSI</div>
+
+
                             <div class="level-desc">Génie Logiciel, Big Data, JEE...</div>
+
+
                         </div>
+
+
                     </a>
+
+
+
+
 
                     <!-- L3 ASR -->
+
+
                     <a href="pages/L3/ASR/index.html" class="level-card level-asr">
+
+
                         <div class="level-card-img"><img src="assets/asr_cover.png" alt="ASR"></div>
+
+
                         <div class="level-icon">
+
+
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+
                                 <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+
+
                                 <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+
+
                                 <line x1="6" y1="6" x2="6.01" y2="6"></line>
+
+
                                 <line x1="6" y1="18" x2="6.01" y2="18"></line>
+
+
                             </svg>
+
+
                         </div>
+
+
                         <div>
+
+
                             <div class="level-title">Licence 3 ASR</div>
+
+
                             <div class="level-desc">Système Avancé, Sécurité, CCNA...</div>
+
+
                         </div>
+
+
                     </a>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
+
+
+
+
 
         <!-- Recent Exams Section -->
+
+
         <section class="section bg-light scroll-reveal">
+
+
             <div class="container">
+
+
                 <h2 class="section-title">Examens Récents</h2>
+
+
                 
+
+
                 <div class="grid grid-cols-3">
+
+
                     <!-- Exam 1 -->
+
+
                     <div class="exam-card">
+
+
                         <div class="exam-header">
+
+
                             <span class="tag">L1 - S1</span>
+
+
                             <div class="exam-meta">
+
+
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+
+
                                 2023
+
+
                             </div>
+
+
                         </div>
+
+
                         <h3 class="exam-title">Examen Final : Algorithmique</h3>
-                        <a href="subjects/L1/semestre1/algorithmique.html" class="btn btn-outline" style="margin-top: auto;">Voir l'Examen</a>
+
+
+                        <a href="Docs/_build/html/index.html" class="btn btn-outline" style="margin-top: auto;">Voir l'Examen</a>
+
+
                     </div>
+
+
+
+
 
                     <!-- Exam 2 -->
+
+
                     <div class="exam-card">
+
+
                         <div class="exam-header">
+
+
                             <span class="tag">L2 - S3</span>
+
+
                             <div class="exam-meta">
+
+
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+
+
                                 2022
+
+
                             </div>
+
+
                         </div>
+
+
                         <h3 class="exam-title">Projet : Base de Données Implémentation</h3>
-                        <a href="subjects/L2/semestre3/implementation-bd.html" class="btn btn-outline" style="margin-top: auto;">Voir l'Examen</a>
+
+
+                        <a href="Docs/_build/html/index.html" class="btn btn-outline" style="margin-top: auto;">Voir l'Examen</a>
+
+
                     </div>
+
+
+
+
 
                     <!-- Exam 3 -->
+
+
                     <div class="exam-card">
+
+
                         <div class="exam-header">
+
+
                             <span class="tag">L3 GLSI</span>
+
+
                             <div class="exam-meta">
+
+
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+
+
                                 2024
+
+
                             </div>
+
+
                         </div>
+
+
                         <h3 class="exam-title">Devoir Surveillé : Programmation JEE</h3>
-                        <a href="subjects/L3/GLSI/programmation-jee.html" class="btn btn-outline" style="margin-top: auto;">Voir l'Examen</a>
+
+
+                        <a href="Docs/_build/html/index.html" class="btn btn-outline" style="margin-top: auto;">Voir l'Examen</a>
+
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
 
-        <!-- ═══ Vision Timeline Section ═══ -->
+
+
+
+
+        <!-- ââ¢ââ¢ââ¢ Vision Timeline Section ââ¢ââ¢ââ¢ -->
+
+
         <section class="section timeline-section" id="vision">
+
+
             <div class="container">
+
+
                 <h2 class="section-title" style="font-family:'Bebas Neue',sans-serif; font-size: clamp(2.5rem,5vw,4rem); letter-spacing:0.04em;">Notre Vision</h2>
-                <p style="text-align:center; color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.8rem; letter-spacing:0.08em; margin-bottom:3rem;">DE L'IDÉE À LA RÉALITÉ</p>
+
+
+                <p style="text-align:center; color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.8rem; letter-spacing:0.08em; margin-bottom:3rem;">DE L'IDàâ°E àâ¬ LA Ràâ°ALITàâ°</p>
+
+
+
+
 
                 <div class="timeline">
+
+
                     <!-- The animated vertical line -->
+
+
                     <div class="timeline-line">
+
+
                         <div class="timeline-line-fill" id="timeline-fill"></div>
+
+
                     </div>
 
-                    <!-- Step 1 — Left -->
+
+
+
+
+                    <!-- Step 1 ââ¬â Left -->
+
+
                     <div class="timeline-item tl-left tl-reveal">
+
+
                         <div class="timeline-node"></div>
+
+
                         <div class="timeline-card">
+
+
                             <div class="timeline-img-wrap">
+
+
                                 <img src="images/image1.png" alt="Problème" loading="lazy">
+
+
                             </div>
-                            <span class="timeline-step">ÉTAPE 01</span>
+
+
+                            <span class="timeline-step">àâ°TAPE 01</span>
+
+
                             <h3>Des ressources dispersées</h3>
+
+
                             <p>Les cours, TD et examens sont souvent éparpillés entre différents groupes et plateformes, ce qui rend la révision difficile.</p>
+
+
                         </div>
+
+
                     </div>
 
-                    <!-- Step 2 — Right -->
+
+
+
+
+                    <!-- Step 2 ââ¬â Right -->
+
+
                     <div class="timeline-item tl-right tl-reveal">
+
+
                         <div class="timeline-node"></div>
+
+
                         <div class="timeline-card">
+
+
                             <div class="timeline-img-wrap">
+
+
                                 <img src="images/image2.png" alt="Centralisation" loading="lazy">
+
+
                             </div>
-                            <span class="timeline-step">ÉTAPE 02</span>
+
+
+                            <span class="timeline-step">àâ°TAPE 02</span>
+
+
                             <h3>Centraliser les ressources</h3>
+
+
                             <p>IAI Docs rassemble cours, TD, examens et explications pédagogiques en un seul endroit pour faciliter la révision.</p>
+
+
                         </div>
+
+
                     </div>
 
-                    <!-- Step 3 — Left -->
+
+
+
+
+                    <!-- Step 3 ââ¬â Left -->
+
+
                     <div class="timeline-item tl-left tl-reveal">
+
+
                         <div class="timeline-node"></div>
+
+
                         <div class="timeline-card">
+
+
                             <div class="timeline-img-wrap">
+
+
                                 <img src="images/image3.png" alt="Communauté" loading="lazy">
+
+
                             </div>
-                            <span class="timeline-step">ÉTAPE 03</span>
+
+
+                            <span class="timeline-step">àâ°TAPE 03</span>
+
+
                             <h3>Une communauté étudiante</h3>
+
+
                             <p>Les étudiants contribuent ensemble en partageant leurs notes, leurs corrections et leurs explications.</p>
+
+
                         </div>
+
+
                     </div>
 
-                    <!-- Step 4 — Right -->
+
+
+
+
+                    <!-- Step 4 ââ¬â Right -->
+
+
                     <div class="timeline-item tl-right tl-reveal">
+
+
                         <div class="timeline-node"></div>
+
+
                         <div class="timeline-card">
+
+
                             <div class="timeline-img-wrap">
+
+
                                 <img src="images/image4.png" alt="Intelligence" loading="lazy">
+
+
                             </div>
-                            <span class="timeline-step">ÉTAPE 04</span>
+
+
+                            <span class="timeline-step">àâ°TAPE 04</span>
+
+
                             <h3>Un hub d'apprentissage intelligent</h3>
+
+
                             <p>Grâce à l'intelligence artificielle, les étudiants pourront obtenir des explications, des exemples et une aide personnalisée directement à partir de leurs cours.</p>
+
+
                         </div>
+
+
                     </div>
 
-                    <!-- Step 5 — Left -->
+
+
+
+
+                    <!-- Step 5 ââ¬â Left -->
+
+
                     <div class="timeline-item tl-left tl-reveal">
+
+
                         <div class="timeline-node"></div>
+
+
                         <div class="timeline-card">
+
+
                             <div class="timeline-img-wrap">
+
+
                                 <img src="images/image5.png" alt="Expansion" loading="lazy">
+
+
                             </div>
-                            <span class="timeline-step">ÉTAPE 05</span>
+
+
+                            <span class="timeline-step">àâ°TAPE 05</span>
+
+
                             <h3>Une plateforme pour tous les IAI</h3>
+
+
                             <p>L'objectif est d'étendre la plateforme pour regrouper les ressources de toutes les représentations IAI.</p>
+
+
                         </div>
+
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
+
+
+
+
 
     </main>
 
 
-        <!-- ═══ WHY USE IAI DOCS ═══ -->
+
+
+
+
+
+
+        <!-- ââ¢ââ¢ââ¢ WHY USE IAI DOCS ââ¢ââ¢ââ¢ -->
+
+
         <section class="section why-section scroll-reveal" id="why">
+
+
             <div class="container">
+
+
                 <span class="section-badge">Pourquoi nous choisir</span>
+
+
                 <h2 class="section-title-v12">Pourquoi utiliser <span class="gradient-text">IAI Docs</span> ?</h2>
+
+
                 <div class="why-grid">
+
+
                     <div class="why-card scroll-reveal">
+
+
                         <div class="why-icon" style="--accent:var(--cyan)">
+
+
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+
+
                         </div>
+
+
                         <h3>Centralisé</h3>
+
+
                         <p>Tous les cours, TD, examens et corrections rassemblés en un seul endroit accessible à tout moment.</p>
+
+
                     </div>
+
+
                     <div class="why-card scroll-reveal">
+
+
                         <div class="why-icon" style="--accent:var(--purple)">
+
+
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+
+
                         </div>
+
+
                         <h3>Communautaire</h3>
+
+
                         <p>Construit par les étudiants, pour les étudiants. Chacun contribue avec ses notes et corrections.</p>
+
+
                     </div>
+
+
                     <div class="why-card scroll-reveal">
+
+
                         <div class="why-icon" style="--accent:var(--green)">
+
+
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+
+
                         </div>
+
+
                         <h3>Structuré</h3>
+
+
                         <p>Organisation par niveau, semestre et matière. Navigation intuitive pour trouver rapidement ce dont vous avez besoin.</p>
+
+
                     </div>
+
+
                     <div class="why-card scroll-reveal">
+
+
                         <div class="why-icon" style="--accent:var(--amber)">
+
+
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+
+
                         </div>
-                        <h3>Évolutif</h3>
+
+
+                        <h3>àâ°volutif</h3>
+
+
                         <p>Nouvelles ressources ajoutées chaque année. La plateforme grandit avec chaque nouvelle promotion.</p>
+
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
 
-        <!-- ═══ CONTRIBUTE CTA ═══ -->
+
+
+
+
+        <!-- ââ¢ââ¢ââ¢ CONTRIBUTE CTA ââ¢ââ¢ââ¢ -->
+
+
         <section class="section cta-section scroll-reveal" id="contribute-cta">
+
+
             <div class="container">
+
+
                 <div class="cta-box">
+
+
                     <div class="cta-glow"></div>
+
+
                     <span class="section-badge" style="margin-bottom:1rem">Open Source</span>
+
+
                     <h2 class="section-title-v12" style="margin-bottom:1rem">Rejoignez la <span class="gradient-text">communauté</span></h2>
+
+
                     <p style="color:var(--muted);max-width:500px;margin:0 auto 2rem;font-size:1.05rem;line-height:1.7">
+
+
                         Partagez vos cours, corrections et examens pour aider les promotions futures. Chaque contribution compte.
+
+
                     </p>
+
+
                     <a href="contribute.html" class="btn-glass btn-glass-primary" style="display:inline-flex">
+
+
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+
+
                         Contribuer maintenant
+
+
                     </a>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
+
+
+
+
 
     <!-- Footer -->
+
+
     <footer class="footer">
+
+
         <div class="container">
+
+
             <div class="footer-grid">
+
+
                 <!-- About -->
+
+
                 <div class="footer-col">
-                    <h3>À propos de l'IAI</h3>
+
+
+                    <h3>àâ¬ propos de l'IAI</h3>
+
+
                     <p class="footer-text">L'Institut Africain d'Informatique est une institution d'excellence dédiée à la formation des ingénieurs et techniciens supérieurs en informatique. Notre communauté partage ses ressources pour la réussite de tous.</p>
+
+
                 </div>
 
+
+
+
+
                 <!-- Links -->
+
+
                 <div class="footer-col">
+
+
                     <h3>Liens Rapides</h3>
+
+
                     <div class="footer-links">
+
+
                         <a href="index.html">Accueil</a>
+
+
                         <a href="pages/L1/index.html">Cours</a>
-                        <a href="search.html">Examens</a>
+
+
+                        <a href="exams.php">Examens</a>
+
+
+                        <a href="search.php">Rechercher</a>
+
+
+                        <a href="contributors.php">Contributeurs</a>
+
+
                         <a href="contribute.html">Contribuer</a>
-                        <a href="contact.html">Contact</a>
+
+
                     </div>
+
+
                 </div>
+
+
+
+
 
                 <!-- Creators -->
                 <div class="footer-col">
                     <h3>Créateurs</h3>
                     <div class="creator-list">
-                        <div class="creator-item">
-                            <div class="creator-avatar">ED</div>
+                        <a href="#" class="creator-item" style="text-decoration:none; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div class="creator-avatar">DK</div>
                             <span class="creator-name">DOSSOU Komlan Krist</span>
-                        </div>
-                        <div class="creator-item">
-                            <div class="creator-avatar">DS</div>
+                        </a>
+                        <a href="#" class="creator-item" style="text-decoration:none; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div class="creator-avatar">AB</div>
                             <span class="creator-name">ADZEVI Boris</span>
-                        </div>
-                        <div class="creator-item">
-                            <div class="creator-avatar">A3</div>
+                        </a>
+                        <a href="#" class="creator-item" style="text-decoration:none; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div class="creator-avatar">KM</div>
                             <span class="creator-name">KOFFI Mikaela</span>
-                        </div>
-                        <div class="creator-item">
-                            <div class="creator-avatar">D4</div>
+                        </a>
+                        <a href="#" class="creator-item" style="text-decoration:none; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div class="creator-avatar">NF</div>
                             <span class="creator-name">NOUGNANKEY Faure</span>
-                        </div>
-                        <div class="creator-item">
-                            <div class="creator-avatar">C5</div>
+                        </a>
+                        <a href="#" class="creator-item" style="text-decoration:none; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div class="creator-avatar">SW</div>
                             <span class="creator-name">SAMBO Wilfried</span>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Contact Form -->
+
+
                 <div class="footer-col">
+
+
                     <h3>Contactez-nous</h3>
+
+
                     <form class="footer-form" action="backend/contact.php" method="POST">
+
+
                         <input type="text" name="name" placeholder="Votre Nom" required>
+
+
                         <input type="email" name="email" placeholder="Votre Email" required>
+
+
                         <textarea name="message" rows="3" placeholder="Votre Message" required></textarea>
+
+
                         <button type="submit" class="btn btn-accent" style="width: 100%;">Envoyer</button>
+
+
                     </form>
+
+
                 </div>
+
+
             </div>
+
+
             <div class="footer-bottom">
+
+
                 <p>&copy; 2026 IAIDOCS. Tous droits réservés.</p>
+
+
                 <div class="social-links">
+
+
                     <!-- Placeholder social icons -->
+
+
                 </div>
+
+
             </div>
+
+
         </div>
+
+
     </footer>
 
+
+
+
+
     <script src="js/main.js"></script>
+
+
 </body>
+
+
 </html>
+
+
