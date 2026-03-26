@@ -523,9 +523,9 @@ try {
 
                     <li><a href="index.html" class="nav-item">Accueil</a></li>
 
-                    <li><a href="exams.html" class="nav-item">Examens</a></li>
+                    <li><a href="exams.php" class="nav-item">Examens</a></li>
 
-                    <li><a href="search.html" class="nav-item">Rechercher</a></li>
+                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
 
                     <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
 
@@ -573,9 +573,9 @@ try {
 
                 <div class="profile-info">
 
-                    <h1><?= htmlspecialchars($username) ?></h1>
+                    <h1><i><?= htmlspecialchars($username) ?></i></h1>
 
-                    <p class="profile-email"><?= htmlspecialchars($email) ?></p>
+                    <p class="profile-email"><b style="color: #00c4a7;"><?= htmlspecialchars($email) ?></p></b>
 
                     <div class="profile-badges">
 
@@ -583,13 +583,13 @@ try {
 
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
 
-                            <?= $uploadCount ?> document(s) validé(s)
+                            <b><?= $uploadCount ?> document(s) validé(s)</b>
 
                         </div>
 
                         <div class="badge badge-rank">
 
-                            <?= $rankIcon ?> <?= $rankLabel ?>
+                            <b><?= $rankIcon ?> <?= $rankLabel ?></b>
 
                         </div>
 
@@ -599,7 +599,7 @@ try {
 
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"></line><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"></line></svg>
 
-                            Membre depuis le <?= $memberSince ?>
+                            <b>Membre depuis le <?= $memberSince ?></b>
 
                         </div>
 
@@ -627,7 +627,7 @@ try {
 
             <div class="dash-card">
 
-                <h2>ð Vos Documents</h2>
+                <h2><i> Vos Documents</i></h2>
 
                 <?php if (empty($userDocs)): ?>
 
@@ -707,7 +707,7 @@ try {
 
                 <div class="dash-card" style="margin-bottom: 1.5rem;">
 
-                    <h2>ð Statistiques</h2>
+                    <h2><i>Vos Statistiques</i></h2>
 
                     <div class="stat-box">
 
@@ -741,7 +741,7 @@ try {
 
                 <div class="dash-card">
 
-                    <h2>â¡ Actions</h2>
+                    <h2><i> Actions</i></h2>
 
                     <a href="contribute.html" class="action-btn action-primary">Ajouter un Document</a>
 

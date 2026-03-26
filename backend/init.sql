@@ -123,12 +123,19 @@ INSERT IGNORE INTO years (year) VALUES (2024), (2025), (2026);
 -- Seed Levels
 INSERT IGNORE INTO levels (name) VALUES ('L1'), ('L2'), ('L3 GLSI'), ('L3 ASR');
 
+-- Cleanup any invalid semesters that were previously inserted
+DELETE s FROM semesters s
+JOIN levels l ON s.level_id = l.id
+WHERE (l.name = 'L1' AND s.name NOT IN ('Semestre 1', 'Semestre 2'))
+   OR (l.name = 'L2' AND s.name NOT IN ('Semestre 3', 'Semestre 4'))
+   OR (l.name IN ('L3 GLSI', 'L3 ASR') AND s.name NOT IN ('Semestre 5', 'Semestre 6'));
+
 -- Seed Semesters (2 per level)
 INSERT IGNORE INTO semesters (level_id, name)
 SELECT l.id, s.name
 FROM levels l
 CROSS JOIN (SELECT 'Semestre 1' AS name UNION SELECT 'Semestre 2') s
-WHERE l.name IN ('L1', 'L2')
+WHERE l.name = 'L1'
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 INSERT IGNORE INTO semesters (level_id, name)
@@ -147,8 +154,10 @@ ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 -- Seed Document Types
 INSERT IGNORE INTO document_types (name) VALUES
+    ('cours'),
     ('devoir'),
     ('partiel'),
-    ('corrige'),
-    ('cours'),
-    ('td_tp');
+    ('exercice'),
+    ('corrige_devoir'),
+    ('corrige_exercice'),
+    ('corrige_partiel');

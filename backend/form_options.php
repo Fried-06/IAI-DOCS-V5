@@ -41,7 +41,7 @@ try {
             break;
 
         case 'types':
-            $stmt = $pdo->query("SELECT id, name FROM document_types ORDER BY name");
+            $stmt = $pdo->query("SELECT id, name FROM document_types WHERE name IN ('devoir', 'corrige_devoir', 'partiel', 'corrige_partiel') ORDER BY name");
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             break;
 

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // contributors.php à¢€” Enhanced Contributors Page with ranks
 
@@ -82,6 +82,20 @@ function getRank($count) {
 }
 
 
+// Safe string helpers to prevent crashes if mbstring is missing
+function safe_strtoupper($str) {
+    if (function_exists('mb_strtoupper')) {
+        return mb_strtoupper($str, 'UTF-8');
+    }
+    return strtoupper($str);
+}
+
+function safe_substr($str, $start, $length = null) {
+    if (function_exists('mb_substr')) {
+        return mb_substr($str, $start, $length, 'UTF-8');
+    }
+    return substr($str, $start, $length);
+}
 
 $totalContributors = count($contributors);
 
@@ -485,11 +499,11 @@ $totalContributors = count($contributors);
 
                     $c = $contributors[$i];
 
-                    $nameInitials = strtoupper(substr($c['name'], 0, 1));
+                    $nameInitials = safe_strtoupper(safe_substr($c['name'], 0, 1));
 
                     $parts = explode(' ', $c['name']);
 
-                    if (count($parts) > 1) $nameInitials .= strtoupper(substr($parts[1], 0, 1));
+                    if (count($parts) > 1) $nameInitials .= safe_strtoupper(safe_substr($parts[1], 0, 1));
 
                 ?>
 
@@ -523,11 +537,11 @@ $totalContributors = count($contributors);
 
                     $rankClass = strtolower($rank[0]);
 
-                    $nameInitials = mb_strtoupper(mb_substr($c['name'], 0, 1));
+                    $nameInitials = safe_strtoupper(safe_substr($c['name'], 0, 1));
 
                     $parts = explode(' ', $c['name']);
 
-                    if (count($parts) > 1) $nameInitials .= mb_strtoupper(mb_substr($parts[1], 0, 1));
+                    if (count($parts) > 1) $nameInitials .= safe_strtoupper(safe_substr($parts[1], 0, 1));
 
                 ?>
 

@@ -40,7 +40,7 @@ try {
          JOIN document_types dt ON d.type_id = dt.id
          JOIN years y ON d.year_id = y.id
          LEFT JOIN users u ON d.user_id = u.id
-         WHERE d.status = 'approved'
+         WHERE d.status = 'approved' AND dt.name IN ('partiel', 'corrige_partiel')
          ORDER BY l.name, sem.name, s.name, y.year DESC"
     );
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
