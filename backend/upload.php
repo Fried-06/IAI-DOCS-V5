@@ -31,13 +31,58 @@ try {
     $pdo = getDB();
 
     $dupStmt = $pdo->prepare(
-        "SELECT id FROM documents 
+        "SELECT id, file_path FROM documents 
          WHERE subject_id = ? AND type_id = ? AND year_id = ? AND status = 'approved' 
          LIMIT 1"
     );
     $dupStmt->execute([$subjectId, $typeId, $yearId]);
-    if ($dupStmt->fetch()) {
-        echo "<script>alert('Erreur: Un document approuvé existe déjà pour cette matière, ce type et cette année.'); window.history.back();</script>";
+    $existingDoc = $dupStmt->fetch(PDO::FETCH_ASSOC);
+
+    $isDuplicate = false;
+
+    if ($existingDoc) {
+        $isDuplicate = true;
+        // If it's in DB, check if the actual HTML file is a placeholder
+        if (!empty($existingDoc['file_path'])) {
+            $htmlPath = __DIR__ . '/../Docs/_build/html/' . ltrim($existingDoc['file_path'], '/');
+            if (file_exists($htmlPath)) {
+                $htmlContent = file_get_contents($htmlPath);
+                if (strpos($htmlContent, 'Aucun contenu disponible pour le moment') !== false) {
+                    $isDuplicate = false; // It's a placeholder, we can overwrite
+                }
+            }
+        }
+    } else {
+        // Not in DB, but check if predicted file exists and has real content
+        $metaStmt = $pdo->prepare("
+            SELECT s.name AS s_name, sem.name AS sem_name, l.name AS l_name, dt.name AS type_name, y.year
+            FROM subjects s
+            JOIN semesters sem ON s.semester_id = sem.id
+            JOIN levels l ON sem.level_id = l.id
+            CROSS JOIN document_types dt
+            CROSS JOIN years y
+            WHERE s.id = ? AND dt.id = ? AND y.id = ?
+        ");
+        $metaStmt->execute([$subjectId, $typeId, $yearId]);
+        if ($meta = $metaStmt->fetch(PDO::FETCH_ASSOC)) {
+            $subjectSlug = strtolower(trim(preg_replace('/[^a-zA-Z0-9_-]/', '_', $meta['s_name']), '_'));
+            $levelSlug = preg_replace('/\s+/', '_', $meta['l_name']);
+            $semesterSlug = preg_replace('/\s+/', '', strtolower($meta['sem_name']));
+            
+            $predictedPath = "$levelSlug/$semesterSlug/$subjectSlug/{$meta['type_name']}/{$meta['year']}.html";
+            $htmlPath = __DIR__ . '/../Docs/_build/html/' . $predictedPath;
+            
+            if (file_exists($htmlPath)) {
+                $htmlContent = file_get_contents($htmlPath);
+                if (strpos($htmlContent, 'Aucun contenu disponible pour le moment') === false) {
+                    $isDuplicate = true; // Contains real content without DB entry!
+                }
+            }
+        }
+    }
+
+    if ($isDuplicate) {
+        echo "<script>alert('Erreur: Un document existant avec du contenu réel a déjà été validé pour cette matière, ce type et cette année.'); window.history.back();</script>";
         exit;
     }
 } catch (\PDOException $e) {

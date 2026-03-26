@@ -45,11 +45,4 @@ Ressources disponibles :
 
 **Corrige**
 
-- `2020 <corrige/2020.html>`_
-- `2021 <corrige/2021.html>`_
-- `2022 <corrige/2022.html>`_
-- `2023 <corrige/2023.html>`_
-- `2024 <corrige/2024.html>`_
-- `2025 <corrige/2025.html>`_
-- `2026 <corrige/2026.html>`_
-
+- `Accéder aux corrigés <corrige/index.html>`_

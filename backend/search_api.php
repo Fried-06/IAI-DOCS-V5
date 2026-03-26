@@ -13,6 +13,10 @@ $subjectId  = intval($_GET['subject_id'] ?? 0);
 $typeId     = intval($_GET['type_id'] ?? 0);
 $yearId     = intval($_GET['year_id'] ?? 0);
 
+$levelStr   = trim($_GET['level'] ?? '');
+$semesterStr= trim($_GET['semester'] ?? '');
+$typeStr    = trim($_GET['type'] ?? '');
+
 // Base URL for document links (configurable)
 $docsBaseUrl = '/Docs/_build/html/';
 
@@ -40,9 +44,17 @@ try {
         $sql .= " AND l.id = ?";
         $params[] = $levelId;
     }
+    if ($levelStr !== '') {
+        $sql .= " AND l.name = ?";
+        $params[] = str_replace('_', ' ', $levelStr);
+    }
     if ($semesterId > 0) {
         $sql .= " AND sem.id = ?";
         $params[] = $semesterId;
+    }
+    if ($semesterStr !== '') {
+        $sql .= " AND sem.name = ?";
+        $params[] = $semesterStr;
     }
     if ($subjectId > 0) {
         $sql .= " AND s.id = ?";
@@ -51,6 +63,10 @@ try {
     if ($typeId > 0) {
         $sql .= " AND dt.id = ?";
         $params[] = $typeId;
+    }
+    if ($typeStr !== '') {
+        $sql .= " AND dt.name = ?";
+        $params[] = $typeStr;
     }
     if ($yearId > 0) {
         $sql .= " AND y.id = ?";
@@ -73,7 +89,8 @@ try {
     foreach ($results as $row) {
         $link = '#';
         if (!empty($row['file_path'])) {
-            $link = $docsBaseUrl . $row['file_path'];
+            $cleanedPath = ltrim($row['file_path'], '/');
+            $link = $docsBaseUrl . $cleanedPath;
         }
 
         $output[] = [

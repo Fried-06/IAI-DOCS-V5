@@ -15,7 +15,7 @@ __pycache__/
 *.egg-info/
 
 # Sphinx build output (generated, not tracked)
-Docs/_build/
+#Docs/_build/
 
 # Uploads (user content)
 uploads/

@@ -1,4 +1,4 @@
-$baseDir = "C:\Users\MSI\Music\IAI_MENTORIA\iai-resources"
+$baseDir = "C:\Users\MSI\Music\IAI_MENTORIA5 - Copie\iai-resources"
 
 $structure = @{
     "L1" = @{
@@ -296,38 +296,77 @@ foreach ($levelKey in $structure.Keys) {
                 <!-- Content -->
                 <div class="subject-content year-panels">
 "@
+            # Build the docs base path (relative from subjects page to Docs/_build/html)
+            # subjects/<level>/<sem>/<matiere>.html → ../../../../... depth varies
+            $docsRelPath = ""
+            if ($levelKey.StartsWith("L3")) { $docsRelPath = "../../../../Docs/_build/html" }
+            else { $docsRelPath = "../../../Docs/_build/html" }
+
+            # Map level key to Docs folder name
+            $docsLevel = $dirKey  # e.g. "L1", "L2", "L3/GLSI" -> need PascalCase
+            if ($levelKey -eq "L3-GLSI") { $docsLevel = "L3_GLSI" }
+            elseif ($levelKey -eq "L3-ASR") { $docsLevel = "L3_ASR" }
+            
+            # Map semester key to Docs folder name (e.g. semestre1 -> Semestre1)
+            $docsSem = $sem.Substring(0,1).ToUpper() + $sem.Substring(1)  # Semestre1
+
             # Generate panels for each year
             for ($year=2026; $year -ge 2020; $year--) {
                 $activeClassPanel = if ($year -eq 2026) { "active" } else { "" }
+                
+                # Map matiere slug to Docs folder name (PascalCase)
+                # Use the nom for display; derive folder name from $matiere slug
+                $nomCamel = ($structure[$levelKey].semestres[$sem].noms[$matiere] -replace "[^\w\s]","") -replace " ","_"
+                $docsSubject = $nomCamel
+                
+                # Build relative base for this subject's docs
+                $docsBase = "$docsRelPath/$docsLevel/$docsSem/$docsSubject"
+
                 $htmlSubj += @"
                     <div id="panel-$year" class="year-panel $activeClassPanel">
                         <h2 style="color: var(--primary); margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Ressources de l'année $year</h2>
                         <div class="resource-grid">
+                            <!-- 
                             <div class="resource-card">
                                 <h3 style="margin-bottom: 1rem; color: var(--text-main);">Cours</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Fascicules et diaporamas du professeur.</p>
                                 <a href="#" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
                             </div>
+                            -->
                             <div class="resource-card">
                                 <h3 style="margin-bottom: 1rem; color: var(--text-main);">Devoirs</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Sujets de devoirs surveillés et TPs.</p>
-                                <a href="#" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
+                                <a href="$docsBase/devoir/$year.html" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
                             </div>
                             <div class="resource-card">
                                 <h3 style="margin-bottom: 1rem; color: var(--text-main);">Partiels</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Examens finaux et de session normale.</p>
-                                <a href="#" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
+                                <a href="$docsBase/partiel/$year.html" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
                             </div>
+                            <!--
                             <div class="resource-card">
                                 <h3 style="margin-bottom: 1rem; color: var(--text-main);">Exercices</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Fiches d'exercices d'entraînement.</p>
                                 <a href="#" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
                             </div>
+                            -->
                             <div class="resource-card">
-                                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Corrigés</h3>
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Solutions détaillées des épreuves.</p>
-                                <a href="#" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
+                                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Corrigé Partiel</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Solutions des examens partiels.</p>
+                                <a href="$docsBase/corrige/corrige_partiel/$year.html" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
                             </div>
+                            <div class="resource-card">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Corrigé Devoir</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Solutions des devoirs surveillés.</p>
+                                <a href="$docsBase/corrige/corrige_devoir/$year.html" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">Consulter</a>
+                            </div>
+                            <!--
+                            <div class="resource-card">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Corrigé Exercice</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Solutions des fiches d'exercices.</p>
+                                <a href="#" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;" data-doc-path="$docsBase/corrige/corrige_exercice/$year.md">Consulter</a>
+                            </div>
+                            -->
                         </div>
                     </div>
 "@

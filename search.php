@@ -348,17 +348,17 @@
 
                         <option value="">Tous les semestres</option>
 
-                        <option value="Semestre1">Semestre 1</option>
+                        <option value="Semestre 1">Semestre 1</option>
 
-                        <option value="Semestre2">Semestre 2</option>
+                        <option value="Semestre 2">Semestre 2</option>
 
-                        <option value="Semestre3">Semestre 3</option>
+                        <option value="Semestre 3">Semestre 3</option>
 
-                        <option value="Semestre4">Semestre 4</option>
+                        <option value="Semestre 4">Semestre 4</option>
 
-                        <option value="Semestre5">Semestre 5</option>
+                        <option value="Semestre 5">Semestre 5</option>
 
-                        <option value="Semestre6">Semestre 6</option>
+                        <option value="Semestre 6">Semestre 6</option>
 
                     </select>
 
@@ -366,11 +366,13 @@
 
                         <option value="">Tous les types</option>
 
-                        <option value="exam">Examen</option>
+                        <option value="devoir">Devoirs</option>
 
-                        <option value="course">Cours</option>
+                        <option value="corrige_devoir">Corrigés de Devoirs</option>
 
-                        <option value="assignment">Devoir / TP</option>
+                        <option value="partiel">Partiels</option>
+
+                        <option value="corrige_partiel">Corrigés de Partiels</option>
 
                     </select>
 
