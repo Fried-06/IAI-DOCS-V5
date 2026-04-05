@@ -50,3 +50,4 @@ test_input.md
 
 # Secrets
 .env
+.env.example
