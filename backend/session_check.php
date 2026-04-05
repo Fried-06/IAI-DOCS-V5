@@ -49,6 +49,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         'user_id'      => $_SESSION['user_id'] ?? '',
         'username'     => $username,
         'email'        => $_SESSION['user_email'] ?? '',
+        'is_admin'     => (($_SESSION['user_role'] ?? '') === 'admin'),
         'initials'     => $initials,
         'upload_count' => $uploadCount,
         'rank'         => $rank,

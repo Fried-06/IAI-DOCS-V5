@@ -1,4 +1,4 @@
-Corrige devoir
+Corrige Devoir
 ==============
 
 .. toctree::

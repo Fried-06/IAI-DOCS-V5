@@ -1,17 +1,16 @@
-Semestre5
-=========
+Semestre 5
+==========
 
 .. toctree::
    :maxdepth: 2
-   :caption: Matières
 
    Administration_Systeme_Avancee/index
-   Securite_Reseaux/index
+   Analyse_Numerique/index
+   Anglais_Professionnel/index
    CCNA3/index
-   Virtualisation/index
+   Entrepreneuriat/index
+   Management_de_Projet/index
+   Securite_Reseaux/index
    Services_Reseaux/index
    Supervision_Reseaux/index
-   Anglais_Professionnel/index
-   Management_de_Projet/index
-   Entrepreneuriat/index
-   Analyse_Numerique/index
+   Virtualisation/index

@@ -1,201 +1,403 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recherche - Ressources IAI</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        .search-hero {
-            padding: 4rem 0;
-            background-color: var(--primary);
-            color: white;
-            text-align: center;
-        }
-        .search-hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .search-bar-container {
-            max-width: 700px;
-            margin: 0 auto;
-            position: relative;
-        }
-        .search-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            padding-left: 3.5rem;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-lg);
-            outline: none;
-        }
-        .search-icon {
-            position: absolute;
-            left: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            width: 20px;
-            height: 20px;
-        }
-        .search-filters {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .filter-btn {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-        .filter-btn:hover, .filter-btn.active {
-            background-color: var(--accent);
-            border-color: var(--accent);
-        }
-    </style>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-</head>
-<body class="page-fade-in">
-    <!-- Navbar (Same as index) -->
-    <nav class="navbar">
-        <div class="container nav-container">
-            <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
-                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
-            </a>
-            <div class="nav-links">
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="nav-item">Accueil</a></li>
-                    <li><a href="exams.php" class="nav-item">Examens</a></li>
-                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
-                    <li><a href="contributors.php" class="nav-item">Contributeurs</a></li>
-                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
-                </ul>
-                <div class="nav-actions">
-                    <button class="theme-toggle" id="theme-toggle" title="Basculer le thème" style="margin-right: 0.5rem;">
-                        <!-- Moon icon default -->
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    </button>
-                    <a href="login.html" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
-                    <a href="login.html" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
-                    <!-- Profil is hidden by default, shown via JS if logged in -->
-                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
-                </div>
-            </div>
-            <button class="mobile-menu-btn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-        </div>
-    </nav>
-
-    <main>
-        <section class="search-hero">
-            <div class="container">
-                <h1>Rechercher des Ressources</h1>
-                <div class="search-bar-container">
-                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" class="search-input" placeholder="Rechercher par matière, cours, année...">
-                </div>
-                <div class="search-filters" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
-                    <select class="form-control" style="width: 200px; background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                        <option value="" style="color: black;">Tous les niveaux</option>
-                        <option value="L1" style="color: black;">Licence 1</option>
-                        <option value="L2" style="color: black;">Licence 2</option>
-                        <option value="L3_GLSI" style="color: black;">Licence 3 GLSI</option>
-                        <option value="L3_ASR" style="color: black;">Licence 3 ASR</option>
-                    </select>
-                    <select class="form-control" style="width: 200px; background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                        <option value="" style="color: black;">Tous les semestres</option>
-                        <option value="S1" style="color: black;">Semestre 1</option>
-                        <option value="S2" style="color: black;">Semestre 2</option>
-                        <option value="S3" style="color: black;">Semestre 3</option>
-                        <option value="S4" style="color: black;">Semestre 4</option>
-                        <option value="S5" style="color: black;">Semestre 5</option>
-                        <option value="S6" style="color: black;">Semestre 6</option>
-                    </select>
-                    <select class="form-control" style="width: 200px; background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                        <option value="" style="color: black;">Toutes les matières</option>
-                        <option value="algo" style="color: black;">Algorithmique</option>
-                        <option value="c" style="color: black;">Langage C</option>
-                        <option value="db" style="color: black;">Bases de données</option>
-                        <option value="reseaux" style="color: black;">Réseaux</option>
-                        <option value="autres" style="color: black;">... autres matières</option>
-                    </select>
-                    <button class="btn btn-accent" style="padding: 0.5rem 1.5rem;">Filtrer</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">Résultats de la recherche</h2>
-                <div class="grid grid-cols-3">
-                    
-                    <!-- Result Card 1 -->
-                    <div class="exam-card">
-                        <div class="exam-header">
-                            <span class="tag">Examen</span>
-                            <div class="exam-meta">2023 - L1</div>
-                        </div>
-                        <h3 class="exam-title">Algorithmique - Session Principale</h3>
-                        <p class="exam-meta" style="margin-top: 0.5rem;">Pr. Ndiaye</p>
-                        <a href="subjects/L1/semestre1/algorithmique.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
-                    </div>
-
-                    <!-- Result Card 2 -->
-                    <div class="exam-card">
-                        <div class="exam-header">
-                            <span class="tag">Cours</span>
-                            <div class="exam-meta">Chapitre 4</div>
-                        </div>
-                        <h3 class="exam-title">Programmation Objet (Java)</h3>
-                        <p class="exam-meta" style="margin-top: 0.5rem;">Polycopier L2 S3</p>
-                        <a href="subjects/L2/semestre3/java-poo.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
-                    </div>
-
-                    <!-- Result Card 3 -->
-                    <div class="exam-card">
-                        <div class="exam-header">
-                            <span class="tag">Devoir</span>
-                            <div class="exam-meta">2024 - L3</div>
-                        </div>
-                        <h3 class="exam-title">Mini-Projet Big Data</h3>
-                        <p class="exam-meta" style="margin-top: 0.5rem;">Hadoop & Spark</p>
-                        <a href="subjects/L3/GLSI/big-data.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
-                    </div>
-
-                    <!-- Result Card 4 -->
-                    <div class="exam-card">
-                        <div class="exam-header">
-                            <span class="tag">Examen</span>
-                            <div class="exam-meta">2022 - L3 ASR</div>
-                        </div>
-                        <h3 class="exam-title">Administration Réseaux CCNA 3</h3>
-                        <p class="exam-meta" style="margin-top: 0.5rem;">Examen Final</p>
-                        <a href="subjects/L3/ASR/ccna3.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2026 Ressources IAI. Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
-<script src="js/main.js"></script>
-</body>
-</html>
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Recherche - Ressources IAI</title>
+
+    <link rel="stylesheet" href="css/style.css?v=2">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+
+        .search-hero {
+
+            padding: 4rem 0;
+
+            background-color: var(--primary);
+
+            color: white;
+
+            text-align: center;
+
+        }
+
+        .search-hero h1 {
+
+            font-size: 2.5rem;
+
+            margin-bottom: 1.5rem;
+
+        }
+
+        .search-bar-container {
+
+            max-width: 700px;
+
+            margin: 0 auto;
+
+            position: relative;
+
+        }
+
+        .search-input {
+
+            width: 100%;
+
+            padding: 1rem 1.5rem;
+
+            padding-left: 3.5rem;
+
+            font-size: 1.1rem;
+
+            border: none;
+
+            border-radius: var(--radius-xl);
+
+            box-shadow: var(--shadow-lg);
+
+            outline: none;
+
+        }
+
+        .search-icon {
+
+            position: absolute;
+
+            left: 1.25rem;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: var(--text-muted);
+
+            width: 20px;
+
+            height: 20px;
+
+        }
+
+        .search-filters {
+
+            display: flex;
+
+            gap: 1rem;
+
+            justify-content: center;
+
+            margin-top: 1.5rem;
+
+            flex-wrap: wrap;
+
+        }
+
+        .filter-btn {
+
+            background-color: rgba(255, 255, 255, 0.1);
+
+            color: white;
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            padding: 0.5rem 1rem;
+
+            border-radius: 2rem;
+
+            font-size: 0.9rem;
+
+            cursor: pointer;
+
+            transition: all var(--transition-fast);
+
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+
+            background-color: var(--accent);
+
+            border-color: var(--accent);
+
+        }
+
+    </style>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script src="js/theme.js?v=2"></script>
+</head>
+
+<body class="page-fade-in">
+
+    <!-- Navbar (Same as index) -->
+
+    <nav class="navbar">
+
+        <div class="container nav-container">
+
+            <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
+
+                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+
+            </a>
+
+            <div class="nav-links">
+
+                <ul class="nav-menu">
+
+                    <li><a href="index.html" class="nav-item">Accueil</a></li>
+
+                    <li><a href="exams.php" class="nav-item">Examens</a></li>
+
+                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
+
+                    <li><a href="contributors.php" class="nav-item">Contributeurs</a></li>
+
+                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+
+                </ul>
+
+                <div class="nav-actions">
+
+                    <button class="theme-toggle" id="theme-toggle" title="Basculer le thème" style="margin-right: 0.5rem;">
+
+                        <!-- Moon icon default -->
+
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+
+                    </button>
+
+                    <a href="login.html" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+
+                    <a href="login.html" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
+
+                    <!-- Profil is hidden by default, shown via JS if logged in -->
+
+                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none; padding: 0.5rem 1rem;">Profil</a>
+
+                </div>
+
+            </div>
+
+            <button class="mobile-menu-btn">
+
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+
+            </button>
+
+        </div>
+
+    </nav>
+
+
+
+    <main>
+
+        <section class="search-hero">
+
+            <div class="container">
+
+                <h1>Rechercher des Ressources</h1>
+
+                <div class="search-bar-container">
+
+                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+
+                    <input type="text" class="search-input" placeholder="Rechercher par matière, cours, année...">
+
+                </div>
+
+                <div class="search-filters" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+
+                    <select class="form-control" style="width: 200px; background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+
+                        <option value="" style="color: black;">Tous les niveaux</option>
+
+                        <option value="L1" style="color: black;">Licence 1</option>
+
+                        <option value="L2" style="color: black;">Licence 2</option>
+
+                        <option value="L3_GLSI" style="color: black;">Licence 3 GLSI</option>
+
+                        <option value="L3_ASR" style="color: black;">Licence 3 ASR</option>
+
+                    </select>
+
+                    <select class="form-control" style="width: 200px; background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+
+                        <option value="" style="color: black;">Tous les semestres</option>
+
+                        <option value="S1" style="color: black;">Semestre 1</option>
+
+                        <option value="S2" style="color: black;">Semestre 2</option>
+
+                        <option value="S3" style="color: black;">Semestre 3</option>
+
+                        <option value="S4" style="color: black;">Semestre 4</option>
+
+                        <option value="S5" style="color: black;">Semestre 5</option>
+
+                        <option value="S6" style="color: black;">Semestre 6</option>
+
+                    </select>
+
+                    <select class="form-control" style="width: 200px; background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+
+                        <option value="" style="color: black;">Toutes les matières</option>
+
+                        <option value="algo" style="color: black;">Algorithmique</option>
+
+                        <option value="c" style="color: black;">Langage C</option>
+
+                        <option value="db" style="color: black;">Bases de données</option>
+
+                        <option value="reseaux" style="color: black;">Réseaux</option>
+
+                        <option value="autres" style="color: black;">... autres matières</option>
+
+                    </select>
+
+                    <button class="btn btn-accent" style="padding: 0.5rem 1.5rem;">Filtrer</button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <section class="section">
+
+            <div class="container">
+
+                <h2 class="section-title">Résultats de la recherche</h2>
+
+                <div class="grid grid-cols-3">
+
+                    
+
+                    <!-- Result Card 1 -->
+
+                    <div class="exam-card">
+
+                        <div class="exam-header">
+
+                            <span class="tag">Examen</span>
+
+                            <div class="exam-meta">2023 - L1</div>
+
+                        </div>
+
+                        <h3 class="exam-title">Algorithmique - Session Principale</h3>
+
+                        <p class="exam-meta" style="margin-top: 0.5rem;">Pr. Ndiaye</p>
+
+                        <a href="subjects/L1/semestre1/algorithmique.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
+
+                    </div>
+
+
+
+                    <!-- Result Card 2 -->
+
+                    <div class="exam-card">
+
+                        <div class="exam-header">
+
+                            <span class="tag">Cours</span>
+
+                            <div class="exam-meta">Chapitre 4</div>
+
+                        </div>
+
+                        <h3 class="exam-title">Programmation Objet (Java)</h3>
+
+                        <p class="exam-meta" style="margin-top: 0.5rem;">Polycopier L2 S3</p>
+
+                        <a href="subjects/L2/semestre3/java-poo.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
+
+                    </div>
+
+
+
+                    <!-- Result Card 3 -->
+
+                    <div class="exam-card">
+
+                        <div class="exam-header">
+
+                            <span class="tag">Devoir</span>
+
+                            <div class="exam-meta">2024 - L3</div>
+
+                        </div>
+
+                        <h3 class="exam-title">Mini-Projet Big Data</h3>
+
+                        <p class="exam-meta" style="margin-top: 0.5rem;">Hadoop & Spark</p>
+
+                        <a href="subjects/L3/GLSI/big-data.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
+
+                    </div>
+
+
+
+                    <!-- Result Card 4 -->
+
+                    <div class="exam-card">
+
+                        <div class="exam-header">
+
+                            <span class="tag">Examen</span>
+
+                            <div class="exam-meta">2022 - L3 ASR</div>
+
+                        </div>
+
+                        <h3 class="exam-title">Administration Réseaux CCNA 3</h3>
+
+                        <p class="exam-meta" style="margin-top: 0.5rem;">Examen Final</p>
+
+                        <a href="subjects/L3/ASR/ccna3.html" class="btn btn-outline" style="margin-top: auto;">Ouvrir</a>
+
+                    </div>
+
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <footer class="footer">
+
+        <div class="container">
+
+            <div class="footer-bottom">
+
+                <p>&copy; 2026 Ressources IAI. Tous droits réservés.</p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+<script src="js/main.js"></script>
+
+</body>
+
+</html>
+

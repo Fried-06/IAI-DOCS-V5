@@ -47,3 +47,6 @@ test.docx
 test3.docx
 dummy.pdf
 test_input.md
+
+# Secrets
+.env

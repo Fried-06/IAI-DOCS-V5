@@ -1,4 +1,4 @@
-Corrige partiel
+Corrige Partiel
 ===============
 
 .. toctree::

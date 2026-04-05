@@ -1,9 +1,160 @@
-# XML et Web Services — Partiel 2026
+<div align="center">
 
-> L2 / Semestre3 / XML et Web Services
+# INSTITUT AFRICAIN D’INFORMATIQUE (IAI - TOGO)
 
-*Aucun contenu disponible pour le moment.*
+**Tél :** 22 20 47 00 / 22 22 13 70  
+**E-mail :** iaitogo@iai-togo.tg  
+**07 BP :** 12456 Lomé 07
+
+**Cycle des Ingénieurs des Travaux Informatiques**  
+**Licence Professionnelle en Informatique**
+
+**Chargés de cours :** MM AGBOKA, BALOUKI, KPELOU  
+**Filière :** TC2 A-B-C-D-E
+
+# PARTIEL
+
+## ÉPREUVE DE : XML & WEB SERVICE
+
+**SEMESTRE :** I  
+**Durée :** 2h00  
+**Date :** 05 mars 2026  
+**NB :** Documents non autorisés
+
+</div>
 
 ---
 
-📌 **Contribuer :** Si vous disposez de ce document, ajoutez-le via la page [Contribuer](../../../../../../contribute.html).
+# Exercice 1 : Web Service (6 pts)
+
+1. Qu'est-ce qu'un web service ? **(1 pt)**
+
+2. Expliquer le fonctionnement d'un web service REST, schéma à l'appui ? **(1 pt)**
+
+3. Quelles sont les différents éléments et leur rôle, d'un web service SOAP  
+   (schéma à l'appui) ? **(2 pts)**
+
+4. Expliquer le concept de l'interopérabilité d'un web service SOAP en vous  
+   basant sur un exemple concret ? **(2 pts)**
+
+---
+
+# Exercice 2 : Schema XSD (9 pts)
+
+Mireille, une doyenne informaticienne d’une banque de la place, gère le virement  
+des salaires des agents des sociétés de la place via les fichiers TXT. Après une mise  
+à jour sécuritaire du système informatique de la banque, seuls les fichiers XML  
+sont autorisés.
+
+À cet effet, il vous est demandé, vous jeune et dynamique  
+informaticien, de mettre en place le schéma XSD validant les documents XML.
+
+## Remarques
+
+- Le sexe : **M** ou **F** **(1 pt)**
+- La nationalité : **AMERICAINE, CANADIENNE, CHINOISE, JAPONNAISE** **(1 pt)**
+- Nombre de personne à charge : **entre 0 et 10** **(1.5 pt)**
+- Le sang : **A+, A-, B+, B-, O+, O-, AB+, AB-** **(1.5 pt)**
+- La taille : **entre 1.0m et 3.0m** **(1 pt)**
+- La masse : **entre 40kg et 120kg** **(1 pt)**
+- À chaque société correspond un fichier XML
+- Dans chaque fichier XML, il y a **au moins trois (03) employés** **(1 pt)**
+- Schéma XSD bien formé **sans espace de nom** **(1 pt)**
+
+## Extrait de la structure des fichiers XML
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<virement>
+
+    <employee society_id="001">
+        <matricule>EMP001</matricule>
+        <nom>SMITH</nom>
+        <prenom>Will</prenom>
+        <sexe>M</sexe>
+        <naissance>24/07/2000</naissance>
+        <nationalite>CANADIENNE</nationalite>
+
+        <infosolde>
+            <embauche>01/01/2025</embauche>
+            <personcharge>1</personcharge>
+            <matrimoniale>Marié</matrimoniale>
+        </infosolde>
+
+        <sante>
+            <sang>O+</sang>
+            <taille>1.9</taille>
+            <masse>78</masse>
+        </sante>
+    </employee>
+
+    <employee society_id="001">
+        <matricule>EMP002</matricule>
+        <nom>CHUN-LI</nom>
+        <prenom>Kim</prenom>
+        <sexe>F</sexe>
+        <naissance>28/02/1998</naissance>
+        <nationalite>CHINOISE</nationalite>
+
+        <infosolde>
+            <embauche>01/01/2002</embauche>
+            <personcharge>0</personcharge>
+            <matrimoniale>Marié</matrimoniale>
+        </infosolde>
+
+        <sante>
+            <sang>O+</sang>
+            <taille>1.8</taille>
+            <masse>70</masse>
+        </sante>
+    </employee>
+
+    <employee society_id="001">
+        <matricule>EMP003</matricule>
+        <nom>JOHN</nom>
+        <prenom>Woo</prenom>
+        <sexe>M</sexe>
+        <naissance>20/10/2005</naissance>
+        <nationalite>JAPONNAISE</nationalite>
+
+        <infosolde>
+            <embauche>01/01/2026</embauche>
+            <personcharge>0</personcharge>
+            <matrimoniale>Célibataire</matrimoniale>
+        </infosolde>
+
+        <sante>
+            <sang>AB</sang>
+            <taille>2.1</taille>
+            <masse>75</masse>
+        </sante>
+    </employee>
+
+</virement>
+```
+
+---
+
+# Exercice 3 : XPATH (2.5 pts)
+
+1. Écrire une expression XPath pour sélectionner tous les noms (`<nom>`) des employés. **(0,5 pt)**
+
+2. Sélectionner les employés qui ont au moins une personne à charge (`<personcharge> > 0`). **(0,5 pt)**
+
+3. Écrire une requête XPath pour sélectionner l’avant-dernier employé de la liste des employés. **(0,5 pt)**
+
+4. Sélectionner les employés ayant le sexe féminin (`<sexe> = 'F'`) et le groupe sanguin est `O+`. **(1 pt)**
+
+5. Sélectionner les employés dont la taille est supérieure à `1.85`. **(0,5 pt)**
+
+---
+
+# Exercice 4 : XQUERY (2.5 pts)
+
+1. Écrire une requête FLWOR qui retourne la liste des prénoms de tous les employés. **(0,5 pt)**
+
+2. Écrire une requête FLWOR qui retourne les employés mariés. **(0,5 pt)**
+
+3. Écrire une requête FLWOR qui affiche les employés triés par date de naissance (du plus âgé au plus jeune). **(1 pt)**
+
+4. Écrire une requête FLWOR qui retourne les employés embauchés après le `01/01/2024`. **(0,5 pt)**

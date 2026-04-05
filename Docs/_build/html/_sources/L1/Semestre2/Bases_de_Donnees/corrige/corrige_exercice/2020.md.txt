@@ -1,9 +1,0 @@
-# Bases de Donnees — Corrige 2020
-
-> L1 / Semestre2 / Bases de Donnees
-
-*Aucun contenu disponible pour le moment.*
-
----
-
-📌 **Contribuer :** Si vous disposez de ce document, ajoutez-le via la page [Contribuer](../../../../../../contribute.html).

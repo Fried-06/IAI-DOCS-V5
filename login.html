@@ -1,423 +1,847 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentification - Ressources IAI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg:      #040c18;
-            --bg2:     #07111f;
-            --bg3:     #0b1930;
-            --border:  #152540;
-            --border2: #1e3558;
-            --cyan:    #00e5c4;
-            --amber:   #ffb703;
-            --text:    #c8ddf2;
-            --muted:   #4a6a8a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .auth-container {
-            position: relative;
-            width: 900px;
-            max-width: 100%;
-            height: 600px;
-            background: var(--bg2);
-            border-radius: 12px;
-            border: 1px solid var(--border2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0, 229, 196, 0.05);
-            overflow: hidden;
-        }
-
-        .form-panel {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 0 4rem;
-            transition: all 0.6s ease-in-out;
-            background: var(--bg2);
-        }
-
-        .form-panel h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.8rem;
-            color: #fff;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.05em;
-        }
-
-        .form-panel p {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-bottom: 2rem;
-            text-align: center;
-            letter-spacing: 0.05em;
-        }
-
-        .sign-in-panel {
-            left: 0;
-            width: 50%;
-            z-index: 2;
-        }
-
-        .sign-up-panel {
-            left: 0;
-            width: 50%;
-            opacity: 0;
-            z-index: 1;
-            transform: translateX(100%);
-        }
-
-        form {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .input-field {
-            width: 100%;
-            background-color: var(--bg3);
-            color: var(--text);
-            margin: 0.6rem 0;
-            padding: 1rem 1.4rem;
-            border-radius: 4px;
-            border: 1px solid var(--border2);
-            outline: none;
-            transition: 0.3s;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-        }
-
-        .input-field:focus {
-            border-color: var(--cyan);
-            box-shadow: 0 0 10px rgba(0, 229, 196, 0.2);
-            background-color: #0d1e3d;
-        }
-
-        .btn {
-            width: 100%;
-            background-color: var(--cyan);
-            color: #000;
-            border: none;
-            padding: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-top: 1.5rem;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #00fbd7;
-            box-shadow: 0 0 20px rgba(0, 229, 196, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .overlay-container {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 50%;
-            height: 100%;
-            overflow: hidden;
-            transition: transform 0.6s ease-in-out;
-            z-index: 100;
-            border-left: 1px solid var(--border2);
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--bg3), var(--bg));
-            color: #fff;
-            transition: transform 0.6s ease-in-out;
-        }
-
-        /* Blueprint grid for overlay */
-        .overlay::before {
-            content:'';position:absolute;inset:0;
-            background-image:
-            linear-gradient(rgba(0,229,196,.03) 1px,transparent 1px),
-            linear-gradient(90deg,rgba(0,229,196,.03) 1px,transparent 1px);
-            background-size:50px 50px;
-            pointer-events:none;
-        }
-
-        .overlay-panel {
-            position: absolute;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 50%;
-            text-align: center;
-            padding: 0 3rem;
-            transition: transform 0.6s ease-in-out;
-        }
-
-        .overlay-left {
-            transform: translateX(-20%);
-        }
-
-        .overlay-right {
-            right: 0;
-            transform: translateX(0);
-        }
-
-        .overlay h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            letter-spacing: 0.05em;
-        }
-
-        .overlay p {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .btn-overlay {
-            background: transparent;
-            border: 2px solid var(--cyan);
-            border-radius: 4px;
-            padding: 0.8rem 2.5rem;
-            color: var(--cyan);
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-overlay:hover {
-            background: var(--cyan);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 229, 196, 0.4);
-        }
-
-        .home-link {
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            z-index: 1000;
-            color: var(--muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-
-        .home-link:hover {
-            color: var(--cyan);
-        }
-
-        .auth-container.sign-up-mode .overlay-container {
-            transform: translateX(-100%);
-        }
-
-        .auth-container.sign-up-mode .overlay {
-            transform: translateX(50%);
-        }
-
-        .auth-container.sign-up-mode .overlay-left {
-            transform: translateX(0);
-        }
-
-        .auth-container.sign-up-mode .overlay-right {
-            transform: translateX(20%);
-        }
-
-        .auth-container.sign-up-mode .sign-in-panel {
-            transform: translateX(100%);
-            opacity: 0;
-            z-index: 1;
-        }
-
-        .auth-container.sign-up-mode .sign-up-panel {
-            transform: translateX(100%);
-            opacity: 1;
-            z-index: 5;
-        }
-
-        @media(max-width: 768px) {
-            .auth-container { height: 100vh; border-radius: 0; }
-            .overlay-container { display: none; }
-            .form-panel { width: 100%; left: 0; }
-            .sign-up-panel { transform: translateX(0); display: none; }
-            .auth-container.sign-up-mode .sign-in-panel { display: none; }
-            .auth-container.sign-up-mode .sign-up-panel { transform: translateX(0); display: flex; }
-        }
-
-        /* Color swipe for login */
-        .auth-container .overlay {
-            transition: transform 0.6s ease-in-out, background 0.6s ease-in-out;
-            background: linear-gradient(135deg, #0b1930, #040c18);
-        }
-        .overlay-right::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(0,229,196,0.08), transparent 70%);
-            pointer-events: none;
-        }
-        .overlay-left::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(168,85,247,0.08), transparent 70%);
-            pointer-events: none;
-        }
-        .auth-container .overlay-right .btn-overlay {
-            border-color: var(--cyan); color: var(--cyan);
-        }
-        .auth-container .overlay-right .btn-overlay:hover {
-            background: var(--cyan); color: #000;
-        }
-        .auth-container.sign-up-mode .overlay-left .btn-overlay {
-            border-color: var(--purple); color: var(--purple);
-        }
-        .auth-container.sign-up-mode .overlay-left .btn-overlay:hover {
-            background: var(--purple); color: #fff;
-        }
-        .auth-container.sign-up-mode .sign-up-panel .btn {
-            background: var(--purple); color: #fff;
-        }
-        .auth-container.sign-up-mode .sign-up-panel .btn:hover {
-            background: #c084fc;
-            box-shadow: 0 0 20px rgba(168,85,247,0.4);
-        }
-        .auth-container.sign-up-mode .sign-up-panel .input-field:focus {
-            border-color: var(--purple);
-            box-shadow: 0 0 10px rgba(168,85,247,0.2);
-        }
-    </style>
-
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-</head>
-<body class="page-fade-in">
-
-    <a href="index.html" class="home-link">
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Retour à l'accueil
-    </a>
-
-    <div class="auth-container" id="container">
-        
-        <!-- Sign Up Form (Inscription) -->
-        <div class="form-panel sign-up-panel">
-            <form action="backend/auth.php" method="POST">
-                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 150px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4));">
-                <h2>Créer un compte</h2>
-                <p>Rejoignez la communauté IAI</p>
-                <input type="hidden" name="action" value="register">
-                <input type="text" class="input-field" name="name" placeholder="Nom complet" required />
-                <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
-                <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
-                <input type="password" class="input-field" name="confirm_password" placeholder="Confirmer le mot de passe" required />
-                <button type="submit" class="btn">S'inscrire</button>
-                <button type="button" class="mobile-toggle" id="mobileSignIn" style="display: none;">Déjà un compte ? Connectez-vous</button>
-            </form>
-        </div>
-
-        <!-- Sign In Form (Connexion) -->
-        <div class="form-panel sign-in-panel">
-            <form action="backend/auth.php" method="POST">
-                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 80px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px rgba(0,229,196,0.4));">
-                <h2>Bon retour !</h2>
-                <p>Connectez-vous à votre compte</p>
-                <input type="hidden" name="action" value="login">
-                <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
-                <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
-                <a href="#" style="align-self: flex-end; margin-top: 0.5rem; color: #6b7280; text-decoration: none; font-size: 0.9rem;">Mot de passe oublié ?</a>
-                <button type="submit" class="btn">Se connecter</button>
-                <button type="button" class="mobile-toggle" id="mobileSignUp" style="display: none;">Pas de compte ? Inscrivez-vous</button>
-            </form>
-        </div>
-
-        <!-- Overlay Section -->
-        <div class="overlay-container">
-            <div class="overlay">
-                <div class="overlay-panel overlay-left">
-                    <h2>Content de vous revoir !</h2>
-                    <p>Pour rester connecté avec nous, veuillez vous connecter avec vos informations personnelles.</p>
-                    <button class="btn-overlay" id="signInBtn">Se Connecter</button>
-                </div>
-                <div class="overlay-panel overlay-right">
-                    <h2>Nouveau ici ?</h2>
-                    <p>Entrez vos détails personnels et commencez votre voyage avec la dernière collection d'exas.</p>
-                    <button class="btn-overlay" id="signUpBtn">S'inscrire</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        const signUpBtn = document.getElementById('signUpBtn');
-        const signInBtn = document.getElementById('signInBtn');
-        const container = document.getElementById('container');
-
-        const mobileSignUp = document.getElementById('mobileSignUp');
-        const mobileSignIn = document.getElementById('mobileSignIn');
-
-        // Toggle animations Desktop
-        signUpBtn.addEventListener('click', () => {
-            container.classList.add('sign-up-mode');
-        });
-
-        signInBtn.addEventListener('click', () => {
-            container.classList.remove('sign-up-mode');
-        });
-
-        // Toggle animations Mobile
-        if(mobileSignUp) {
-            mobileSignUp.addEventListener('click', () => {
-                container.classList.add('sign-up-mode');
-            });
-        }
-        if(mobileSignIn) {
-            mobileSignIn.addEventListener('click', () => {
-                container.classList.remove('sign-up-mode');
-            });
-        }
-    </script>
-<script src="js/main.js"></script>
-</body>
-</html>
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Authentification - Ressources IAI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    
+
+    <style>
+
+        :root {
+
+            --bg:      #040c18;
+
+            --bg2:     #07111f;
+
+            --bg3:     #0b1930;
+
+            --border:  #152540;
+
+            --border2: #1e3558;
+
+            --cyan:    #00e5c4;
+
+            --amber:   #ffb703;
+
+            --text:    #c8ddf2;
+
+            --muted:   #4a6a8a;
+
+        }
+
+
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+            font-family: 'DM Sans', sans-serif;
+
+        }
+
+
+
+        body {
+
+            background: var(--bg);
+
+            color: var(--text);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            height: 100vh;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .auth-container {
+
+            position: relative;
+
+            width: 900px;
+
+            max-width: 100%;
+
+            height: 600px;
+
+            background: var(--bg2);
+
+            border-radius: 12px;
+
+            border: 1px solid var(--border2);
+
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0, 229, 196, 0.05);
+
+            overflow: hidden;
+
+        }
+
+
+
+        .form-panel {
+
+            position: absolute;
+
+            top: 0;
+
+            height: 100%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 0 4rem;
+
+            transition: all 0.6s ease-in-out;
+
+            background: var(--bg2);
+
+        }
+
+
+
+        .form-panel h2 {
+
+            font-family: 'Bebas Neue', sans-serif;
+
+            font-size: 2.8rem;
+
+            color: #fff;
+
+            margin-bottom: 0.5rem;
+
+            letter-spacing: 0.05em;
+
+        }
+
+
+
+        .form-panel p {
+
+            font-family: 'JetBrains Mono', monospace;
+
+            font-size: 0.8rem;
+
+            color: var(--muted);
+
+            margin-bottom: 2rem;
+
+            text-align: center;
+
+            letter-spacing: 0.05em;
+
+        }
+
+
+
+        .sign-in-panel {
+
+            left: 0;
+
+            width: 50%;
+
+            z-index: 2;
+
+        }
+
+
+
+        .sign-up-panel {
+
+            left: 0;
+
+            width: 50%;
+
+            opacity: 0;
+
+            z-index: 1;
+
+            transform: translateX(100%);
+
+        }
+
+
+
+        form {
+
+            width: 100%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+        }
+
+
+
+        .input-field {
+
+            width: 100%;
+
+            background-color: var(--bg3);
+
+            color: var(--text);
+
+            margin: 0.6rem 0;
+
+            padding: 1rem 1.4rem;
+
+            border-radius: 4px;
+
+            border: 1px solid var(--border2);
+
+            outline: none;
+
+            transition: 0.3s;
+
+            font-family: 'JetBrains Mono', monospace;
+
+            font-size: 0.85rem;
+
+        }
+
+
+
+        .input-field:focus {
+
+            border-color: var(--cyan);
+
+            box-shadow: 0 0 10px rgba(0, 229, 196, 0.2);
+
+            background-color: #0d1e3d;
+
+        }
+
+
+
+        .btn {
+
+            width: 100%;
+
+            background-color: var(--cyan);
+
+            color: #000;
+
+            border: none;
+
+            padding: 1rem;
+
+            border-radius: 4px;
+
+            cursor: pointer;
+
+            font-family: 'JetBrains Mono', monospace;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.1em;
+
+            margin-top: 1.5rem;
+
+            transition: 0.3s;
+
+        }
+
+
+
+        .btn:hover {
+
+            background-color: #00fbd7;
+
+            box-shadow: 0 0 20px rgba(0, 229, 196, 0.4);
+
+            transform: translateY(-2px);
+
+        }
+
+
+
+        .overlay-container {
+
+            position: absolute;
+
+            top: 0;
+
+            left: 50%;
+
+            width: 50%;
+
+            height: 100%;
+
+            overflow: hidden;
+
+            transition: transform 0.6s ease-in-out;
+
+            z-index: 100;
+
+            border-left: 1px solid var(--border2);
+
+        }
+
+
+
+        .overlay {
+
+            position: absolute;
+
+            top: 0;
+
+            left: -100%;
+
+            width: 200%;
+
+            height: 100%;
+
+            background: linear-gradient(135deg, var(--bg3), var(--bg));
+
+            color: #fff;
+
+            transition: transform 0.6s ease-in-out;
+
+        }
+
+
+
+        /* Blueprint grid for overlay */
+
+        .overlay::before {
+
+            content:'';position:absolute;inset:0;
+
+            background-image:
+
+            linear-gradient(rgba(0,229,196,.03) 1px,transparent 1px),
+
+            linear-gradient(90deg,rgba(0,229,196,.03) 1px,transparent 1px);
+
+            background-size:50px 50px;
+
+            pointer-events:none;
+
+        }
+
+
+
+        .overlay-panel {
+
+            position: absolute;
+
+            top: 0;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            height: 100%;
+
+            width: 50%;
+
+            text-align: center;
+
+            padding: 0 3rem;
+
+            transition: transform 0.6s ease-in-out;
+
+        }
+
+
+
+        .overlay-left {
+
+            transform: translateX(-20%);
+
+        }
+
+
+
+        .overlay-right {
+
+            right: 0;
+
+            transform: translateX(0);
+
+        }
+
+
+
+        .overlay h2 {
+
+            font-family: 'Bebas Neue', sans-serif;
+
+            font-size: 3rem;
+
+            margin-bottom: 1rem;
+
+            letter-spacing: 0.05em;
+
+        }
+
+
+
+        .overlay p {
+
+            font-family: 'JetBrains Mono', monospace;
+
+            font-size: 0.85rem;
+
+            color: var(--muted);
+
+            margin-bottom: 2rem;
+
+            line-height: 1.6;
+
+        }
+
+
+
+        .btn-overlay {
+
+            background: transparent;
+
+            border: 2px solid var(--cyan);
+
+            border-radius: 4px;
+
+            padding: 0.8rem 2.5rem;
+
+            color: var(--cyan);
+
+            font-family: 'JetBrains Mono', monospace;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+        }
+
+
+
+        .btn-overlay:hover {
+
+            background: var(--cyan);
+
+            color: #000;
+
+            box-shadow: 0 0 15px rgba(0, 229, 196, 0.4);
+
+        }
+
+
+
+        .home-link {
+
+            position: absolute;
+
+            top: 1.5rem;
+
+            left: 1.5rem;
+
+            z-index: 1000;
+
+            color: var(--muted);
+
+            text-decoration: none;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            font-family: 'JetBrains Mono', monospace;
+
+            font-size: 0.8rem;
+
+            transition: 0.3s;
+
+        }
+
+
+
+        .home-link:hover {
+
+            color: var(--cyan);
+
+        }
+
+
+
+        .auth-container.sign-up-mode .overlay-container {
+
+            transform: translateX(-100%);
+
+        }
+
+
+
+        .auth-container.sign-up-mode .overlay {
+
+            transform: translateX(50%);
+
+        }
+
+
+
+        .auth-container.sign-up-mode .overlay-left {
+
+            transform: translateX(0);
+
+        }
+
+
+
+        .auth-container.sign-up-mode .overlay-right {
+
+            transform: translateX(20%);
+
+        }
+
+
+
+        .auth-container.sign-up-mode .sign-in-panel {
+
+            transform: translateX(100%);
+
+            opacity: 0;
+
+            z-index: 1;
+
+        }
+
+
+
+        .auth-container.sign-up-mode .sign-up-panel {
+
+            transform: translateX(100%);
+
+            opacity: 1;
+
+            z-index: 5;
+
+        }
+
+
+
+        @media(max-width: 768px) {
+
+            .auth-container { height: 100vh; border-radius: 0; }
+
+            .overlay-container { display: none; }
+
+            .form-panel { width: 100%; left: 0; }
+
+            .sign-up-panel { transform: translateX(0); display: none; }
+
+            .auth-container.sign-up-mode .sign-in-panel { display: none; }
+
+            .auth-container.sign-up-mode .sign-up-panel { transform: translateX(0); display: flex; }
+
+        }
+
+
+
+        /* Color swipe for login */
+
+        .auth-container .overlay {
+
+            transition: transform 0.6s ease-in-out, background 0.6s ease-in-out;
+
+            background: linear-gradient(135deg, #0b1930, #040c18);
+
+        }
+
+        .overlay-right::before {
+
+            content: '';
+
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+
+            background: radial-gradient(circle at 50% 50%, rgba(0,229,196,0.08), transparent 70%);
+
+            pointer-events: none;
+
+        }
+
+        .overlay-left::before {
+
+            content: '';
+
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+
+            background: radial-gradient(circle at 50% 50%, rgba(168,85,247,0.08), transparent 70%);
+
+            pointer-events: none;
+
+        }
+
+        .auth-container .overlay-right .btn-overlay {
+
+            border-color: var(--cyan); color: var(--cyan);
+
+        }
+
+        .auth-container .overlay-right .btn-overlay:hover {
+
+            background: var(--cyan); color: #000;
+
+        }
+
+        .auth-container.sign-up-mode .overlay-left .btn-overlay {
+
+            border-color: var(--purple); color: var(--purple);
+
+        }
+
+        .auth-container.sign-up-mode .overlay-left .btn-overlay:hover {
+
+            background: var(--purple); color: #fff;
+
+        }
+
+        .auth-container.sign-up-mode .sign-up-panel .btn {
+
+            background: var(--purple); color: #fff;
+
+        }
+
+        .auth-container.sign-up-mode .sign-up-panel .btn:hover {
+
+            background: #c084fc;
+
+            box-shadow: 0 0 20px rgba(168,85,247,0.4);
+
+        }
+
+        .auth-container.sign-up-mode .sign-up-panel .input-field:focus {
+
+            border-color: var(--purple);
+
+            box-shadow: 0 0 10px rgba(168,85,247,0.2);
+
+        }
+
+    </style>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script src="js/theme.js?v=2"></script>
+</head>
+
+<body class="page-fade-in">
+
+
+
+    <a href="index.html" class="home-link">
+
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+
+        Retour à l'accueil
+
+    </a>
+
+
+
+    <div class="auth-container" id="container">
+
+        
+
+        <!-- Sign Up Form (Inscription) -->
+
+        <div class="form-panel sign-up-panel">
+
+            <form action="backend/auth.php" method="POST">
+
+                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 150px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4));">
+
+                <h2>Créer un compte</h2>
+
+                <p>Rejoignez la communauté IAI</p>
+
+                <input type="hidden" name="action" value="register">
+
+                <input type="text" class="input-field" name="name" placeholder="Nom complet" required />
+
+                <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
+
+                <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
+
+                <input type="password" class="input-field" name="confirm_password" placeholder="Confirmer le mot de passe" required />
+
+                <button type="submit" class="btn">S'inscrire</button>
+
+                <button type="button" class="mobile-toggle" id="mobileSignIn" style="display: none;">Déjà un compte ? Connectez-vous</button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- Sign In Form (Connexion) -->
+
+        <div class="form-panel sign-in-panel">
+
+            <form action="backend/auth.php" method="POST">
+
+                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 80px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px rgba(0,229,196,0.4));">
+
+                <h2>Bon retour !</h2>
+
+                <p>Connectez-vous à votre compte</p>
+
+                <input type="hidden" name="action" value="login">
+
+                <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
+
+                <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
+
+                <a href="#" style="align-self: flex-end; margin-top: 0.5rem; color: #6b7280; text-decoration: none; font-size: 0.9rem;">Mot de passe oublié ?</a>
+
+                <button type="submit" class="btn">Se connecter</button>
+
+                <button type="button" class="mobile-toggle" id="mobileSignUp" style="display: none;">Pas de compte ? Inscrivez-vous</button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- Overlay Section -->
+
+        <div class="overlay-container">
+
+            <div class="overlay">
+
+                <div class="overlay-panel overlay-left">
+
+                    <h2>Content de vous revoir !</h2>
+
+                    <p>Pour rester connecté avec nous, veuillez vous connecter avec vos informations personnelles.</p>
+
+                    <button class="btn-overlay" id="signInBtn">Se Connecter</button>
+
+                </div>
+
+                <div class="overlay-panel overlay-right">
+
+                    <h2>Nouveau ici ?</h2>
+
+                    <p>Entrez vos détails personnels et commencez votre voyage avec la dernière collection d'exas.</p>
+
+                    <button class="btn-overlay" id="signUpBtn">S'inscrire</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <script>
+
+        const signUpBtn = document.getElementById('signUpBtn');
+
+        const signInBtn = document.getElementById('signInBtn');
+
+        const container = document.getElementById('container');
+
+
+
+        const mobileSignUp = document.getElementById('mobileSignUp');
+
+        const mobileSignIn = document.getElementById('mobileSignIn');
+
+
+
+        // Toggle animations Desktop
+
+        signUpBtn.addEventListener('click', () => {
+
+            container.classList.add('sign-up-mode');
+
+        });
+
+
+
+        signInBtn.addEventListener('click', () => {
+
+            container.classList.remove('sign-up-mode');
+
+        });
+
+
+
+        // Toggle animations Mobile
+
+        if(mobileSignUp) {
+
+            mobileSignUp.addEventListener('click', () => {
+
+                container.classList.add('sign-up-mode');
+
+            });
+
+        }
+
+        if(mobileSignIn) {
+
+            mobileSignIn.addEventListener('click', () => {
+
+                container.classList.remove('sign-up-mode');
+
+            });
+
+        }
+
+    </script>
+
+<script src="js/main.js"></script>
+
+</body>
+
+</html>
+

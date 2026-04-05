@@ -1,9 +1,0 @@
-# CCNA2 — Corrige 2021
-
-> L2 / Semestre3 / CCNA2
-
-*Aucun contenu disponible pour le moment.*
-
----
-
-📌 **Contribuer :** Si vous disposez de ce document, ajoutez-le via la page [Contribuer](../../../../../../contribute.html).

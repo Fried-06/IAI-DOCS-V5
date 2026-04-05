@@ -4,6 +4,12 @@
 // then stores the RELATIVE public file_path in the documents table.
 
 session_start();
+set_time_limit(300);
+if (($_SESSION['user_role'] ?? '') !== 'admin') {
+    die("Action non autorisée.");
+}
+// Increase timeout for AI generation
+set_time_limit(300);
 require_once __DIR__ . '/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -13,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $docId = intval($_POST['id'] ?? 0);
 $action = $_POST['action'] ?? '';
 
-if ($docId <= 0 || !in_array($action, ['approve', 'reject'])) {
+if ($docId <= 0 || !in_array($action, ['generate', 'generate_docling', 'generate_ai', 'generate_ai_clean', 'save_draft', 'publish', 'reject'])) {
     die("Invalid parameters.");
 }
 
@@ -72,72 +78,158 @@ if ($action === 'reject') {
 }
 
 // ============================================
-// APPROVE — Run Python pipeline then store relative file_path
+// GENERATE — Multi-mode extraction pipeline
 // ============================================
-$filename = escapeshellarg($doc['filename']);
-$title    = escapeshellarg($doc['title']);
 
-// Build a safe category/type name for routing
-$typeName = $doc['type_name']; // e.g. "partiel", "devoir", "cours"
+// Map actions to extract.py modes
+$generateActions = [
+    'generate'           => 'ai_clean',   // Legacy: default to Docling + AI cascade
+    'generate_docling'   => 'docling',    // Docling only (fast, free)
+    'generate_ai'        => 'ai',         // Gemini Vision Direct (no Docling)
+    'generate_ai_clean'  => 'ai_clean',   // Docling + AI cascade
+];
 
-// Sanitize subject name for filesystem paths
-$subjectSlug = preg_replace('/[^a-zA-Z0-9_-]/', '_', $doc['subject_name']);
-$subjectSlug = strtolower(trim($subjectSlug, '_'));
-
-// Sanitize level name for filesystem
-$levelSlug = preg_replace('/\s+/', '_', $doc['level_name']); // "L3 GLSI" → "L3_GLSI"
-
-// Sanitize semester
-$semesterSlug = preg_replace('/\s+/', '', strtolower($doc['semester_name'])); // "Semestre 1" → "semestre1"
-
-$year = $doc['year'];
-
-// 1. Convert (PDF/DOCX → Markdown)
-$cmdConvert = "python convert.py ../uploads/$filename 2>&1";
-$outConvert = shell_exec($cmdConvert);
-
-// 2. Clean
-$nameWithoutExt = pathinfo($doc['filename'], PATHINFO_FILENAME);
-$mdFilenameArg = escapeshellarg($nameWithoutExt . '.md');
-$typeArg = escapeshellarg($typeName);
-$cmdClean = "python clean.py ../processed/$mdFilenameArg " . escapeshellarg($doc['title']) . " $typeArg 2>&1";
-$outClean = shell_exec($cmdClean);
-
-// 3. Route — place the cleaned .md into the correct Sphinx source folder
-$cmdRoute = "python route.py ../cleaned/$mdFilenameArg " . escapeshellarg($doc['title']) . " " . escapeshellarg($levelSlug) . " $typeArg 2>&1";
-$outRoute = shell_exec($cmdRoute);
-
-// 4. Build Sphinx
-$cmdBuild = "python build_docs.py 2>&1";
-$outBuild = shell_exec($cmdBuild);
-
-// 5. Compute the RELATIVE public file_path
-//    Format: {level}/{semester}/{subject}/{type}/{year}.html
-//    Example: L1/semestre1/algorithmique/partiel/2024.html
-$relativePath = "$levelSlug/$semesterSlug/$subjectSlug/$typeName/$year.html";
-
-// 6. Update document in DB with approved status and relative file_path
-$updateStmt = $pdo->prepare("UPDATE documents SET status = 'approved', file_path = ? WHERE id = ?");
-$updateStmt->execute([$relativePath, $docId]);
-
-// 7. Notification
-if ($doc['user_id']) {
-    $notifStmt = $pdo->prepare(
-        "INSERT INTO notifications (user_id, document_id, type, title, message) VALUES (?, ?, 'approval', ?, ?)"
-    );
-    $notifStmt->execute([
-        $doc['user_id'],
-        $docId,
-        'Document publié',
-        "Votre document '{$doc['title']}' a été approuvé et publié !"
-    ]);
+if (isset($generateActions[$action])) {
+    $mode = $generateActions[$action];
+    $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $doc['title']);
+    $filename = escapeshellarg($doc['filename']);
+    $modeArg = escapeshellarg($mode);
+    
+    // Increase timeout for AI modes
+    if ($mode !== 'docling') {
+        set_time_limit(300);
+    }
+    
+    // Construct nice display title, e.g., "Probabilités - Partiel 2026"
+    $typeLabel = str_replace('_', ' ', ucfirst($doc['type_name']));
+    $displayTitle = escapeshellarg("{$doc['subject_name']} - {$typeLabel} {$doc['year']}");
+    
+    $cmdExtract = "python extract.py ../uploads/$filename $docId " . escapeshellarg($safeTitle) . " --display-title $displayTitle --mode $modeArg 2>&1";
+    $outExtract = shell_exec($cmdExtract);
+    
+    // Log
+    $modeLabel = strtoupper($mode);
+    $logMsg = date('[Y-m-d H:i:s] ') . "GENERATE [$modeLabel] DOC: {$doc['title']} | ID: $docId\n";
+    $logMsg .= "  Extract: $outExtract\n";
+    file_put_contents(__DIR__ . '/admin.log', $logMsg, FILE_APPEND);
+    
+    header("Location: admin_edit.php?id=$docId");
+    exit;
 }
 
-// 8. Log
-$logMsg = date('[Y-m-d H:i:s] ') . "APPROVED DOC: {$doc['title']} | ID: $docId | Path: $relativePath\n";
-$logMsg .= "  Convert: $outConvert\n  Clean: $outClean\n  Route: $outRoute\n  Build: $outBuild\n";
-file_put_contents(__DIR__ . '/admin.log', $logMsg, FILE_APPEND);
+// ============================================
+// SAVE DRAFT
+// ============================================
+if ($action === 'save_draft') {
+    $draftContent = $_POST['markdown_content'] ?? '';
+    $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $doc['title']);
+    $draftFilename = __DIR__ . '/../drafts/' . $safeTitle . '.md';
+    file_put_contents($draftFilename, $draftContent);
+    
+    // Check if it's an API request or regular form submission
+    header("Location: admin_edit.php?id=$docId&success=" . urlencode("Brouillon enregistré."));
+    exit;
+}
 
-header("Location: admin.php?tab=documents&success=" . urlencode("Document approuvé et publié !"));
-exit;
+// ============================================
+// PUBLISH — Save draft, run pipeline, update DB
+// ============================================
+if ($action === 'publish') {
+    $draftContent = $_POST['markdown_content'] ?? '';
+    $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $doc['title']);
+    $draftFilename = __DIR__ . '/../drafts/' . $safeTitle . '.md';
+    file_put_contents($draftFilename, $draftContent);
+    
+    // ── Helper: strip accents & spaces from a slug ──────────────────
+    // Uses iconv transliteration so é→e, à→a, ç→c, etc.
+    $slugify = function($text) {
+        // Transliterate to ASCII (removes accents)
+        $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        if ($ascii === false) {
+            // Fallback: manual replacements for common French chars
+            $map = ['é'=>'e','è'=>'e','ê'=>'e','ë'=>'e','à'=>'a','â'=>'a',
+                    'ä'=>'a','î'=>'i','ï'=>'i','ô'=>'o','ö'=>'o','ù'=>'u',
+                    'û'=>'u','ü'=>'u','ç'=>'c','É'=>'E','È'=>'E','Ê'=>'E',
+                    'À'=>'A','Â'=>'A','Î'=>'I','Ô'=>'O','Ù'=>'U','Û'=>'U','Ç'=>'C'];
+            $ascii = strtr($text, $map);
+        }
+        // Remove spaces and non-alphanumeric chars
+        return preg_replace('/[^a-zA-Z0-9_\-]/', '', str_replace(' ', '', $ascii));
+    };
+
+    // Exact Sphinx directory casing synchronization (accent-free)
+    $levelSlug    = $slugify(str_replace('Licence ', 'L', trim($doc['level_name'])));
+    $semesterSlug = $slugify(trim($doc['semester_name']));
+    $subjectSlug  = $slugify(trim($doc['subject_name']));
+
+    
+    $typeSlug = $doc['type_name'];
+    if (strpos($typeSlug, 'corrige_') === 0) {
+        $typeSlug = 'corrige/' . $typeSlug; // Handles nested corrige routing
+    }
+    
+    $year         = intval($doc['year']);
+
+    // 1. Route — move draft to Sphinx tree
+    // route.py expected format: python route.py <clean_md_file> <level> <sem> <sub_name> <type> <year>
+    $routeScript = __DIR__ . '/route.py';
+    $draftFileArg = escapeshellarg($draftFilename);
+    $cmdRoute = "python " . escapeshellarg($routeScript) . " $draftFileArg " . 
+                escapeshellarg($levelSlug) . " " . 
+                escapeshellarg($semesterSlug) . " " . 
+                escapeshellarg($subjectSlug) . " " . 
+                escapeshellarg($typeSlug) . " " . 
+                $year . " 2>&1";
+    $outRoute = shell_exec($cmdRoute);
+
+    // 2. Build Sphinx ASYNCHRONOUSLY
+    // We NO LONGER run $cmdBuild = "python build_docs.py 2>&1"; here!
+    
+    // 3. Compute the RELATIVE public file_path
+    $relativePath = "$levelSlug/$semesterSlug/$subjectSlug/$typeSlug/$year.html";
+
+    // 4. Update document in DB with approved status, relative file_path, and pending worker status
+    $updateStmt = $pdo->prepare("UPDATE documents SET status = 'approved', file_path = ?, worker_status = 'pending', locked_by = NULL, raw_markdown = NULL WHERE id = ?");
+    $updateStmt->execute([$relativePath, $docId]);
+    
+    // 4b. Delete any duplicate placeholder document for this exact same subject/type/year
+    $deleteStmt = $pdo->prepare("DELETE FROM documents WHERE subject_id = ? AND type_id = ? AND year_id = ? AND id != ? AND status = 'approved'");
+    $deleteStmt->execute([$doc['subject_id'], $doc['type_id'], $doc['year_id'], $docId]);
+
+    // 5. Notification
+    if ($doc['user_id']) {
+        $notifStmt = $pdo->prepare(
+            "INSERT INTO notifications (user_id, document_id, type, title, message) VALUES (?, ?, 'approval', ?, ?)"
+        );
+        $notifStmt->execute([
+            $doc['user_id'],
+            $docId,
+            'Document publié',
+            "Votre document '{$doc['title']}' a été approuvé et publié !"
+        ]);
+    }
+    
+    // Add admin notification tracking for the worker
+    $logAdmin = $_SESSION['user_id'] ?? 0;
+    if ($logAdmin) {
+        $pdo->prepare("UPDATE documents SET admin_id = ? WHERE id = ?")->execute([$logAdmin, $docId]);
+    }
+
+    // 6. Log
+    $logMsg = date('[Y-m-d H:i:s] ') . "APPROVED DOC: {$doc['title']} | ID: $docId | Path: $relativePath\n";
+    $logMsg .= "  Route: $outRoute\n  Build: Queued for background worker\n";
+    file_put_contents(__DIR__ . '/admin.log', $logMsg, FILE_APPEND);
+
+    header("Location: admin.php?tab=documents&success=" . urlencode("Document validé et placé en file d'attente pour publication en arrière-plan."));
+    exit;
+}
+
+// ============================================
+// CANCEL EDIT (Unlock)
+// ============================================
+if ($action === 'cancel') {
+    $pdo->prepare("UPDATE documents SET locked_by = NULL WHERE id = ?")->execute([$docId]);
+    header("Location: admin.php?tab=documents");
+    exit;
+}
 ?>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="100%" height="100%">
+    <defs>
+        <linearGradient id="glowMap" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--theme-accent)" stop-opacity="0.8" />
+            <stop offset="50%" stop-color="var(--theme-primary)" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="var(--theme-purple)" stop-opacity="0.8" />
+        </linearGradient>
+    </defs>
+    <!-- Simplified smooth path mimicking Africa outline -->
+    <path fill="none" stroke="url(#glowMap)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+          d="M 230 200 
+             C 270 170, 320 150, 420 160 
+             C 470 165, 520 200, 560 210
+             C 610 220, 680 200, 720 230
+             C 730 250, 720 300, 710 320
+             C 700 350, 650 380, 650 420
+             C 650 480, 680 500, 680 560
+             C 680 620, 640 650, 620 700
+             C 580 800, 560 850, 480 880
+             C 450 890, 400 850, 380 800
+             C 350 720, 340 680, 280 620
+             C 240 580, 200 560, 180 500
+             C 160 440, 150 400, 180 320
+             C 200 270, 200 230, 230 200 Z" />
+</svg>

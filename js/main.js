@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // AUTH STATE CHECK — Dynamic navbar based on session
     // ═══════════════════════════════════════════════════════
     (function checkAuthState() {
-        fetch('/backend/session_check.php')
+        fetch('backend/session_check.php')
             .then(res => res.json())
             .then(data => {
                 // Find all nav-actions containers on the page
@@ -33,9 +33,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         avatarGroup.className = 'nav-avatar-group';
                         avatarGroup.style.cssText = 'display:flex;align-items:center;gap:0.75rem;';
 
+                        // Prepend Admin Dashboard link if user is admin
+                        if (data.is_admin) {
+                            const adminLink = document.createElement('a');
+                            adminLink.href = 'backend/admin.php';
+                            adminLink.className = 'nav-item nav-admin-btn';
+                            adminLink.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin';
+                            adminLink.style.cssText = 'font-size:0.8rem;text-decoration:none;color:var(--text-dim,#94a3b8);display:flex;align-items:center;padding:0.4rem 0.6rem;border-radius:6px;transition:all 0.2s;';
+                            adminLink.onmouseover = () => { adminLink.style.color = '#3b82f6'; adminLink.style.background = 'rgba(59,130,246,0.1)'; };
+                            adminLink.onmouseout = () => { adminLink.style.color = 'var(--text-dim,#94a3b8)'; adminLink.style.background = 'transparent'; };
+                            avatarGroup.appendChild(adminLink);
+                        }
+
                         // Avatar link (goes to profile)
                         const avatarLink = document.createElement('a');
-                        avatarLink.href = '/profile.php';
+                        avatarLink.href = 'profile.php';
                         avatarLink.className = 'nav-avatar-link';
                         avatarLink.title = data.username;
                         avatarLink.style.cssText = 'display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;';
@@ -53,9 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         avatarLink.appendChild(avatarCircle);
                         avatarLink.appendChild(userName);
 
+                        avatarGroup.appendChild(avatarLink);
+
                         // Logout button
                         const logoutBtn = document.createElement('a');
-                        logoutBtn.href = '/backend/logout.php';
+                        logoutBtn.href = 'backend/logout.php';
                         logoutBtn.className = 'btn btn-outline nav-logout-btn';
                         logoutBtn.style.cssText = 'padding:0.4rem 0.8rem;font-size:0.8rem;border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:6px;text-decoration:none;transition:all 0.3s;';
                         logoutBtn.textContent = 'Déconnexion';

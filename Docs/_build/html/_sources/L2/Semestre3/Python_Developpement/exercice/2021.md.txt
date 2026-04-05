@@ -1,9 +1,0 @@
-# Python Developpement — Exercice 2021
-
-> L2 / Semestre3 / Python Developpement
-
-*Aucun contenu disponible pour le moment.*
-
----
-
-📌 **Contribuer :** Si vous disposez de ce document, ajoutez-le via la page [Contribuer](../../../../../../contribute.html).

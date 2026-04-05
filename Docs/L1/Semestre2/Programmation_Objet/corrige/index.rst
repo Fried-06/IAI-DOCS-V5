@@ -6,4 +6,3 @@ Corrigés
 
    corrige_partiel/index
    corrige_devoir/index
-   corrige_exercice/index

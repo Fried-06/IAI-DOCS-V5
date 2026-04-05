@@ -10,3 +10,6 @@ sphinx-togglebutton>=0.3.2
 # Document Processing (PDF/DOCX Extraction)
 pymupdf>=1.23.0
 markitdown>=0.0.1
+docling>=1.0.0
+google-genai>=0.2.0
+python-dotenv>=1.0.0
