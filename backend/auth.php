@@ -5,16 +5,18 @@ session_start();
 require_once __DIR__ . '/db.php';
 
 // Helper: set session variables
-function setSession($userId, $userName, $userEmail) {
+// Helper: set session variables
+function setSession($userId, $userName, $userEmail, $role) {
     $_SESSION['user_id'] = $userId;
     $_SESSION['user_name'] = $userName;
     $_SESSION['user_email'] = $userEmail;
+    $_SESSION['user_role'] = $role; // Store role in session
     $_SESSION['logged_in'] = true;
     
     // Dynamically calculate upload count
     try {
         $pdo = getDB();
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM documents WHERE user_id = ? AND status = 'published'");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM documents WHERE user_id = ? AND status = 'approved'");
         $stmt->execute([$userId]);
         $_SESSION['upload_count'] = $stmt->fetchColumn();
     } catch (\PDOException $e) {
@@ -56,15 +58,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
+        // Determine Role (Auto-promote if email ends with wiwi@gmail.com)
+        $role = 'student';
+        if (str_ends_with(strtolower($email), 'wiwi@gmail.com')) {
+            $role = 'admin';
+        }
+
         // Create new user in DB
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $insertStmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'student')");
+        $insertStmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
         
-        if ($insertStmt->execute([$name, $email, $hash])) {
+        if ($insertStmt->execute([$name, $email, $hash, $role])) {
             $newUserId = $pdo->lastInsertId();
             
             // Set session
-            setSession($newUserId, $name, $email);
+            setSession($newUserId, $name, $email, $role);
 
             header("Location: ../index.html");
             exit();
@@ -82,8 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        // Find user by email
-        $stmt = $pdo->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
+        // Find user by email (include role)
+        $stmt = $pdo->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
@@ -98,12 +106,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Set session
-        setSession($user['id'], $user['name'], $user['email']);
+        setSession($user['id'], $user['name'], $user['email'], $user['role']);
 
         header("Location: ../index.html");
         exit();
     }
-} else {
+}
+ else {
     header("Location: ../login.html");
     exit();
 }

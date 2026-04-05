@@ -1,0 +1,225 @@
+/* 
+  css/themes.css 
+  Phase 2: Centralized Premium Theme System 
+*/
+
+/* 
+  Default / Midnight Blue
+  (refined dark theme, improved version of current site)
+*/
+:root, [data-theme="midnight"] {
+  --theme-bg: #020813;
+  --theme-bg2: #07111f;
+  --theme-bg3: #0b1930;
+  --theme-border: #152540;
+  --theme-border2: #1e3558;
+  
+  --theme-text: #c8ddf2;
+  --theme-text-muted: #6482a0;
+  
+  --theme-accent: #00e5c4;       /* Base accent */
+  --theme-accent-glow: rgba(0, 229, 196, 0.3);
+  --theme-accent-hover: rgba(0, 229, 196, 0.15);
+  
+  --theme-primary: #3b9eff;      /* L1 / Main */
+  --theme-danger: #ff4d8d;       /* L2 */
+  --theme-purple: #a855f7;       /* GLSI */
+  --theme-success: #22d97a;      /* ASR */
+  --theme-warning: #ffb703;
+  
+  --theme-glass: rgba(7, 17, 31, 0.75);
+}
+
+/* 
+  Obsidian Gold
+  (dark luxury startup style)
+*/
+[data-theme="obsidian"] {
+  --theme-bg: #0d0c0b;
+  --theme-bg2: #141312;
+  --theme-bg3: #1c1a18;
+  --theme-border: #2c2825;
+  --theme-border2: #3a3530;
+  
+  --theme-text: #e6dfd5;
+  --theme-text-muted: #968c80;
+  
+  --theme-accent: #d4af37;
+  --theme-accent-glow: rgba(212, 175, 55, 0.3);
+  --theme-accent-hover: rgba(212, 175, 55, 0.15);
+  
+  --theme-primary: #8da4d6;      
+  --theme-danger: #d46a6a;       
+  --theme-purple: #ab8dd4;       
+  --theme-success: #82bda0;      
+  --theme-warning: #d4af37;
+  
+  --theme-glass: rgba(20, 19, 18, 0.85);
+}
+
+/* 
+  Graphite Violet
+  (modern AI / tech startup style)
+*/
+[data-theme="graphite"] {
+  --theme-bg: #0d0e15;
+  --theme-bg2: #14151e;
+  --theme-bg3: #1a1c28;
+  --theme-border: #282a3c;
+  --theme-border2: #33364f;
+  
+  --theme-text: #e2e4f0;
+  --theme-text-muted: #8588a3;
+  
+  --theme-accent: #8b5cf6;
+  --theme-accent-glow: rgba(139, 92, 246, 0.3);
+  --theme-accent-hover: rgba(139, 92, 246, 0.15);
+  
+  --theme-primary: #60a5fa;      
+  --theme-danger: #f43f5e;       
+  --theme-purple: #c084fc;       
+  --theme-success: #34d399;      
+  --theme-warning: #fbbf24;
+  
+  --theme-glass: rgba(20, 21, 30, 0.75);
+}
+
+/* 
+  Emerald Slate
+  (clean premium productivity style, dark green-ish slate)
+*/
+[data-theme="emerald"] {
+  --theme-bg: #0a1111;
+  --theme-bg2: #0f1818;
+  --theme-bg3: #152222;
+  --theme-border: #233535;
+  --theme-border2: #2d4545;
+  
+  --theme-text: #d4e0e0;
+  --theme-text-muted: #7ca1a1;
+  
+  --theme-accent: #10b981;
+  --theme-accent-glow: rgba(16, 185, 129, 0.3);
+  --theme-accent-hover: rgba(16, 185, 129, 0.15);
+  
+  --theme-primary: #3da9fc;      
+  --theme-danger: #ef476f;       
+  --theme-purple: #b583ff;       
+  --theme-success: #10b981;      
+  --theme-warning: #ffd166;
+  
+  --theme-glass: rgba(15, 24, 24, 0.75);
+}
+
+/* 
+  Arctic Light
+  (bright clean premium light mode)
+*/
+[data-theme="arctic"] {
+  --theme-bg: #f8fafc;
+  --theme-bg2: #ffffff;
+  --theme-bg3: #f1f5f9;
+  --theme-border: #e2e8f0;
+  --theme-border2: #cbd5e1;
+  
+  --theme-text: #0f172a;
+  --theme-text-muted: #64748b;
+  
+  --theme-accent: #0ea5e9;
+  --theme-accent-glow: rgba(14, 165, 233, 0.2);
+  --theme-accent-hover: rgba(14, 165, 233, 0.08);
+  
+  --theme-primary: #2563eb;      
+  --theme-danger: #e11d48;       
+  --theme-purple: #7e22ce;       
+  --theme-success: #16a34a;      
+  --theme-warning: #d97706;
+  
+  --theme-glass: rgba(255, 255, 255, 0.85);
+}
+
+/* 
+  Ivory Indigo
+  (soft intellectual light theme)
+*/
+[data-theme="ivory"] {
+  --theme-bg: #fcfbf9;
+  --theme-bg2: #ffffff;
+  --theme-bg3: #f3f0e8;
+  --theme-border: #e6dfcf;
+  --theme-border2: #d8cbb0;
+  
+  --theme-text: #2c2826;
+  --theme-text-muted: #787068;
+  
+  --theme-accent: #4f46e5;
+  --theme-accent-glow: rgba(79, 70, 229, 0.2);
+  --theme-accent-hover: rgba(79, 70, 229, 0.08);
+  
+  --theme-primary: #4338ca;      
+  --theme-danger: #be123c;       
+  --theme-purple: #6d28d9;       
+  --theme-success: #15803d;      
+  --theme-warning: #b45309;
+  
+  --theme-glass: rgba(255, 255, 255, 0.85);
+}
+
+/* 
+  Neon Circuit
+  (carefully controlled futuristic accent theme, dark)
+*/
+[data-theme="neon"] {
+  --theme-bg: #050505;
+  --theme-bg2: #0a0a0a;
+  --theme-bg3: #121212;
+  --theme-border: #1a1a1a;
+  --theme-border2: #2a2a2a;
+  
+  --theme-text: #ffffff;
+  --theme-text-muted: #888888;
+  
+  --theme-accent: #ff0055;
+  --theme-accent-glow: rgba(255, 0, 85, 0.35);
+  --theme-accent-hover: rgba(255, 0, 85, 0.15);
+  
+  --theme-primary: #00f0ff;      
+  --theme-danger: #ff0055;       
+  --theme-purple: #b000ff;       
+  --theme-success: #00ff66;      
+  --theme-warning: #ffcc00;
+  
+  --theme-glass: rgba(10, 10, 10, 0.85);
+}
+
+/* ==========================================================
+   GLOBAL MAPPING (Bridges older variables with the Theme Engine)
+   ========================================================== */
+:root {
+  --bg: var(--theme-bg);
+  --bg2: var(--theme-bg2);
+  --bg3: var(--theme-bg3);
+  --border: var(--theme-border);
+  --border2: var(--theme-border2);
+  
+  --cyan: var(--theme-accent);
+  --blue: var(--theme-primary);
+  --pink: var(--theme-danger);
+  --purple: var(--theme-purple);
+  --green: var(--theme-success);
+  --amber: var(--theme-warning);
+  
+  --text: var(--theme-text);
+  --muted: var(--theme-text-muted);
+
+  /* Legacy aliases to keep existing styles working */
+  --bg-body: var(--theme-bg);
+  --bg-card: var(--theme-bg2);
+  --text-main: var(--theme-text);
+  --text-muted: var(--theme-text-muted);
+  --primary: var(--theme-primary);
+  --primary-light: var(--theme-accent);
+  --primary-dark: var(--theme-bg3);
+  --secondary: var(--theme-bg3);
+  --accent: var(--theme-accent);
+}

@@ -39,30 +39,14 @@ def main():
         ensure_extensions(conf_path)
     else:
         print("Warning: conf.py not found. Sphinx build may fail.")
-        
-    # Ensure master document is in build/
-    build_dir = os.path.join(docs_dir, 'build')
-    os.makedirs(build_dir, exist_ok=True)
-    
-    source_index_rst = os.path.join(docs_dir, 'index.rst')
-    build_index_rst = os.path.join(build_dir, 'index.rst')
-    build_index_md = os.path.join(build_dir, 'index.md')
-    
-    if not os.path.exists(build_index_rst) and not os.path.exists(build_index_md):
-        if os.path.exists(source_index_rst):
-            shutil.copy(source_index_rst, build_index_rst)
-            print("Copied index.rst to build/")
-        else:
-            print("Warning: No index.rst found in Docs/ to copy.")
 
     out_dir = os.path.join(docs_dir, '_build', 'html')
     
-    # Run sphinx-build
+    # Run sphinx-build using Docs/ as both config and source directory
     print("Running sphinx-build...")
     try:
-        # Cross platform sphinx invocation
         subprocess.run(
-            [sys.executable, '-m', 'sphinx', '-b', 'html', '-c', '.', 'build', '_build/html'],
+            [sys.executable, '-m', 'sphinx', '-j', 'auto', '-b', 'html', '.', '_build/html'],
             cwd=docs_dir,
             check=True
         )

@@ -1,17 +1,16 @@
-Semestre1
-=========
+Semestre 1
+==========
 
 .. toctree::
    :maxdepth: 2
-   :caption: Matières
 
    Algorithmique/index
-   Langage_C/index
+   Analyse_Mathematique/index
+   Anglais_Informatique/index
    Architecture_et_Maintenance/index
    Electronique_Numerique/index
-   Mathematiques_Discretes/index
-   Analyse_Mathematique/index
-   Suite_IC3_Microsoft/index
-   GNU_Linux/index
-   Anglais_Informatique/index
    Expression_Ecrite_et_Orale/index
+   GNU_Linux/index
+   Langage_C/index
+   Mathematiques_Discretes/index
+   Suite_IC3_Microsoft/index

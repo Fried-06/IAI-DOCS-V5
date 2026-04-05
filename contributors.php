@@ -113,284 +113,13 @@ $totalContributors = count($contributors);
 
     <title>Contributeurs - Ressources IAI</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=2">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 
-    <style>
+    
 
-        .contrib-hero {
-
-            padding: 4rem 0;
-
-            background: linear-gradient(135deg, #040c18 0%, #0b1930 50%, #0a1628 100%);
-
-            color: white; text-align: center;
-
-            position: relative; overflow: hidden;
-
-        }
-
-        .contrib-hero::before {
-
-            content:''; position:absolute; inset:0;
-
-            background-image:
-
-                linear-gradient(rgba(255,183,3,.03) 1px,transparent 1px),
-
-                linear-gradient(90deg,rgba(255,183,3,.03) 1px,transparent 1px);
-
-            background-size:50px 50px; pointer-events:none;
-
-        }
-
-        .contrib-hero h1 {
-
-            font-family: 'Bebas Neue', sans-serif;
-
-            font-size: clamp(2rem,5vw,3.5rem);
-
-            letter-spacing: 0.04em; position: relative; z-index: 1;
-
-        }
-
-        .contrib-hero p {
-
-            font-family: 'JetBrains Mono', monospace;
-
-            font-size: 0.85rem; color: #4a6a8a;
-
-            position: relative; z-index: 1;
-
-            max-width: 600px; margin: 0.75rem auto 0;
-
-        }
-
-        .contrib-hero .count-badge {
-
-            display: inline-block; margin-top: 1rem;
-
-            padding: 0.4rem 1rem; border-radius: 2rem;
-
-            background: rgba(255,183,3,0.1); border: 1px solid rgba(255,183,3,0.2);
-
-            font-family: 'JetBrains Mono', monospace;
-
-            font-size: 0.8rem; color: #ffb703;
-
-            position: relative; z-index: 1;
-
-        }
-
-
-
-        .contributors-list {
-
-            margin: 2rem auto; max-width: 800px;
-
-        }
-
-
-
-        /* Podium for top 3 */
-
-        .podium { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
-
-        .podium-card {
-
-            background: #07111f; border: 1px solid #1e3558;
-
-            border-radius: 12px; padding: 1.5rem; text-align: center;
-
-            width: 220px; transition: all 0.3s;
-
-        }
-
-        .podium-card:hover {
-
-            transform: translateY(-5px);
-
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-
-        }
-
-        .podium-1 { border-color: rgba(255,215,0,0.3); }
-
-        .podium-2 { border-color: rgba(192,192,192,0.3); }
-
-        .podium-3 { border-color: rgba(205,127,50,0.3); }
-
-        .podium-rank {
-
-            font-size: 2rem; margin-bottom: 0.5rem;
-
-        }
-
-        .podium-avatar {
-
-            width: 64px; height: 64px; border-radius: 50%;
-
-            background: linear-gradient(135deg, #00e5c4, #a855f7);
-
-            display: flex; align-items: center; justify-content: center;
-
-            font-weight: 700; font-size: 1.3rem; color: #fff;
-
-            margin: 0 auto 0.75rem;
-
-        }
-
-        .podium-name {
-
-            font-weight: 600; color: #c8ddf2; font-size: 1rem;
-
-            margin-bottom: 0.25rem;
-
-        }
-
-        .podium-count {
-
-            font-size: 0.8rem; color: #4a6a8a;
-
-            font-family: 'JetBrains Mono', monospace;
-
-        }
-
-
-
-        /* Regular contributor cards */
-
-        .contributor-card {
-
-            background: #07111f; border: 1px solid #152540;
-
-            border-radius: 10px; margin-bottom: 0.75rem;
-
-            overflow: hidden; transition: all 0.3s;
-
-        }
-
-        .contributor-card:hover { border-color: #1e3558; }
-
-        .contributor-header {
-
-            cursor: pointer; padding: 1.25rem;
-
-            display: flex; justify-content: space-between; align-items: center;
-
-            transition: background 0.2s;
-
-        }
-
-        .contributor-header:hover { background: rgba(0,229,196,0.03); }
-
-        .contributor-left {
-
-            display: flex; align-items: center; gap: 1rem;
-
-        }
-
-        .contributor-rank-num {
-
-            width: 32px; height: 32px; border-radius: 50%;
-
-            background: #0b1930; border: 1px solid #1e3558;
-
-            display: flex; align-items: center; justify-content: center;
-
-            font-family: 'JetBrains Mono', monospace;
-
-            font-size: 0.75rem; color: #4a6a8a; font-weight: 600;
-
-        }
-
-        .avatar-circle {
-
-            width: 42px; height: 42px;
-
-            background: linear-gradient(135deg, #00e5c4, #a855f7);
-
-            color: white; border-radius: 50%;
-
-            display: flex; align-items: center; justify-content: center;
-
-            font-weight: 700; font-size: 1rem;
-
-        }
-
-        .contributor-name {
-
-            font-weight: 600; color: #c8ddf2; font-size: 0.95rem;
-
-        }
-
-        .contributor-right { display: flex; align-items: center; gap: 0.75rem; }
-
-        .rank-badge {
-
-            padding: 0.25rem 0.6rem; border-radius: 0.3rem;
-
-            font-size: 0.7rem; font-family: 'JetBrains Mono', monospace;
-
-            font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
-
-        }
-
-        .rank-gold { background: rgba(255,215,0,0.15); color: #FFD700; }
-
-        .rank-silver { background: rgba(192,192,192,0.15); color: #C0C0C0; }
-
-        .rank-bronze { background: rgba(205,127,50,0.15); color: #CD7F32; }
-
-        .upload-count {
-
-            font-size: 0.85rem; color: #00e5c4;
-
-            font-family: 'JetBrains Mono', monospace; font-weight: 600;
-
-        }
-
-        .documents-list {
-
-            display: none; padding: 0; margin: 0; list-style: none;
-
-            border-top: 1px solid #152540;
-
-        }
-
-        .documents-list.active { display: block; }
-
-        .doc-item {
-
-            padding: 0.75rem 1.25rem 0.75rem 4.5rem;
-
-            border-bottom: 1px solid #0b1930;
-
-            display: flex; justify-content: space-between; align-items: center;
-
-        }
-
-        .doc-item:last-child { border-bottom: none; }
-
-        .doc-title { font-weight: 500; color: #c8ddf2; font-size: 0.85rem; }
-
-        .doc-meta { font-size: 0.75rem; color: #4a6a8a; font-family: 'JetBrains Mono', monospace; }
-
-
-
-        .empty-contrib {
-
-            text-align: center; padding: 4rem; color: #4a6a8a;
-
-            background: #07111f; border-radius: 12px; border: 1px solid #152540;
-
-            font-family: 'JetBrains Mono', monospace;
-
-        }
-
-    </style>
-
+    <script src="js/theme.js?v=2"></script>
 </head>
 
 <body class="page-fade-in">
@@ -475,7 +204,7 @@ $totalContributors = count($contributors);
 
                 <p>Aucun contributeur pour le moment.</p>
 
-                <p style="margin-top:0.5rem;">Soyez le premier à  partager vos documents !</p>
+                <p style="margin-top:0.5rem;">Soyez le premier à partager vos documents !</p>
 
                 <a href="contribute.html" style="display:inline-block;margin-top:1rem;padding:0.6rem 1.5rem;background:linear-gradient(135deg,#00e5c4,#00c4a7);color:#000;border-radius:8px;text-decoration:none;font-weight:600;">Contribuer</a>
 
@@ -491,7 +220,7 @@ $totalContributors = count($contributors);
 
                 <?php
 
-                $podiumRanks = ['à°Ÿ¥‡', 'à°Ÿ¥ˆ', 'à°Ÿ¥‰'];
+                $podiumRanks = ['🥇', '🥈', '🥉'];
 
                 $podiumClasses = ['podium-1', 'podium-2', 'podium-3'];
 
@@ -581,7 +310,7 @@ $totalContributors = count($contributors);
 
                                 <div class="doc-title"><?= htmlspecialchars($doc['title']) ?></div>
 
-                                <div class="doc-meta"><?= htmlspecialchars($doc['level']) ?> à¢€¢ <?= htmlspecialchars($doc['category']) ?></div>
+                                <div class="doc-meta"><?= htmlspecialchars($doc['level']) ?> • <?= htmlspecialchars($doc['category']) ?></div>
 
                             </div>
 

@@ -1,6 +1,7 @@
+# Cryptographie - Partiel 2026
+
 <div align="center">
 
-# INSTITUT AFRICAIN D'INFORMATIQUE (IAI – TOGO)
 **Tél : 22 20 47 00 / 22 22 13 70 e-mail : iaitogo@iai-togo.tg 07 BP : 12456 Lomé 07**
 
 ---
@@ -13,7 +14,6 @@
 **Durée : 2 H 00 mn**<br>
 **Filières : TC 2 A, B, C & D**
 
-## EXAMEN DE FIN DE SEMESTRE
 ### EPREUVE DE CRYPTOGRAPHIE
 **SEMESTRE III**
 
