@@ -1,0 +1,3 @@
+# Protections de la zone privée
+Order allow,deny
+Deny from all
