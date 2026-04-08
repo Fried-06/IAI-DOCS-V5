@@ -33,6 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         avatarGroup.className = 'nav-avatar-group';
                         avatarGroup.style.cssText = 'display:flex;align-items:center;gap:0.75rem;';
 
+                        // Prepend Studio link for all logged in users
+                        const studioLink = document.createElement('a');
+                        studioLink.href = 'studio/index.php';
+                        studioLink.className = 'nav-item nav-studio-btn';
+                        studioLink.innerHTML = '✨ Studio AI';
+                        studioLink.style.cssText = 'font-size:0.9rem; text-decoration:none; color:var(--primary); font-weight:700; margin-right:1rem;';
+                        avatarGroup.appendChild(studioLink);
+
                         // Prepend Admin Dashboard link if user is admin
                         if (data.is_admin) {
                             const adminLink = document.createElement('a');
