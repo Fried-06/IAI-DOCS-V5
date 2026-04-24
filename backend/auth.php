@@ -111,8 +111,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: ../index.html");
         exit();
     }
-}
- else {
+    // Traitement du mot de passe oublié
+    elseif ($action === 'forgot_password') {
+        $email = trim($_POST['email'] ?? '');
+        if (empty($email)) {
+            echo "<script>alert('Erreur: Email requis.'); window.history.back();</script>";
+            exit;
+        }
+        // Vérifier si l'email existe
+        $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+        if (!$user) {
+            echo "<script>alert('Aucun compte trouvé avec cet email.'); window.history.back();</script>";
+            exit;
+        }
+        // Générer un token unique
+        $token = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        // Stocker le token dans la base (table à créer: password_resets)
+        $pdo->prepare("INSERT INTO password_resets (user_id, token, expires_at) VALUES (?, ?, ?)")
+            ->execute([$user['id'], $token, $expires]);
+        // Envoyer un email avec le lien de réinitialisation (ici, simulation)
+        $resetLink = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . "/reset_password.php?token=$token";
+        // En vrai, utiliser mail() ou une librairie d'email
+        echo "<script>alert('Un lien de réinitialisation a été envoyé à votre email (simulation). Lien: $resetLink'); window.location='../login.html';</script>";
+        exit;
+    }
+} 
+else {
     header("Location: ../login.html");
     exit();
 }
