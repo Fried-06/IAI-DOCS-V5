@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Pending Documents (with JOINs)
 $pendingDocs = $pdo->query(
-    "SELECT d.id, d.title, d.filename, d.created_at,
+    "SELECT d.id, d.title, d.filename, d.created_at, d.raw_markdown,
             s.name AS subject_name, dt.name AS type_name, y.year,
             l.name AS level_name, sem.name AS semester_name,
             u.name AS user_name
@@ -269,7 +269,11 @@ $allSemesters = $pdo->query(
                                 <?php if ($isLocked): ?>
                                     <span class="badge badge-inactive" style="margin-left:5px;">Verrouillé (En édition)</span>
                                 <?php elseif ($hasDraft): ?>
-                                    <a href="admin_edit.php?id=<?= $doc['id'] ?>" class="btn btn-warning btn-sm">Ouvrir le brouillon</a>
+                                    <?php if ($doc['filename'] === 'markdown_direct.md' || !empty($doc['raw_markdown'])): ?>
+                                        <a href="admin_edit.php?id=<?= $doc['id'] ?>" class="btn btn-warning btn-sm" title="Vérifier le Markdown transmis directement">🛠️ Éditer le Markdown</a>
+                                    <?php else: ?>
+                                        <a href="admin_edit.php?id=<?= $doc['id'] ?>" class="btn btn-warning btn-sm">Ouvrir le brouillon</a>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <form method="POST" action="admin_action.php" style="display:inline;" onsubmit="this.querySelector('button').innerText='Docling...';">
                                         <input type="hidden" name="id" value="<?= $doc['id'] ?>">

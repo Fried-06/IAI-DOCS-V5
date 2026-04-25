@@ -108,7 +108,7 @@ RÈGLES DE FORMATAGE OBLIGATOIRES :
         if action == "chat" and user_prompt:
             contents.append(user_prompt)
         try:
-            response = client.models.generate_content(
+            response = client.models.generate_content_stream(
                 model='gemini-2.5-flash',
                 contents=contents,
                 config=types.GenerateContentConfig(
@@ -116,7 +116,10 @@ RÈGLES DE FORMATAGE OBLIGATOIRES :
                     temperature=0.7,
                 )
             )
-            print(json.dumps({"success": True, "result": response.text}))
+            for chunk in response:
+                if chunk.text:
+                    print(json.dumps({"success": True, "chunk": chunk.text}))
+                    sys.stdout.flush()
         except Exception as api_err:
             print(json.dumps({"success": False, "error": str(api_err)}))
 
