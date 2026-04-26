@@ -108,6 +108,9 @@ $pendingDocs = $pdo->query(
      ORDER BY d.created_at DESC"
 )->fetchAll(PDO::FETCH_ASSOC);
 
+// Active Users (last 5 minutes)
+$activeUsersCount = $pdo->query("SELECT COUNT(*) FROM users WHERE last_active >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)")->fetchColumn();
+
 // All Years
 $allYears = $pdo->query("SELECT * FROM years ORDER BY year DESC")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -190,7 +193,12 @@ $allSemesters = $pdo->query(
 <body>
     <div class="navbar">
         <a href="../index.html" class="logo">⚙ IAI DOCS ADMIN</a>
-        <a href="../index.html" class="header-btn">← Retour au site</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #00e5c4; background: rgba(0,229,196,0.1); padding: 6px 12px; border-radius: 6px; border: 1px solid #00e5c4;">
+                🟢 <?= $activeUsersCount ?> en ligne
+            </div>
+            <a href="../index.html" class="header-btn">← Retour au site</a>
+        </div>
     </div>
 
     <div class="container">
