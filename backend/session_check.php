@@ -13,6 +13,10 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     $uploadCount = 0;
     try {
         $pdo = getDB();
+        
+        // Update last active timestamp
+        $pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?")->execute([$_SESSION['user_id']]);
+        
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM documents WHERE user_id = ? AND status = 'approved'");
         $stmt->execute([$_SESSION['user_id']]);
         $uploadCount = (int) $stmt->fetchColumn();

@@ -86,8 +86,19 @@ if (is_resource($process)) {
     fwrite($pipes[0], $payload);
     fclose($pipes[0]);
     
-    // Read stdout
-    $output = stream_get_contents($pipes[1]);
+    // Read stdout line by line to support streaming
+    while (!feof($pipes[1])) {
+        $line = fgets($pipes[1]);
+        if ($line !== false) {
+            // Strip potential python warnings from JSON lines if necessary, 
+            // but we expect clean json lines now.
+            if (strpos(trim($line), '{') === 0) {
+                echo $line;
+                ob_flush();
+                flush();
+            }
+        }
+    }
     fclose($pipes[1]);
     
     // Read stderr (for debugging)
@@ -95,14 +106,6 @@ if (is_resource($process)) {
     fclose($pipes[2]);
     
     proc_close($process);
-    
-    // Attempt to parse json from python output
-    preg_match('/\{[\s\S]*\}/', $output, $matches);
-    if (!empty($matches)) {
-        echo $matches[0];
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Erreur critique du proxy AI.', 'details' => $output . ' | ' . $stderr]);
-    }
 } else {
     echo json_encode(['success' => false, 'error' => 'Impossible de lancer le processus Python.']);
 }

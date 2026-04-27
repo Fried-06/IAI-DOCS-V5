@@ -427,16 +427,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await res.json();
+            
+            // Read stream
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
             
             loaderNode.remove(); // Remove loading state
+            const msgNode = appendMessage('ai', '');
+            const contentContainer = msgNode.querySelector('.msg-content');
+            let fullText = "";
+            let buffer = "";
 
-            if (data.success) {
-                const rendered = processAiContent(data.result);
-                appendMessage('ai', rendered);
-            } else {
-                appendMessage('ai', `<span class="text-accent-danger">Erreur AI: ${data.error}</span>`);
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                buffer += decoder.decode(value, { stream: true });
+                let lines = buffer.split('\n');
+                buffer = lines.pop(); // Keep incomplete line in buffer
+                
+                for (let line of lines) {
+                    if (!line.trim()) continue;
+                    try {
+                        const data = JSON.parse(line);
+                        if (data.success) {
+                            if (data.chunk) {
+                                fullText += data.chunk;
+                            } else if (data.result) {
+                                fullText += data.result; // fallback for non-streaming actions if any
+                            }
+                        } else {
+                            fullText += `\n<span class="text-accent-danger">Erreur AI: ${data.error}</span>\n`;
+                        }
+                    } catch(e) {
+                         // unparseable line, ignore
+                    }
+                }
+                
+                // Live update HTML during streaming
+                contentContainer.innerHTML = processAiContent(fullText);
+                elements.chatArea.scrollTop = elements.chatArea.scrollHeight;
             }
+            
+            // Final parse of the remaining buffer just in case
+            if (buffer.trim()) {
+                try {
+                    const data = JSON.parse(buffer);
+                    if (data.success && data.chunk) fullText += data.chunk;
+                    else if (!data.success && data.error) fullText += `\n<span class="text-accent-danger">Erreur AI: ${data.error}</span>\n`;
+                } catch(e) {}
+            }
+            
+            // Final render update
+            contentContainer.innerHTML = processAiContent(fullText);
+            renderMath(contentContainer);
+            renderMermaidIn(contentContainer);
+            elements.chatArea.scrollTop = elements.chatArea.scrollHeight;
+
         } catch (err) {
             loaderNode.remove();
             appendMessage('ai', `<span class="text-accent-danger">Erreur de connexion avec le copilote IA.</span>`);
