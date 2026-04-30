@@ -51,3 +51,8 @@ test_input.md
 # Secrets
 .env
 .env.example
+backend/config.php
+supabase_dump.json
+migrate_to_supabase.php
+push_to_supabase.py
+*.json

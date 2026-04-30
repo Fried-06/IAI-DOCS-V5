@@ -1,19 +1,15 @@
 <?php
 // backend/db.php - Database connection helper
 
-// Configuration - Adjust these to match your environment
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'iai_docs');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
+require_once __DIR__ . '/config.php';
 
 class Database {
     private static $instance = null;
     private $pdo;
 
     private function __construct() {
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+        // DSN pour PostgreSQL
+        $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -24,7 +20,7 @@ class Database {
             $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (\PDOException $e) {
             error_log("Database Connection Error: " . $e->getMessage());
-            die("Erreur de connexion à la base de données.");
+            die("Erreur de connexion à Supabase : " . $e->getMessage());
         }
     }
 
