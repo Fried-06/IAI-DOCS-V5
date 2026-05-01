@@ -1,0 +1,9 @@
+<?php
+// backend/config.php.example
+// Copiez ce fichier vers 'backend/config.php' et remplissez avec vos accès Supabase
+
+define('DB_HOST', 'votre_host_supabase');
+define('DB_PORT', '6543');
+define('DB_NAME', 'postgres');
+define('DB_USER', 'votre_user_supabase');
+define('DB_PASS', 'votre_mot_de_passe');
