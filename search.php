@@ -303,30 +303,29 @@
 
                     data.results.forEach((item, i) => {
 
-                        const card = document.createElement('a');
-
-                        card.href = item.link;
-
+                        const card = document.createElement('div');
                         card.className = 'result-card';
-
                         card.style.animationDelay = (i * 50) + 'ms';
+                        
+                        // Fix undefined string representations
+                        const pdfLink = item.pdfLink || '#';
+                        const htmlLink = item.htmlLink || '#';
 
                         card.innerHTML = `
-
                             <div class="result-card-header">
-
                                 <span class="result-type-badge">${escHtml(item.type)}</span>
-
                                 <span class="result-level">${escHtml(item.level_label)}</span>
-
                             </div>
-
                             <div class="result-title">${escHtml(item.title)}</div>
-
                             <div class="result-semester">${escHtml(item.semester_label || '')}</div>
-
-                            <div class="result-link">Ouvrir â</div>
-
+                            <div class="subject-card-buttons" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="${escHtml(pdfLink)}" class="btn btn-primary" target="_blank" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;" title="${pdfLink === '#' ? 'PDF non disponible' : 'Ouvrir le fichier original'}" ${pdfLink === '#' ? 'onclick="return false;" style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                    📄 Voir PDF
+                                </a>
+                                <a href="${escHtml(htmlLink)}" class="btn btn-outline" target="_blank" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; ${!item.hasHtml ? 'opacity: 0.45; cursor: not-allowed; border-color: #4a6a8a; color: #4a6a8a;' : 'border-color: #00e5c4; color: #00e5c4;'}" title="${!item.hasHtml ? 'Contenu en cours de génération' : 'Ouvrir la page HTML'}" ${!item.hasHtml ? 'onclick="return false;"' : ''}>
+                                    🌐 Voir HTML
+                                </a>
+                            </div>
                         `;
 
                         resultsGrid.appendChild(card);

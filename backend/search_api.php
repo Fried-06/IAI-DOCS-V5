@@ -23,7 +23,7 @@ $docsBaseUrl = '/Docs/_build/html/';
 try {
     $pdo = getDB();
 
-    $sql = "SELECT d.id, d.title, d.file_path, d.created_at,
+    $sql = "SELECT d.id, d.title, d.file_path, d.created_at, d.pdf_url, d.status,
                    s.name AS subject_name,
                    sem.name AS semester_name,
                    l.name AS level_name,
@@ -87,20 +87,24 @@ try {
     // Build response with proper links
     $output = [];
     foreach ($results as $row) {
-        $link = '#';
-        if (!empty($row['file_path'])) {
+        $pdfLink = !empty($row['pdf_url']) ? '/' . ltrim($row['pdf_url'], '/') : '#';
+        $htmlLink = '#';
+        if ($row['status'] === 'approved' && !empty($row['file_path'])) {
             $cleanedPath = ltrim($row['file_path'], '/');
-            $link = $docsBaseUrl . $cleanedPath;
+            $htmlLink = $docsBaseUrl . $cleanedPath;
         }
+        $hasHtml = ($htmlLink !== '#');
 
         $output[] = [
             'title'          => $row['title'],
             'subject'        => $row['subject_name'],
-            'level'          => $row['level_name'],
-            'semester'        => $row['semester_name'],
+            'level_label'    => $row['level_name'],
+            'semester_label' => $row['semester_name'],
             'type'           => $row['type_name'],
             'year'           => $row['year'],
-            'link'           => $link,
+            'pdfLink'        => $pdfLink,
+            'htmlLink'       => $htmlLink,
+            'hasHtml'        => $hasHtml,
             'contributor'    => $row['user_name'] ?? 'Anonyme',
             'date'           => $row['created_at']
         ];
