@@ -26,7 +26,7 @@ $exams = [];
 try {
     $pdo = getDB();
     $stmt = $pdo->query(
-        "SELECT d.title, d.file_path,
+        "SELECT d.title, d.file_path, d.pdf_url, d.status,
                 s.name AS subject_name,
                 sem.name AS semester_name,
                 l.name AS level_name,
@@ -46,10 +46,13 @@ try {
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     foreach ($records as $rec) {
-        $link = '#';
-        if (!empty($rec['file_path'])) {
-            $link = $docsBaseUrl . $rec['file_path'];
+        $pdfLink = !empty($rec['pdf_url']) ? '/' . ltrim($rec['pdf_url'], '/') : '#';
+        $htmlLink = '#';
+        if ($rec['status'] === 'approved' && !empty($rec['file_path'])) {
+            $htmlLink = $docsBaseUrl . ltrim($rec['file_path'], '/');
         }
+        $hasHtml = ($htmlLink !== '#');
+
         $exams[] = [
             'title' => $rec['title'],
             'level' => $rec['level_name'],
@@ -57,7 +60,9 @@ try {
             'subject' => $rec['subject_name'],
             'type' => $rec['type_name'],
             'year' => $rec['year'],
-            'link' => $link,
+            'pdfLink' => $pdfLink,
+            'htmlLink' => $htmlLink,
+            'hasHtml' => $hasHtml,
             'user' => $rec['user_name'] ?? 'Anonyme'
         ];
     }
@@ -236,29 +241,23 @@ sort($allSemesters);
 
                 <?php foreach ($items as $exam): ?>
 
-                <a href="<?= htmlspecialchars($exam['link']) ?>" class="subject-card" data-semester="<?= $exam['semester'] ?>">
-
+                <div class="subject-card" data-semester="<?= htmlspecialchars($exam['semester']) ?>">
                     <div class="subject-card-title"><?= htmlspecialchars($exam['title']) ?></div>
-
                     <div class="subject-card-meta">
-
                         <?= $semesterLabels[$exam['semester']] ?? $exam['semester'] ?>
-
                         <?php if (!empty($exam['source']) && $exam['source'] === 'upload'): ?>
-
-                            â¢ Contribution
-
+                            • Contribution
                         <?php endif; ?>
-
                     </div>
-
-                    <div class="subject-card-arrow">
-
-                        Voir la fiche â
-
+                    <div class="subject-card-buttons" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="<?= htmlspecialchars($exam['pdfLink']) ?>" class="btn btn-primary" target="_blank" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;" title="<?= $exam['pdfLink'] === '#' ? 'PDF non disponible' : 'Ouvrir le fichier original' ?>" <?= $exam['pdfLink'] === '#' ? 'onclick="return false;" style="opacity: 0.5; cursor: not-allowed;"' : '' ?>>
+                            📄 Voir PDF
+                        </a>
+                        <a href="<?= htmlspecialchars($exam['htmlLink']) ?>" class="btn btn-outline" target="_blank" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; <?= !$exam['hasHtml'] ? 'opacity: 0.45; cursor: not-allowed; border-color: #4a6a8a; color: #4a6a8a;' : 'border-color: #00e5c4; color: #00e5c4;' ?>" title="<?= !$exam['hasHtml'] ? 'Contenu en cours de génération' : 'Ouvrir la page HTML' ?>" <?= !$exam['hasHtml'] ? 'onclick="return false;"' : '' ?>>
+                            🌐 Voir HTML
+                        </a>
                     </div>
-
-                </a>
+                </div>
 
                 <?php endforeach; ?>
 

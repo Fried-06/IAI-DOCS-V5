@@ -96,6 +96,8 @@ CREATE TABLE IF NOT EXISTS documents (
     original_name VARCHAR(255) NOT NULL,
     filename VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) DEFAULT NULL COMMENT 'Relative public URL to generated HTML, e.g. L1/semestre1/algo/partiel/2024.html',
+    pdf_url TEXT DEFAULT NULL COMMENT 'URL to original PDF/Word file',
+    file_hash VARCHAR(32) DEFAULT NULL COMMENT 'MD5 hash of original file to prevent duplicates',
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
