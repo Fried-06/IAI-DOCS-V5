@@ -116,17 +116,22 @@ if (!$hasMarkdown) {
     $safeBaseName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $baseName);
     $uniqueFileName = $safeBaseName . '_' . time() . '.' . $fileExtension;
     
-    // Upload to Supabase Storage
-    $bucketName = 'resources';
+    // Sauvegarde locale pour le pipeline Admin (Python extract.py a besoin du fichier physiquement)
+    if (!move_uploaded_file($_FILES['document']['tmp_name'], $uploadDir . $uniqueFileName)) {
+        echo "<script>alert('Erreur: Impossible de sauvegarder le fichier localement.'); window.history.back();</script>";
+        exit;
+    }
+
+    // Upload to Supabase Storage (on utilise le fichier local qu'on vient de créer)
+    $bucketName = 'iai_resources';
     $destinationPath = $subjectSlug . '/' . $yearStr . '/' . $uniqueFileName;
     $mimeType = ($fileExtension === 'pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     
-    $uploadResult = SupabaseStorage::uploadFile($bucketName, $destinationPath, $_FILES['document']['tmp_name'], $mimeType);
+    $uploadResult = SupabaseStorage::uploadFile($bucketName, $destinationPath, $uploadDir . $uniqueFileName, $mimeType);
     
     if ($uploadResult !== true) {
         error_log("Supabase Upload Error: " . json_encode($uploadResult));
-        echo "<script>alert('Erreur système lors de l\\'enregistrement du fichier sur le cloud.'); window.history.back();</script>";
-        exit;
+        // On ne bloque pas forcément si le local a réussi, mais c'est mieux de prévenir
     }
     
     // Set pdf_url to the public URL
@@ -136,8 +141,8 @@ if (!$hasMarkdown) {
 // --- Insert into DB ---
 try {
     $stmt = $pdo->prepare(
-        "INSERT INTO documents (title, description, user_id, subject_id, type_id, year_id, original_name, filename, status, raw_markdown, file_hash, pdf_url) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)"
+        "INSERT INTO documents (title, description, user_id, subject_id, type_id, year_id, original_name, filename, status, worker_status, raw_markdown, file_hash, pdf_url) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved', 'pending', ?, ?, ?)"
     );
     $stmt->execute([
         $title,

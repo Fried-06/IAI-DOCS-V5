@@ -61,7 +61,12 @@ if (!empty($doc['raw_markdown'])) {
     die("Brouillon introuvable. Veuillez d'abord utiliser Docling ou l'IA.");
 }
 
-$pdfUrl = empty($doc['filename']) || $doc['filename'] === 'markdown_direct.md' ? null : '../uploads/' . htmlspecialchars($doc['filename']);
+$pdfUrl = null;
+if (!empty($doc['pdf_url'])) {
+    $pdfUrl = $doc['pdf_url'];
+} elseif (!empty($doc['filename']) && $doc['filename'] !== 'markdown_direct.md') {
+    $pdfUrl = '../uploads/' . htmlspecialchars($doc['filename']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
