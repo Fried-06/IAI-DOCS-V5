@@ -717,28 +717,30 @@
 
         <!-- Sign In Form (Connexion) -->
 
-        <div class="form-panel sign-in-panel">
 
-            <form action="backend/auth.php" method="POST">
-
+        <div class="form-panel sign-in-panel" id="signInPanel">
+            <form action="backend/auth.php" method="POST" id="signInForm">
                 <img src="assets/logoiai.png" alt="Logo IAI" style="height: 80px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px rgba(0,229,196,0.4));">
-
                 <h2>Bon retour !</h2>
-
                 <p>Connectez-vous à votre compte</p>
-
                 <input type="hidden" name="action" value="login">
-
                 <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
-
                 <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
-
-                <a href="#" style="align-self: flex-end; margin-top: 0.5rem; color: #6b7280; text-decoration: none; font-size: 0.9rem;">Mot de passe oublié ?</a>
-
+                    <div style="display: flex; align-items: center; margin: 0.5rem 0 1rem 0;">
+                        <input type="checkbox" id="rememberMe" name="remember_me" style="margin-right: 0.5rem;">
+                        <label for="rememberMe" style="color: #c8ddf2; font-size: 0.95rem; cursor: pointer;">Se rappeler de moi</label>
+                    </div>
+                <a href="#" id="forgotPwdLink" style="align-self: flex-end; margin-top: 0.5rem; color: #6b7280; text-decoration: none; font-size: 0.9rem;">Mot de passe oublié ?</a>
                 <button type="submit" class="btn">Se connecter</button>
-
                 <button type="button" class="mobile-toggle" id="mobileSignUp" style="display: none;">Pas de compte ? Inscrivez-vous</button>
-
+            </form>
+            <!-- Formulaire mot de passe oublié (affiché dynamiquement, exclusif) -->
+            <form id="forgotPwdForm" action="backend/auth.php" method="POST" style="display:none; flex-direction:column; align-items:center; margin-top:1.5rem; background:var(--bg3); padding:1.5rem 1rem; border-radius:8px; border:1px solid var(--border2); width:100%; max-width:350px;">
+                <input type="hidden" name="action" value="forgot_password">
+                <label for="forgot_email" style="color:var(--text);margin-bottom:0.5rem;">Saisissez votre email :</label>
+                <input type="email" class="input-field" id="forgot_email" name="email" placeholder="Adresse Email" required style="margin-bottom:1rem;" />
+                <button type="submit" class="btn" style="margin-top:0;">Envoyer le lien</button>
+                <button type="button" id="cancelForgotPwd" style="margin-top:0.7rem; background:none; border:none; color:var(--muted); cursor:pointer;">Annuler</button>
             </form>
 
         </div>
@@ -777,6 +779,27 @@
 
 
 
+
+    <script>
+        // Mot de passe oublié : affichage exclusif du formulaire
+        const forgotPwdLink = document.getElementById('forgotPwdLink');
+        const forgotPwdForm = document.getElementById('forgotPwdForm');
+        const cancelForgotPwd = document.getElementById('cancelForgotPwd');
+        const signInForm = document.getElementById('signInForm');
+        if(forgotPwdLink && forgotPwdForm && signInForm) {
+            forgotPwdLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                forgotPwdForm.style.display = 'flex';
+                signInForm.style.display = 'none';
+            });
+        }
+        if(cancelForgotPwd && forgotPwdForm && signInForm) {
+            cancelForgotPwd.addEventListener('click', function() {
+                forgotPwdForm.style.display = 'none';
+                signInForm.style.display = 'flex';
+            });
+        }
+    </script>
     </div>
 
 

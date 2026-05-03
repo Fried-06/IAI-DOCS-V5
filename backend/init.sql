@@ -7,9 +7,6 @@
 CREATE DATABASE IF NOT EXISTS iai_docs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE iai_docs;
 
--- ============================================================
--- 1. USERS — Authentication & Roles
--- ============================================================
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -18,6 +15,20 @@ CREATE TABLE IF NOT EXISTS users (
     role ENUM('student', 'admin') DEFAULT 'student',
     last_active TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- PASSWORD RESETS — Pour la réinitialisation de mot de passe
+-- ============================================================
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_token (token)
 ) ENGINE=InnoDB;
 
 -- ============================================================
@@ -95,9 +106,6 @@ CREATE TABLE IF NOT EXISTS documents (
     FOREIGN KEY (year_id) REFERENCES years(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ============================================================
--- 8. NOTIFICATIONS — System alerts for users
--- ============================================================
 CREATE TABLE IF NOT EXISTS notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -109,6 +117,20 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+
+-- ============================================================
+-- 9. USER TOKENS — Pour la connexion persistante ("Se rappeler de moi")
+-- ============================================================
+CREATE TABLE IF NOT EXISTS user_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_token (token)
 ) ENGINE=InnoDB;
 
 

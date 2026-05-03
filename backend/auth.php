@@ -1,8 +1,28 @@
 <?php
 // backend/auth.php - Real Authentication with MySQL database
 
+
 session_start();
 require_once __DIR__ . '/db.php';
+
+// Connexion automatique via le cookie "remember_me"
+if (!isset($_SESSION['logged_in']) && isset($_COOKIE['remember_me'])) {
+    $pdo = getDB();
+    $token = $_COOKIE['remember_me'];
+    $stmt = $pdo->prepare("SELECT ut.user_id, u.name, u.email, u.role FROM user_tokens ut JOIN users u ON ut.user_id = u.id WHERE ut.token = ? AND ut.expires_at > NOW()");
+    $stmt->execute([$token]);
+    $row = $stmt->fetch();
+    if ($row) {
+        setSession($row['user_id'], $row['name'], $row['email'], $row['role']);
+        // Rafraîchir le cookie (optionnel)
+        setcookie('remember_me', $token, time() + 60*60*24*30, '/', '', false, true);
+        // Rediriger vers la page d'accueil si sur login
+        if (basename($_SERVER['PHP_SELF']) === 'auth.php' || basename($_SERVER['PHP_SELF']) === 'login.html') {
+            header('Location: ../index.html');
+            exit();
+        }
+    }
+}
 
 // Helper: set session variables
 // Helper: set session variables
@@ -32,6 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+
+        // Vérifier si l'utilisateur a coché "Se rappeler de moi"
+        $rememberMe = isset($_POST['remember_me']);
         $confirm_password = $_POST['confirm_password'] ?? '';
 
         // Validations
@@ -108,11 +131,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Set session
         setSession($user['id'], $user['name'], $user['email'], $user['role']);
 
+        // Si "Se rappeler de moi" est coché, créer un cookie persistant (30 jours)
+        if ($rememberMe) {
+            $token = bin2hex(random_bytes(32));
+            // Stocker le token dans la base de données (table à créer: user_tokens)
+            $stmt = $pdo->prepare("INSERT INTO user_tokens (user_id, token, expires_at) VALUES (?, ?, ?)");
+            $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
+            $stmt->execute([$user['id'], $token, $expires]);
+            setcookie('remember_me', $token, time() + 60*60*24*30, '/', '', false, true);
+        }
+
         header("Location: ../index.html");
         exit();
     }
-}
- else {
+    // Traitement du mot de passe oublié
+    elseif ($action === 'forgot_password') {
+        $email = trim($_POST['email'] ?? '');
+        if (empty($email)) {
+            echo "<script>alert('Erreur: Email requis.'); window.history.back();</script>";
+            exit;
+        }
+        // Vérifier si l'email existe
+        $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+        if (!$user) {
+            echo "<script>alert('Aucun compte trouvé avec cet email.'); window.history.back();</script>";
+            exit;
+        }
+        // Générer un token unique
+        $token = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        // Stocker le token dans la base (table à créer: password_resets)
+        $pdo->prepare("INSERT INTO password_resets (user_id, token, expires_at) VALUES (?, ?, ?)")
+            ->execute([$user['id'], $token, $expires]);
+        // Envoyer un email avec le lien de réinitialisation (ici, simulation)
+        $resetLink = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . "/reset_password.php?token=$token";
+        // En vrai, utiliser mail() ou une librairie d'email
+        echo "<script>alert('Un lien de réinitialisation a été envoyé à votre email (simulation). Lien: $resetLink'); window.location='../login.html';</script>";
+        exit;
+    }
+} 
+else {
     header("Location: ../login.html");
     exit();
 }
