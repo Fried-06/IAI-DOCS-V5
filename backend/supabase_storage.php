@@ -33,7 +33,8 @@ class SupabaseStorage {
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Authorization: Bearer ' . SUPABASE_KEY,
             'apikey: ' . SUPABASE_KEY,
-            'Content-Type: ' . $mimeType
+            'Content-Type: ' . $mimeType,
+            'x-upsert: true'
         ]);
 
         // Optionnel : Désactiver la vérification SSL si le bundle CA est manquant sur Windows
