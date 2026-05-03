@@ -87,11 +87,26 @@ try {
     // Build response with proper links
     $output = [];
     foreach ($results as $row) {
-        $pdfLink = !empty($row['pdf_url']) ? '/' . ltrim($row['pdf_url'], '/') : '#';
+        // PDF Link: Check if it's already an absolute URL
+        if (!empty($row['pdf_url'])) {
+            if (strpos($row['pdf_url'], 'http') === 0) {
+                $pdfLink = $row['pdf_url'];
+            } else {
+                $pdfLink = '/' . ltrim($row['pdf_url'], '/');
+            }
+        } else {
+            $pdfLink = '#';
+        }
+
+        // HTML Link: Check if it's already an absolute URL
         $htmlLink = '#';
         if ($row['status'] === 'approved' && !empty($row['file_path'])) {
-            $cleanedPath = ltrim($row['file_path'], '/');
-            $htmlLink = $docsBaseUrl . $cleanedPath;
+            if (strpos($row['file_path'], 'http') === 0) {
+                $htmlLink = $row['file_path'];
+            } else {
+                $cleanedPath = ltrim($row['file_path'], '/');
+                $htmlLink = $docsBaseUrl . $cleanedPath;
+            }
         }
         $hasHtml = ($htmlLink !== '#');
 

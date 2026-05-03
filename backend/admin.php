@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Pending Documents (with JOINs)
 $pendingDocs = $pdo->query(
-    "SELECT d.id, d.title, d.filename, d.created_at, d.raw_markdown,
+    "SELECT d.id, d.title, d.filename, d.pdf_url, d.created_at, d.raw_markdown,
             s.name AS subject_name, dt.name AS type_name, y.year,
             l.name AS level_name, sem.name AS semester_name,
             u.name AS user_name
@@ -270,7 +270,9 @@ $allSemesters = $pdo->query(
                                         }
                                     }
                                 ?>
-                                <?php if (!empty($doc['filename']) && $doc['filename'] !== 'markdown_direct.md'): ?>
+                                <?php if (!empty($doc['pdf_url'])): ?>
+                                    <a href="<?= htmlspecialchars($doc['pdf_url']) ?>" target="_blank" class="btn btn-view btn-sm">PDF Original</a>
+                                <?php elseif (!empty($doc['filename']) && $doc['filename'] !== 'markdown_direct.md'): ?>
                                     <a href="../uploads/<?= htmlspecialchars($doc['filename']) ?>" target="_blank" class="btn btn-view btn-sm">PDF Original</a>
                                 <?php endif; ?>
                                 

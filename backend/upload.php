@@ -4,7 +4,7 @@
 
 session_start();
 require_once __DIR__ . '/db.php';
-
+require_once __DIR__ . '/supabase_storage.php';
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: ../contribute.html");
     exit;
@@ -111,24 +111,26 @@ if (!$hasMarkdown) {
         // Ignore, will use 'divers/0000'
     }
 
-    $structuredDir = $uploadDir . $subjectSlug . '/' . $yearStr . '/';
-    if (!is_dir($structuredDir)) {
-        mkdir($structuredDir, 0755, true);
-    }
-
     // Generate safe unique filename
     $baseName = pathinfo($fileName, PATHINFO_FILENAME);
     $safeBaseName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $baseName);
     $uniqueFileName = $safeBaseName . '_' . time() . '.' . $fileExtension;
-    $destination = $structuredDir . $uniqueFileName;
-
-    if (!move_uploaded_file($_FILES['document']['tmp_name'], $destination)) {
-        echo "<script>alert('Erreur système lors de l\\'enregistrement du fichier.'); window.history.back();</script>";
+    
+    // Upload to Supabase Storage
+    $bucketName = 'resources';
+    $destinationPath = $subjectSlug . '/' . $yearStr . '/' . $uniqueFileName;
+    $mimeType = ($fileExtension === 'pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    
+    $uploadResult = SupabaseStorage::uploadFile($bucketName, $destinationPath, $_FILES['document']['tmp_name'], $mimeType);
+    
+    if ($uploadResult !== true) {
+        error_log("Supabase Upload Error: " . json_encode($uploadResult));
+        echo "<script>alert('Erreur système lors de l\\'enregistrement du fichier sur le cloud.'); window.history.back();</script>";
         exit;
     }
     
-    // Set pdf_url (local path for now, easily changeable to Supabase Storage later)
-    $pdfUrl = 'uploads/' . $subjectSlug . '/' . $yearStr . '/' . $uniqueFileName;
+    // Set pdf_url to the public URL
+    $pdfUrl = SupabaseStorage::getPublicUrl($bucketName, $destinationPath);
 }
 
 // --- Insert into DB ---
