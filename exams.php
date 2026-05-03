@@ -58,10 +58,9 @@ try {
         }
 
         // HTML Link: Check if it's already an absolute URL
-        $htmlLink = '#';
         if ($rec['status'] === 'approved' && !empty($rec['file_path'])) {
             if (strpos($rec['file_path'], 'http') === 0) {
-                $htmlLink = $rec['file_path'];
+                $htmlLink = 'viewer.php?url=' . urlencode($rec['file_path']);
             } else {
                 $htmlLink = $docsBaseUrl . ltrim($rec['file_path'], '/');
             }

@@ -102,7 +102,7 @@ try {
         $htmlLink = '#';
         if ($row['status'] === 'approved' && !empty($row['file_path'])) {
             if (strpos($row['file_path'], 'http') === 0) {
-                $htmlLink = $row['file_path'];
+                $htmlLink = 'viewer.php?url=' . urlencode($row['file_path']);
             } else {
                 $cleanedPath = ltrim($row['file_path'], '/');
                 $htmlLink = $docsBaseUrl . $cleanedPath;
