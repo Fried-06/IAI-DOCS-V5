@@ -46,10 +46,25 @@ try {
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     foreach ($records as $rec) {
-        $pdfLink = !empty($rec['pdf_url']) ? '/' . ltrim($rec['pdf_url'], '/') : '#';
+        // PDF Link: Check if it's already an absolute URL
+        if (!empty($rec['pdf_url'])) {
+            if (strpos($rec['pdf_url'], 'http') === 0) {
+                $pdfLink = $rec['pdf_url'];
+            } else {
+                $pdfLink = '/' . ltrim($rec['pdf_url'], '/');
+            }
+        } else {
+            $pdfLink = '#';
+        }
+
+        // HTML Link: Check if it's already an absolute URL
         $htmlLink = '#';
         if ($rec['status'] === 'approved' && !empty($rec['file_path'])) {
-            $htmlLink = $docsBaseUrl . ltrim($rec['file_path'], '/');
+            if (strpos($rec['file_path'], 'http') === 0) {
+                $htmlLink = $rec['file_path'];
+            } else {
+                $htmlLink = $docsBaseUrl . ltrim($rec['file_path'], '/');
+            }
         }
         $hasHtml = ($htmlLink !== '#');
 
