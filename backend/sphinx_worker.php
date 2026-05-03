@@ -33,15 +33,59 @@ try {
     $success = (strpos($output, 'Sphinx build successful') !== false) || (strpos($output, 'build succeeded') !== false);
 
     if ($success) {
-        $successStmt = $pdo->prepare("UPDATE documents SET worker_status = 'success', worker_error = NULL WHERE id IN ($placeholders)");
-        $successStmt->execute($docIds);
-        echo "[" . date('H:i:s') . "] BUILD SUCCESS.\n";
+        echo "[" . date('H:i:s') . "] BUILD SUCCESS. Début de l'upload vers Supabase...\n";
         
-        // Notifier les administrateurs
+        require_once __DIR__ . '/supabase_storage.php';
+
         foreach ($docs as $doc) {
+            // Récupérer les détails pour construire le chemin
+            $q = $pdo->prepare("
+                SELECT l.name as level_name, s.name as semester_name, sub.name as subject_name, t.name as type_name, y.year 
+                FROM documents d
+                JOIN subjects sub ON d.subject_id = sub.id
+                JOIN semesters s ON sub.semester_id = s.id
+                JOIN levels l ON s.level_id = l.id
+                JOIN document_types t ON d.type_id = t.id
+                JOIN years y ON d.year_id = y.id
+                WHERE d.id = ?
+            ");
+            $q->execute([$doc['id']]);
+            $meta = $q->fetch(PDO::FETCH_ASSOC);
+
+            if ($meta) {
+                // Construction du chemin local (identique à la logique Sphinx)
+                $level = str_replace(' ', '_', $meta['level_name']);
+                $semester = str_replace(' ', '', $meta['semester_name']);
+                $subject = str_replace([' ', '/'], ['_', '_'], $meta['subject_name']);
+                $type = $meta['type_name'];
+                $year = $meta['year'];
+
+                $relativePath = "$level/$semester/$subject/$type/$year.html";
+                $localHtml = __DIR__ . "/../Docs/_build/html/$relativePath";
+
+                if (file_exists($localHtml)) {
+                    echo "   Upload de $relativePath ... ";
+                    $upload = SupabaseStorage::uploadFile('subjects', $relativePath, $localHtml, 'text/html');
+                    
+                    if ($upload === true) {
+                        $publicUrl = SupabaseStorage::getPublicUrl('subjects', $relativePath);
+                        $pdo->prepare("UPDATE documents SET file_path = ?, worker_status = 'success', worker_error = NULL WHERE id = ?")
+                            ->execute([$publicUrl, $doc['id']]);
+                        echo "OK ✅\n";
+                    } else {
+                        echo "ERREUR ❌\n";
+                        $pdo->prepare("UPDATE documents SET worker_status = 'error', worker_error = 'Upload failed' WHERE id = ?")
+                            ->execute([$doc['id']]);
+                    }
+                } else {
+                    echo "   [SKIP] Fichier introuvable : $localHtml\n";
+                }
+            }
+
+            // Notifier l'admin
             if ($doc['admin_id']) {
                 $pdo->prepare("INSERT INTO notifications (user_id, document_id, type, title, message) VALUES (?, ?, 'system', ?, ?)")->execute([
-                    $doc['admin_id'], $doc['id'], 'Sphinx Terminé', 'Le document "' . $doc['title'] . '" a été compilé en arrière-plan avec succès.'
+                    $doc['admin_id'], $doc['id'], 'Sphinx Terminé', 'Le document "' . $doc['title'] . '" est maintenant disponible sur le Cloud.'
                 ]);
             }
         }
