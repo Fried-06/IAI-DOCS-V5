@@ -61,11 +61,24 @@ if ($ext === 'html') {
                 const a = e.target.closest('a');
                 if (!a) return;
                 const h = a.getAttribute('href');
-                if (!h || h === '#' || h.startsWith('javascript:')) return;
+                if (!h || h.startsWith('javascript:')) return;
+
+                // Cas spécial : Retour en haut (# ou #top)
+                if (h === '#' || h === '#top') {
+                    e.preventDefault(); e.stopPropagation();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+
+                // Ancres internes classiques
                 if (h.startsWith('#')) {
                     e.preventDefault(); e.stopPropagation();
                     const t = document.getElementById(h.substring(1)) || document.getElementsByName(h.substring(1))[0];
-                    if (t) t.scrollIntoView({ behavior: 'smooth' });
+                    if (t) {
+                        t.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
                     return;
                 }
                 e.preventDefault(); e.stopPropagation();
@@ -100,6 +113,45 @@ if ($ext === 'html') {
                 }
                 originalOpen.apply(this, arguments);
             };
+
+            // 4. SURLIGNER POUR EXPLIQUER
+            const style = document.createElement('style');
+            style.textContent = `
+                .ai-explain-btn {
+                    position: absolute; background: #00e5c4; color: #040c18;
+                    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
+                    cursor: pointer; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    display: none; align-items: center; gap: 5px; border: none;
+                }
+            `;
+            document.head.appendChild(style);
+
+            const explainBtn = document.createElement('button');
+            explainBtn.className = 'ai-explain-btn';
+            explainBtn.innerHTML = '✨ Expliquer avec l\\'IA';
+            document.body.appendChild(explainBtn);
+
+            document.addEventListener('mouseup', function(e) {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+
+                if (text.length > 5) {
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    explainBtn.style.left = (rect.left + window.scrollX) + 'px';
+                    explainBtn.style.top = (rect.top + window.scrollY - 40) + 'px';
+                    explainBtn.style.display = 'flex';
+                    explainBtn.onmousedown = function(btnEv) {
+                        btnEv.preventDefault();
+                        window.parent.postMessage({ type: 'explain_text', text: text }, '*');
+                        explainBtn.style.display = 'none';
+                        selection.removeAllRanges();
+                    };
+                } else {
+                    explainBtn.style.display = 'none';
+                }
+            });
         })();
     </script>";
 
