@@ -35,25 +35,43 @@
 
 
 /* ══════════════════════════════════════════════════════════
-   SECTION B — LARGE BRANDED REVEAL PANEL
-   Normal flow after Section A, revealed as user scrolls
+   SECTION B — LARGE BRANDED REVEAL PANEL (LE TIROIR)
+   Caché sous le site, révélé au scroll final.
    ══════════════════════════════════════════════════════════ */
 .footer-brand-reveal {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
+  position: sticky;
+  bottom: 0;
+  z-index: -1; /* Derrière tout le reste */
+  height: 50vh; /* Moitié moins haut pour l'effet tiroir */
+  min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 
-  /* Rich jade-green branded background */
-  background: #061a12;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% 120%, rgba(16, 185, 129, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(0, 229, 196, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(34, 217, 122, 0.06) 0%, transparent 60%);
+  /* Design "Hyper Class" : Noir profond avec grain et lueur émeraude */
+  background: #020617; /* Slate 950 */
+  background-image: 
+    radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.15), transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  filter: contrast(120%) brightness(100%);
 }
+
+/* On s'assure que le wrapper laisse la place au tiroir */
+.footer-reveal-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Le footer standard doit avoir un fond opaque pour cacher le tiroir */
+.footer-standard {
+  position: relative;
+  z-index: 2;
+  background: var(--bg);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  margin-bottom: 0;
+}
+
 
 .footer-brand-reveal__inner {
   text-align: center;

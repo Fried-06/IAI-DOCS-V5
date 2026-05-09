@@ -1,13 +1,13 @@
 /* js/theme.js - Premium Phase 3 Theme Selector */
 
 const THEMES = [
-  { id: 'midnight', name: 'Midnight Blue', icon: '🌑' },
-  { id: 'obsidian', name: 'Obsidian Gold', icon: '⚜️' },
-  { id: 'graphite', name: 'Graphite Violet', icon: '🔮' },
-  { id: 'emerald', name: 'Emerald Slate', icon: '🌿' },
-  { id: 'arctic', name: 'Arctic Light', icon: '☀️' },
-  { id: 'ivory', name: 'Ivory Indigo', icon: '🏛️' },
-  { id: 'neon', name: 'Neon Circuit', icon: '⚡' }
+  { id: 'midnight', name: 'Midnight Blue' },
+  { id: 'obsidian', name: 'Obsidian Gold' },
+  { id: 'graphite', name: 'Graphite Violet' },
+  { id: 'emerald', name: 'Emerald Slate' },
+  { id: 'arctic', name: 'Arctic Light' },
+  { id: 'ivory', name: 'Ivory Indigo' },
+  { id: 'neon', name: 'Neon Circuit' }
 ];
 
 const initializeTheme = () => {
@@ -109,9 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Find active theme object
     const currentThemeId = document.documentElement.getAttribute('data-theme') || 'midnight';
-    const activeThemeObj = THEMES.find(t => t.id === currentThemeId) || THEMES[0];
     
-    btn.innerHTML = `<span>${activeThemeObj.icon}</span> <span>Thème</span>`;
+    btn.innerHTML = `<span>Thème</span>`;
     
     const menu = document.createElement('div');
     menu.className = 'theme-dropdown-menu';
@@ -121,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       option.className = 'theme-option';
       if (t.id === currentThemeId) option.classList.add('active-theme');
       
-      option.innerHTML = `<span>${t.icon}</span> <span>${t.name}</span>`;
+      option.innerHTML = `<span>${t.name}</span>`;
       
       option.addEventListener('click', () => {
         // Update DOM
@@ -131,14 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update menu states across all open dropdowns
         document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active-theme'));
         document.querySelectorAll('.theme-option').forEach(opt => {
-          if (opt.textContent.includes(t.name)) {
+          if (opt.textContent.trim() === t.name) {
             opt.classList.add('active-theme');
           }
         });
         
         // Update button visual
         document.querySelectorAll('.theme-dropdown-btn').forEach(button => {
-          button.innerHTML = `<span>${t.icon}</span> <span>Thème</span>`;
+          button.innerHTML = `<span>Thème</span>`;
         });
         
         // Close menu
