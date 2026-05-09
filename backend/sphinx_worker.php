@@ -33,8 +33,13 @@ try {
     $success = (strpos($output, 'Sphinx build successful') !== false) || (strpos($output, 'build succeeded') !== false);
 
     if ($success) {
-        echo "[" . date('H:i:s') . "] BUILD SUCCESS. Début de l'upload vers Supabase...\n";
+        echo "[" . date('H:i:s') . "] BUILD SUCCESS. Début de la synchronisation intelligente vers Supabase...\n";
         
+        // Lancer la synchronisation miroir (n'enverra que ce qui a changé)
+        $syncCmd = "php " . escapeshellarg(__DIR__ . '/sync_full_docs.php') . " 2>&1";
+        $syncOutput = shell_exec($syncCmd);
+        echo $syncOutput;
+
         require_once __DIR__ . '/supabase_storage.php';
 
         foreach ($docs as $doc) {
@@ -53,7 +58,7 @@ try {
             $meta = $q->fetch(PDO::FETCH_ASSOC);
 
             if ($meta) {
-                // Construction du chemin local (identique à la logique Sphinx)
+                // Construction du chemin relatif
                 $level = str_replace(' ', '_', $meta['level_name']);
                 $semester = str_replace(' ', '', $meta['semester_name']);
                 $subject = str_replace([' ', '/'], ['_', '_'], $meta['subject_name']);
@@ -61,25 +66,13 @@ try {
                 $year = $meta['year'];
 
                 $relativePath = "$level/$semester/$subject/$type/$year.html";
-                $localHtml = __DIR__ . "/../Docs/_build/html/$relativePath";
-
-                if (file_exists($localHtml)) {
-                    echo "   Upload de $relativePath ... ";
-                    $upload = SupabaseStorage::uploadFile('subjects', $relativePath, $localHtml, 'text/html');
-                    
-                    if ($upload === true) {
-                        $publicUrl = SupabaseStorage::getPublicUrl('subjects', $relativePath);
-                        $pdo->prepare("UPDATE documents SET file_path = ?, worker_status = 'success', worker_error = NULL WHERE id = ?")
-                            ->execute([$publicUrl, $doc['id']]);
-                        echo "OK ✅\n";
-                    } else {
-                        echo "ERREUR ❌\n";
-                        $pdo->prepare("UPDATE documents SET worker_status = 'error', worker_error = 'Upload failed' WHERE id = ?")
-                            ->execute([$doc['id']]);
-                    }
-                } else {
-                    echo "   [SKIP] Fichier introuvable : $localHtml\n";
-                }
+                
+                // On sait que le sync a fait son travail, on récupère l'URL publique
+                $publicUrl = SupabaseStorage::getPublicUrl('subjects', $relativePath);
+                
+                // Mettre à jour la base de données
+                $pdo->prepare("UPDATE documents SET file_path = ?, worker_status = 'success', worker_error = NULL WHERE id = ?")
+                    ->execute([$publicUrl, $doc['id']]);
             }
 
             // Notifier l'admin

@@ -514,7 +514,7 @@ try {
 
             <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
 
-                <img src="assets/logoiai.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
 
             </a>
 
