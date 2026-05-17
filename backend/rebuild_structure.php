@@ -124,7 +124,7 @@ HTML;
             $docsSemKey = str_replace(' ', '', $semName); // "Semestre1" (preserving case from DB)
 
             // Fetch Subjects (only active)
-            $subjStmt = $pdo->prepare("SELECT * FROM subjects WHERE semester_id = ? AND is_active = 1 ORDER BY name");
+            $subjStmt = $pdo->prepare("SELECT * FROM subjects WHERE semester_id = ? AND is_active = TRUE ORDER BY name");
             $subjStmt->execute([$sem['id']]);
             $subjects = $subjStmt->fetchAll();
 

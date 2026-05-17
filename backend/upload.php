@@ -10,7 +10,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-$title       = trim($_POST['title'] ?? '');
 $subjectId   = intval($_POST['subject_id'] ?? 0);
 $typeId      = intval($_POST['type_id'] ?? 0);
 $yearId      = intval($_POST['year_id'] ?? 0);
@@ -23,14 +22,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && $_SERVER['CONTENT_
 }
 
 // --- Validation ---
-if (empty($title)) {
-    echo "<script>alert('Erreur: Le titre est requis.'); window.history.back();</script>";
-    exit;
-}
 if ($subjectId <= 0 || $typeId <= 0 || $yearId <= 0) {
     echo "<script>alert('Erreur: Veuillez sélectionner la matière, le type de document et l\\'année.'); window.history.back();</script>";
     exit;
 }
+
+// --- Récupération des Métadonnées & Standardisation du Titre ---
+$subjectName = 'Divers';
+$typeName = 'Document';
+$yearVal = '0000';
+try {
+    $pdo = getDB();
+    $metaStmt = $pdo->prepare("
+        SELECT 
+            (SELECT name FROM subjects WHERE id = ?) AS subject_name,
+            (SELECT name FROM document_types WHERE id = ?) AS type_name,
+            (SELECT year FROM years WHERE id = ?) AS year_val
+    ");
+    $metaStmt->execute([$subjectId, $typeId, $yearId]);
+    if ($meta = $metaStmt->fetch(PDO::FETCH_ASSOC)) {
+        if (!empty($meta['subject_name'])) $subjectName = $meta['subject_name'];
+        if (!empty($meta['type_name'])) $typeName = $meta['type_name'];
+        if (!empty($meta['year_val'])) $yearVal = $meta['year_val'];
+    }
+} catch (\PDOException $e) {
+    error_log("Upload metadata fetch error: " . $e->getMessage());
+}
+
+// Formater le label du type (devoir -> Devoir, corrige_partiel -> Corrigé Partiel)
+$typeLabel = ucwords(str_replace('_', ' ', $typeName));
+if (strtolower($typeName) === 'devoir') {
+    $typeLabel = 'Devoir';
+} elseif (strtolower($typeName) === 'corrige_devoir') {
+    $typeLabel = 'Corrigé Devoir';
+} elseif (strtolower($typeName) === 'partiel') {
+    $typeLabel = 'Partiel';
+} elseif (strtolower($typeName) === 'corrige_partiel') {
+    $typeLabel = 'Corrigé Partiel';
+}
+
+// Construction du titre uniforme de la plateforme
+$title = "{$subjectName} - {$typeLabel} {$yearVal}";
 
 // --- Prepare File or Raw Markdown ---
 $hasMarkdown = isset($_POST['has_markdown']) && $_POST['has_markdown'] === 'on';
@@ -79,6 +111,11 @@ if ($hasMarkdown && !empty($rawMarkdown)) {
     $fileHash = md5_file($fileTmpName);
 }
 
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>alert('Erreur: Vous devez être connecté pour contribuer.'); window.location.href='../login.html';</script>";
+    exit;
+}
+
 // --- Duplicate Detection (MD5 Hash) ---
 try {
     $pdo = getDB();
@@ -97,19 +134,8 @@ try {
 // --- Save File (if not raw markdown) ---
 if (!$hasMarkdown) {
     // Get subject and year for folder structure
-    $subjectSlug = 'divers';
-    $yearStr = '0000';
-    try {
-        $pdo = getDB();
-        $metaStmt = $pdo->prepare("SELECT s.name AS subject_name, y.year FROM subjects s CROSS JOIN years y WHERE s.id = ? AND y.id = ?");
-        $metaStmt->execute([$subjectId, $yearId]);
-        if ($meta = $metaStmt->fetch(PDO::FETCH_ASSOC)) {
-            $subjectSlug = strtolower(trim(preg_replace('/[^a-zA-Z0-9_-]/', '_', $meta['subject_name']), '_'));
-            $yearStr = $meta['year'];
-        }
-    } catch (\PDOException $e) {
-        // Ignore, will use 'divers/0000'
-    }
+    $subjectSlug = strtolower(trim(preg_replace('/[^a-zA-Z0-9_-]/', '_', $subjectName), '_'));
+    $yearStr = $yearVal;
 
     // Generate safe unique filename
     $baseName = pathinfo($fileName, PATHINFO_FILENAME);
@@ -142,7 +168,7 @@ if (!$hasMarkdown) {
 try {
     $stmt = $pdo->prepare(
         "INSERT INTO documents (title, description, user_id, subject_id, type_id, year_id, original_name, filename, status, worker_status, raw_markdown, file_hash, pdf_url) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved', 'pending', ?, ?, ?)"
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NULL, ?, ?, ?)"
     );
     $stmt->execute([
         $title,
