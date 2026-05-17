@@ -35,7 +35,7 @@ try {
                 echo json_encode(['error' => 'semester_id is required']);
                 exit;
             }
-            $stmt = $pdo->prepare("SELECT id, name FROM subjects WHERE semester_id = ? AND is_active = 1 ORDER BY name");
+            $stmt = $pdo->prepare("SELECT id, name FROM subjects WHERE semester_id = ? AND is_active = TRUE ORDER BY name");
             $stmt->execute([$semesterId]);
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             break;

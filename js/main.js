@@ -1,12 +1,12 @@
-/**
+﻿/**
  * IAI Resources - Main JavaScript
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ═══════════════════════════════════════════════════════
-    // AUTH STATE CHECK — Dynamic navbar based on session
-    // ═══════════════════════════════════════════════════════
+    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // AUTH STATE CHECK ÔÇö Dynamic navbar based on session
+    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
     (function checkAuthState() {
         fetch('backend/session_check.php')
             .then(res => res.json())
@@ -23,95 +23,78 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Hide login/register buttons
                         if (loginBtn) loginBtn.style.display = 'none';
                         if (registerBtn) registerBtn.style.display = 'none';
-                          // Create Profile Dropdown Structure
-                        const profileWrapper = document.createElement('div');
-                        profileWrapper.className = 'profile-dropdown-wrapper';
-                        profileWrapper.style.cssText = 'position:relative;display:flex;align-items:center;';
+                        if (profileBtn) profileBtn.style.display = 'none';
 
-                        // The Toggle Button (Avatar Circle Only)
-                        const profileToggle = document.createElement('div');
-                        profileToggle.className = 'profile-toggle';
-                        profileToggle.style.cssText = 'display:flex;align-items:center;cursor:pointer;padding:2px;border-radius:50%;transition:transform 0.3s;';
-                        
-                        const avatarCircle = document.createElement('div');
-                        avatarCircle.className = 'nav-avatar-circle';
-                        avatarCircle.textContent = data.initials;
-                        avatarCircle.style.cssText = 'width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#00e5c4,#a855f7);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;box-shadow:0 4px 15px rgba(0,229,196,0.3);';
+                        // Check if avatar already injected
+                        if (container.querySelector('.nav-avatar-group')) return;
 
-                        profileToggle.appendChild(avatarCircle);
-
-                        // The Dropdown Menu
-                        const dropdownMenu = document.createElement('div');
-                        dropdownMenu.className = 'profile-dropdown-menu';
-                        dropdownMenu.style.cssText = 'position:absolute;top:120%;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:1rem;min-width:220px;display:none;flex-direction:column;gap:0.5rem;box-shadow:0 20px 50px rgba(0,0,0,0.5);z-index:10001;';
-
-                        // Header inside Dropdown
-                        const userInfo = document.createElement('div');
-                        userInfo.style.cssText = 'padding:0.5rem;margin-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.1);';
-                        userInfo.innerHTML = `<div style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Connecté en tant que</div><div style="font-size:1rem;font-weight:700;color:#fff;">${data.username}</div>`;
-                        dropdownMenu.appendChild(userInfo);
-
-                        // Menu Items
-                        const profileLink = document.createElement('a');
-                        profileLink.href = 'profile.php';
-                        profileLink.className = 'dropdown-item';
-                        profileLink.innerHTML = '👤 Mon Profil';
-                        profileLink.style.cssText = 'padding:0.8rem 1rem;color:#fff;text-decoration:none;font-size:0.9rem;border-radius:12px;transition:all 0.2s;display:flex;align-items:center;gap:10px;';
-                        
-                        const logoutLink = document.createElement('a');
-                        logoutLink.href = 'backend/logout.php';
-                        logoutLink.className = 'dropdown-item logout-item';
-                        logoutLink.innerHTML = '🚪 Déconnexion';
-                        logoutLink.style.cssText = 'padding:0.8rem 1rem;color:#ff6b6b;text-decoration:none;font-size:0.9rem;border-radius:12px;transition:all 0.2s;font-weight:600;display:flex;align-items:center;gap:10px;margin-top:0.5rem;background:rgba(255,107,107,0.05);';
-
-                        dropdownMenu.appendChild(profileLink);
-                        dropdownMenu.appendChild(logoutLink);
-
-                        profileWrapper.appendChild(profileToggle);
-                        profileWrapper.appendChild(dropdownMenu);
-
-                        // Toggle Logic
-                        profileToggle.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const isOpen = dropdownMenu.style.display === 'flex';
-                            dropdownMenu.style.display = isOpen ? 'none' : 'flex';
-                            profileToggle.style.transform = isOpen ? 'scale(1)' : 'scale(1.1)';
-                        });
-
-                        document.addEventListener('click', () => {
-                            dropdownMenu.style.display = 'none';
-                            profileToggle.style.transform = 'scale(1)';
-                        });
-
-
-
-
-                        // Create Final Group
+                        // Create avatar + logout group
                         const avatarGroup = document.createElement('div');
                         avatarGroup.className = 'nav-avatar-group';
-                        avatarGroup.style.cssText = 'display:flex;align-items:center;gap:1.5rem;';
+                        avatarGroup.style.cssText = 'display:flex;align-items:center;gap:0.75rem;';
 
-                        // Prepend Studio & Admin if needed
+                        // Prepend Studio link for all logged in users
                         const studioLink = document.createElement('a');
                         studioLink.href = 'studio/index.php';
                         studioLink.className = 'nav-item nav-studio-btn';
-                        studioLink.innerHTML = 'Studio';
-                        studioLink.style.cssText = 'font-size:0.95rem; text-decoration:none; color:var(--cyan,#00e5c4); font-weight:700;';
+                        studioLink.innerHTML = 'Ô£¿ Studio AI';
+                        studioLink.style.cssText = 'font-size:0.9rem; text-decoration:none; color:var(--primary); font-weight:700; margin-right:1rem;';
                         avatarGroup.appendChild(studioLink);
 
+                        // Prepend Admin Dashboard link if user is admin
                         if (data.is_admin) {
                             const adminLink = document.createElement('a');
                             adminLink.href = 'backend/admin.php';
                             adminLink.className = 'nav-item nav-admin-btn';
-                            adminLink.innerHTML = '⚙️ Admin';
-                            adminLink.style.cssText = 'font-size:0.85rem;text-decoration:none;color:var(--text-dim,#94a3b8);font-weight:600;';
+                            adminLink.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin';
+                            adminLink.style.cssText = 'font-size:0.8rem;text-decoration:none;color:var(--text-dim,#94a3b8);display:flex;align-items:center;padding:0.4rem 0.6rem;border-radius:6px;transition:all 0.2s;';
+                            adminLink.onmouseover = () => { adminLink.style.color = '#3b82f6'; adminLink.style.background = 'rgba(59,130,246,0.1)'; };
+                            adminLink.onmouseout = () => { adminLink.style.color = 'var(--text-dim,#94a3b8)'; adminLink.style.background = 'transparent'; };
                             avatarGroup.appendChild(adminLink);
                         }
 
-                        avatarGroup.appendChild(profileWrapper);
+                        // Avatar link (goes to profile)
+                        const avatarLink = document.createElement('a');
+                        avatarLink.href = 'profile.php';
+                        avatarLink.className = 'nav-avatar-link';
+                        avatarLink.title = data.username;
+                        avatarLink.style.cssText = 'display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;';
+
+                        const avatarCircle = document.createElement('div');
+                        avatarCircle.className = 'nav-avatar-circle';
+                        avatarCircle.textContent = data.initials;
+                        avatarCircle.style.cssText = 'width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--cyan,#00e5c4),var(--purple,#a855f7));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;letter-spacing:0.02em;box-shadow:0 0 12px rgba(0,229,196,0.3);';
+
+                        const userName = document.createElement('span');
+                        userName.textContent = data.username;
+                        userName.className = 'nav-username';
+                        userName.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text,#c8ddf2);';
+
+                        avatarLink.appendChild(avatarCircle);
+                        avatarLink.appendChild(userName);
+
+                        avatarGroup.appendChild(avatarLink);
+
+                        // Logout button
+                        const logoutBtn = document.createElement('a');
+                        logoutBtn.href = 'backend/logout.php';
+                        logoutBtn.className = 'btn btn-outline nav-logout-btn';
+                        logoutBtn.style.cssText = 'padding:0.4rem 0.8rem;font-size:0.8rem;border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:6px;text-decoration:none;transition:all 0.3s;';
+                        logoutBtn.textContent = 'D├®connexion';
+                        logoutBtn.addEventListener('mouseenter', () => {
+                            logoutBtn.style.background = 'rgba(255,100,100,0.15)';
+                            logoutBtn.style.borderColor = '#ff6b6b';
+                        });
+                        logoutBtn.addEventListener('mouseleave', () => {
+                            logoutBtn.style.background = 'transparent';
+                            logoutBtn.style.borderColor = 'rgba(255,100,100,0.3)';
+                        });
+
+                        avatarGroup.appendChild(avatarLink);
+                        avatarGroup.appendChild(logoutBtn);
                         container.appendChild(avatarGroup);
                     } else {
-                        // Not logged in — buttons already visible by default
+                        // Not logged in ÔÇö buttons already visible by default
                         if (loginBtn) loginBtn.style.display = '';
                         if (registerBtn) registerBtn.style.display = '';
                     }
@@ -257,9 +240,9 @@ document.querySelectorAll('a.nav-item').forEach(link => {
 });
 
 
-// ═══════════════════════════════════════════════════════
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 // PHASE 11: TIMELINE SCROLL FILL + CARD REVEAL
-// ═══════════════════════════════════════════════════════
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 
 document.addEventListener("DOMContentLoaded", () => {
     const timelineFill = document.getElementById("timeline-fill");
@@ -299,9 +282,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ═══════════════════════════════════════════════════════
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 // PHASE 11: MODERN NAVBAR SCROLL BEHAVIOR
-// ═══════════════════════════════════════════════════════
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 
 (function() {
     const navbar = document.querySelector(".navbar");
@@ -366,13 +349,13 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 
 
-// ═══════════════════════════════════════════════════════
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 // PHASE 12: MODERN STARTUP HOMEPAGE JS
-// ═══════════════════════════════════════════════════════
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ── 1. MOUSE SPOTLIGHT ──
+    // ÔöÇÔöÇ 1. MOUSE SPOTLIGHT ÔöÇÔöÇ
     const hero = document.querySelector(".hero-v12");
     const spotlight = document.getElementById("hero-spotlight");
     if (hero && spotlight) {
@@ -386,7 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hero.addEventListener("mouseenter", () => { spotlight.style.display = "block"; });
     }
 
-    // ── 2. ANIMATED COUNTER ──
+    // ÔöÇÔöÇ 2. ANIMATED COUNTER ÔöÇÔöÇ
     function animateCounter(el) {
         const target = parseInt(el.getAttribute("data-target"), 10);
         const duration = 2000;
@@ -414,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const statsSection = document.querySelector(".stats-section");
     if (statsSection) statsObserver.observe(statsSection);
 
-    // ── 3. SCROLL REVEAL (Phase 12) ──
+    // ÔöÇÔöÇ 3. SCROLL REVEAL (Phase 12) ÔöÇÔöÇ
     const sr12Observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {

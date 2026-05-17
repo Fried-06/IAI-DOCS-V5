@@ -192,7 +192,18 @@ if ($action === 'publish') {
     $updateStmt = $pdo->prepare("UPDATE documents SET status = 'approved', file_path = ?, worker_status = 'pending', locked_by = NULL, raw_markdown = NULL WHERE id = ?");
     $updateStmt->execute([$relativePath, $docId]);
     
-    // 4b. Delete any duplicate placeholder document for this exact same subject/type/year
+    // 4b. Récupérer le pdf_url des doublons existants avant de les supprimer
+    $pdfCheckStmt = $pdo->prepare("SELECT pdf_url, original_name FROM documents WHERE subject_id = ? AND type_id = ? AND year_id = ? AND id != ? AND status = 'approved' AND pdf_url IS NOT NULL LIMIT 1");
+    $pdfCheckStmt->execute([$doc['subject_id'], $doc['type_id'], $doc['year_id'], $docId]);
+    $existingPdf = $pdfCheckStmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($existingPdf) {
+        // Transférer le lien PDF et le nom d'origine sur le document nouvellement approuvé
+        $copyPdfStmt = $pdo->prepare("UPDATE documents SET pdf_url = ?, original_name = COALESCE(original_name, ?) WHERE id = ?");
+        $copyPdfStmt->execute([$existingPdf['pdf_url'], $existingPdf['original_name'], $docId]);
+    }
+
+    // Supprimer tout document doublon pour cette même matière/type/année
     $deleteStmt = $pdo->prepare("DELETE FROM documents WHERE subject_id = ? AND type_id = ? AND year_id = ? AND id != ? AND status = 'approved'");
     $deleteStmt->execute([$doc['subject_id'], $doc['type_id'], $doc['year_id'], $docId]);
 

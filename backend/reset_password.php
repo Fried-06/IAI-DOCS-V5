@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hash = password_hash($password, PASSWORD_DEFAULT);
     $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$hash, $row['user_id']]);
     // Marquer le token comme utilisé
-    $pdo->prepare("UPDATE password_resets SET used = 1 WHERE id = ?")->execute([$row['id']]);
+    $pdo->prepare("UPDATE password_resets SET used = TRUE WHERE id = ?")->execute([$row['id']]);
     echo "<script>alert('Mot de passe réinitialisé avec succès.'); window.location='../login.html';</script>";
     exit;
 }

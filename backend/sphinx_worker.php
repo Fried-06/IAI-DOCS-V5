@@ -7,7 +7,7 @@ $pdo = getDB();
 
 try {
     // Selectionner les documents en file d'attente
-    $stmt = $pdo->query("SELECT id, title, admin_id FROM documents WHERE worker_status = 'pending'");
+    $stmt = $pdo->query("SELECT id, title, admin_id FROM documents WHERE status = 'approved' AND worker_status = 'pending'");
     $docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($docs)) {
@@ -18,64 +18,56 @@ try {
     $docIds = array_column($docs, 'id');
     $placeholders = implode(',', array_fill(0, count($docIds), '?'));
 
-    // Marquer comme 'building'
+    // Marquer les documents en cours de compilation ('building')
     $updateStmt = $pdo->prepare("UPDATE documents SET worker_status = 'building' WHERE id IN ($placeholders)");
     $updateStmt->execute($docIds);
 
-    echo "[" . date('H:i:s') . "] Lancement de Sphinx pour " . count($docs) . " documents...\n";
+    echo "[" . date('H:i:s') . "] Lancement de Sphinx pour " . count($docs) . " document(s) spécifique(s) (IDs: " . implode(', ', $docIds) . ")...\n";
     
-    // Lancer Sphinx
+    // Lancer Sphinx avec la liste des IDs à compiler
     $buildScript = __DIR__ . '/build_docs.py';
-    $cmd = "python " . escapeshellarg($buildScript) . " 2>&1";
+    $cmd = "python " . escapeshellarg($buildScript) . " " . implode(' ', array_map('intval', $docIds)) . " 2>&1";
     $output = shell_exec($cmd);
 
-    // Vérifier globalement le succès
+    // Vérifier globalement le succès de la compilation
     $success = (strpos($output, 'Sphinx build successful') !== false) || (strpos($output, 'build succeeded') !== false);
 
     if ($success) {
-        echo "[" . date('H:i:s') . "] BUILD SUCCESS. Début de la synchronisation intelligente vers Supabase...\n";
+        echo "[" . date('H:i:s') . "] BUILD SUCCESS. Mise à jour des liens Cloud...\n";
         
-        // Lancer la synchronisation miroir (n'enverra que ce qui a changé)
-        $syncCmd = "php " . escapeshellarg(__DIR__ . '/sync_full_docs.php') . " 2>&1";
-        $syncOutput = shell_exec($syncCmd);
-        echo $syncOutput;
-
         require_once __DIR__ . '/supabase_storage.php';
 
         foreach ($docs as $doc) {
-            // Récupérer les détails pour construire le chemin
-            $q = $pdo->prepare("
-                SELECT l.name as level_name, s.name as semester_name, sub.name as subject_name, t.name as type_name, y.year 
-                FROM documents d
-                JOIN subjects sub ON d.subject_id = sub.id
-                JOIN semesters s ON sub.semester_id = s.id
-                JOIN levels l ON s.level_id = l.id
-                JOIN document_types t ON d.type_id = t.id
-                JOIN years y ON d.year_id = y.id
-                WHERE d.id = ?
-            ");
+            // Récupérer le file_path déjà correctement slugifié lors de la publication
+            $q = $pdo->prepare("SELECT file_path FROM documents WHERE id = ?");
             $q->execute([$doc['id']]);
-            $meta = $q->fetch(PDO::FETCH_ASSOC);
+            $dbDoc = $q->fetch(PDO::FETCH_ASSOC);
 
-            if ($meta) {
-                // Construction du chemin relatif
-                $level = str_replace(' ', '_', $meta['level_name']);
-                $semester = str_replace(' ', '', $meta['semester_name']);
-                $subject = str_replace([' ', '/'], ['_', '_'], $meta['subject_name']);
-                $type = $meta['type_name'];
-                $year = $meta['year'];
-
-                $relativePath = "$level/$semester/$subject/$type/$year.html";
+            if ($dbDoc && !empty($dbDoc['file_path'])) {
+                $relativePath = $dbDoc['file_path'];
                 
-                // On sait que le sync a fait son travail, on récupère l'URL publique
+                // Si c'est déjà une URL absolue, on extrait la partie relative à partir de 'subjects/'
+                if (str_contains($relativePath, 'http')) {
+                    $parsedUrl = parse_url($relativePath, PHP_URL_PATH);
+                    if (str_contains($parsedUrl, 'subjects/')) {
+                        $relativePath = explode('subjects/', $parsedUrl)[1];
+                    } else {
+                        $relativePath = ltrim($parsedUrl, '/');
+                    }
+                }
+                
+                // S'assurer d'utiliser l'extension HTML
+                $relativePath = str_replace('.md', '.html', $relativePath);
+                
+                // Récupérer l'URL cloud finale publique
                 $publicUrl = SupabaseStorage::getPublicUrl('subjects', $relativePath);
                 
-                // Mettre à jour la base de données
+                // Enregistrer l'URL finale et passer le statut à 'success'
                 $pdo->prepare("UPDATE documents SET file_path = ?, worker_status = 'success', worker_error = NULL WHERE id = ?")
                     ->execute([$publicUrl, $doc['id']]);
             }
 
-            // Notifier l'admin
+            // Notifier l'admin de la réussite
             if ($doc['admin_id']) {
                 $pdo->prepare("INSERT INTO notifications (user_id, document_id, type, title, message) VALUES (?, ?, 'system', ?, ?)")->execute([
                     $doc['admin_id'], $doc['id'], 'Sphinx Terminé', 'Le document "' . $doc['title'] . '" est maintenant disponible sur le Cloud.'
@@ -83,10 +75,10 @@ try {
             }
         }
     } else {
-        // Enregistrer l'erreur
+        // Enregistrer l'erreur et notifier
         $errorStmt = $pdo->prepare("UPDATE documents SET worker_status = 'error', worker_error = ? WHERE id IN ($placeholders)");
         $params = $docIds;
-        array_unshift($params, $output); // Placer le message d'erreur en 1er parametre
+        array_unshift($params, $output); // Mettre la trace d'erreur en 1er paramètre
         $errorStmt->execute($params);
         echo "[" . date('H:i:s') . "] BUILD ERROR.\n";
         
