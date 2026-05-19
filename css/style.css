@@ -8,11 +8,11 @@
   (refined dark theme, improved version of current site)
 */
 :root, [data-theme="midnight"] {
-  --theme-bg: #020813;
-  --theme-bg2: #07111f;
-  --theme-bg3: #0b1930;
-  --theme-border: #152540;
-  --theme-border2: #1e3558;
+  --theme-bg: #000000;
+  --theme-bg2: #050505;
+  --theme-bg3: #0a0a0a;
+  --theme-border: rgba(255, 255, 255, 0.05);
+  --theme-border2: rgba(255, 255, 255, 0.08);
   
   --theme-text: #c8ddf2;
   --theme-text-muted: #6482a0;
@@ -436,6 +436,41 @@ main {
   gap: 1rem;
 }
 
+.auth-login-btn {
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all var(--transition-fast);
+}
+
+.auth-login-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.auth-register-btn {
+  color: #000;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  background: var(--cyan);
+  box-shadow: 0 4px 12px rgba(0, 229, 196, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.auth-register-btn:hover {
+  background: #00fbd7;
+  box-shadow: 0 6px 16px rgba(0, 229, 196, 0.3);
+  transform: translateY(-1px);
+}
+
 .online-users {
   display: flex;
   align-items: center;
@@ -779,12 +814,14 @@ main {
 
 /* --- Feature Cards (Levels) --- */
 .level-card {
-  background-color: var(--bg-card);
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
   padding: 2.5rem 1.5rem;
   text-align: center;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
@@ -830,10 +867,13 @@ main {
 
 /* --- Exam Cards --- */
 .exam-card {
-  background-color: var(--bg-card);
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
@@ -890,7 +930,7 @@ main {
 }
 
 .bg-light {
-  background-color: var(--secondary);
+  background-color: transparent;
 }
 
 /* --- Footer --- */
@@ -1337,7 +1377,9 @@ span, button, .nav-item, .footer {
 
 /* Fixing generic areas for the dark tech-doc style */
 .navbar {
-  background: var(--bg);
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
 .footer {
@@ -1974,7 +2016,7 @@ code, pre, .timeline-step, .hero-badge, .stat-label {
   padding: 3.5rem 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+  background: transparent;
 }
 
 .stats-grid {
@@ -3002,4 +3044,218 @@ body::after {
 @keyframes mapPulse {
   0% { transform: scale(1) translateY(0); opacity: 0.08; filter: drop-shadow(0 0 15px var(--theme-accent-glow)); }
   100% { transform: scale(1.02) translateY(-10px); opacity: 0.18; filter: drop-shadow(0 0 35px var(--theme-accent)); }
+}
+
+/* ==========================================================
+   JETBRAINS GLOW ORB SYSTEM (Breathing & Color Cycling)
+   ========================================================== */
+.jetbrains-glow-orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #3b9eff 0%, #a855f7 40%, #00e5c4 70%, transparent 100%);
+  opacity: 0.22;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
+  animation: jetbrains-glow-anim 12s ease-in-out infinite;
+  will-change: transform, filter, opacity;
+}
+
+@keyframes jetbrains-glow-anim {
+  0% {
+    transform: translate(-50%, -50%) scale(0.85);
+    filter: blur(120px) hue-rotate(0deg);
+    opacity: 0.18;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    filter: blur(160px) hue-rotate(180deg);
+    opacity: 0.28;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.85);
+    filter: blur(120px) hue-rotate(360deg);
+    opacity: 0.18;
+  }
+}
+
+/* ==========================================================
+   PREMIUM MOUSE-FOLLOWING GLOW CARDS
+   ========================================================== */
+.level-card,
+.exam-card,
+.timeline-card,
+.why-card,
+.podium-card,
+.contributor-card,
+.result-card,
+.subject-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.015) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, border-color 0.3s;
+  
+  /* Default glow color (Cyan/Blue) */
+  --glow-color: rgba(0, 229, 196, 0.12);
+  --glow-border-color: rgba(0, 229, 196, 0.55);
+}
+
+/* 1. Inner soft spotlight background glow */
+.level-card::before,
+.exam-card::before,
+.timeline-card::before,
+.why-card::before,
+.podium-card::before,
+.contributor-card::before,
+.result-card::before,
+.subject-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    250px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    var(--glow-color),
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 2. Outer pixel-perfect masked border glow */
+.level-card::after,
+.exam-card::after,
+.timeline-card::after,
+.why-card::after,
+.podium-card::after,
+.contributor-card::after,
+.result-card::after,
+.subject-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    220px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    var(--glow-border-color),
+    transparent 60%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Hover States to Reveal Glows */
+.level-card:hover::before,
+.exam-card:hover::before,
+.timeline-card:hover::before,
+.why-card:hover::before,
+.podium-card:hover::before,
+.contributor-card:hover::before,
+.result-card:hover::before,
+.subject-card:hover::before,
+.level-card:hover::after,
+.exam-card:hover::after,
+.timeline-card:hover::after,
+.why-card:hover::after,
+.podium-card:hover::after,
+.contributor-card:hover::after,
+.result-card:hover::after,
+.subject-card:hover::after {
+  opacity: 1;
+}
+
+/* Hover lift effect integration */
+.level-card:hover,
+.exam-card:hover,
+.timeline-card:hover,
+.why-card:hover,
+.podium-card:hover,
+.contributor-card:hover,
+.result-card:hover,
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure child content sits above the spotlight glow */
+.level-card > *,
+.exam-card > *,
+.timeline-card > *,
+.why-card > *,
+.podium-card > *,
+.contributor-card > *,
+.result-card > *,
+.subject-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================
+   COLOR SPECIFIC MAPPINGS (Blue, Purple, Green, Red, Orange)
+   ========================================================== */
+
+/* Blue (L1 / Default info) */
+.glow-blue,
+.level-card.l1,
+.subject-card.l1,
+.level-card:nth-child(4n+1) {
+  --glow-color: rgba(59, 158, 255, 0.14);
+  --glow-border-color: rgba(59, 158, 255, 0.65);
+}
+
+/* Purple (GLSI) */
+.glow-purple,
+.level-card.glsi,
+.subject-card.glsi,
+.level-card:nth-child(4n+2),
+.why-card:nth-child(2) {
+  --glow-color: rgba(168, 85, 247, 0.14);
+  --glow-border-color: rgba(168, 85, 247, 0.65);
+}
+
+/* Green (ASR) */
+.glow-green,
+.level-card.asr,
+.subject-card.asr,
+.level-card:nth-child(4n+3),
+.why-card:nth-child(3) {
+  --glow-color: rgba(34, 217, 122, 0.14);
+  --glow-border-color: rgba(34, 217, 122, 0.65);
+}
+
+/* Red / Pink (L2) */
+.glow-red,
+.glow-pink,
+.level-card.l2,
+.subject-card.l2,
+.level-card:nth-child(4n+4) {
+  --glow-color: rgba(255, 77, 141, 0.14);
+  --glow-border-color: rgba(255, 77, 141, 0.65);
+}
+
+/* Orange / Amber */
+.glow-orange,
+.glow-amber,
+.why-card:nth-child(4) {
+  --glow-color: rgba(255, 183, 3, 0.14);
+  --glow-border-color: rgba(255, 183, 3, 0.65);
 }

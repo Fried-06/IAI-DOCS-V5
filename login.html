@@ -200,42 +200,83 @@
 
 
 
-        .input-field {
-
+        .input-group {
+            position: relative;
             width: 100%;
-
-            background-color: var(--bg3);
-
-            color: var(--text);
-
             margin: 0.6rem 0;
-
-            padding: 1rem 1.4rem;
-
-            border-radius: 4px;
-
-            border: 1px solid var(--border2);
-
-            outline: none;
-
-            transition: 0.3s;
-
-            font-family: 'JetBrains Mono', monospace;
-
-            font-size: 0.85rem;
-
+            display: flex;
+            align-items: center;
         }
 
+        .input-icon {
+            position: absolute;
+            left: 1.2rem;
+            width: 18px;
+            height: 18px;
+            stroke: var(--muted);
+            fill: none;
+            pointer-events: none;
+            transition: stroke 0.3s;
+            z-index: 5;
+        }
 
+        .input-field {
+            width: 100%;
+            background-color: var(--bg3);
+            color: var(--text);
+            padding: 1rem 1.4rem 1rem 3.2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(30, 53, 88, 0.7);
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
 
         .input-field:focus {
-
+            background-color: #0c1c38;
             border-color: var(--cyan);
+            box-shadow: 0 0 12px rgba(0, 229, 196, 0.2);
+        }
 
-            box-shadow: 0 0 10px rgba(0, 229, 196, 0.2);
+        .input-field:focus ~ .input-icon {
+            stroke: var(--cyan);
+        }
 
-            background-color: #0d1e3d;
+        .auth-container.sign-up-mode .input-field:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+        }
 
+        .auth-container.sign-up-mode .input-field:focus ~ .input-icon {
+            stroke: var(--purple);
+        }
+
+        /* Password Show/Hide button */
+        .password-toggle-btn {
+            position: absolute;
+            right: 1.2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            z-index: 5;
+        }
+
+        .password-toggle-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--muted);
+            fill: none;
+            transition: stroke 0.3s;
+        }
+
+        .password-toggle-btn:hover svg {
+            stroke: var(--text);
         }
 
 
@@ -689,21 +730,39 @@
 
             <form action="backend/auth.php" method="POST">
 
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height: 150px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4));">
+                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height: 80px; margin-bottom: 0.5rem; filter: drop-shadow(0 0 8px rgba(168,85,247,0.4));">
 
                 <h2>Créer un compte</h2>
 
-                <p>Rejoignez la communauté IAI</p>
+                <p style="margin-bottom: 1rem;">Rejoignez la communauté IAI</p>
 
                 <input type="hidden" name="action" value="register">
 
-                <input type="text" class="input-field" name="name" placeholder="Nom complet" required />
+                <div class="input-group">
+                    <input type="text" class="input-field" name="name" placeholder="Nom complet" required />
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
 
-                <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
+                <div class="input-group">
+                    <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
 
-                <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
+                <div class="input-group">
+                    <input type="password" class="input-field password-input" name="password" placeholder="Mot de passe" required />
+                    <button type="button" class="password-toggle-btn" tabindex="-1">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
 
-                <input type="password" class="input-field" name="confirm_password" placeholder="Confirmer le mot de passe" required />
+                <div class="input-group">
+                    <input type="password" class="input-field password-input" name="confirm_password" placeholder="Confirmer le mot de passe" required />
+                    <button type="button" class="password-toggle-btn" tabindex="-1">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
 
                 <button type="submit" class="btn">S'inscrire</button>
 
@@ -724,8 +783,20 @@
                 <h2>Bon retour !</h2>
                 <p>Connectez-vous à votre compte</p>
                 <input type="hidden" name="action" value="login">
-                <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
-                <input type="password" class="input-field" name="password" placeholder="Mot de passe" required />
+                
+                <div class="input-group">
+                    <input type="email" class="input-field" name="email" placeholder="Adresse Email" required />
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" class="input-field password-input" name="password" placeholder="Mot de passe" required />
+                    <button type="button" class="password-toggle-btn" tabindex="-1">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+
                     <div style="display: flex; align-items: center; margin: 0.5rem 0 1rem 0;">
                         <input type="checkbox" id="rememberMe" name="remember_me" style="margin-right: 0.5rem;">
                         <label for="rememberMe" style="color: #c8ddf2; font-size: 0.95rem; cursor: pointer;">Se rappeler de moi</label>
@@ -738,7 +809,12 @@
             <form id="forgotPwdForm" action="backend/auth.php" method="POST" style="display:none; flex-direction:column; align-items:center; margin-top:1.5rem; background:var(--bg3); padding:1.5rem 1rem; border-radius:8px; border:1px solid var(--border2); width:100%; max-width:350px;">
                 <input type="hidden" name="action" value="forgot_password">
                 <label for="forgot_email" style="color:var(--text);margin-bottom:0.5rem;">Saisissez votre email :</label>
-                <input type="email" class="input-field" id="forgot_email" name="email" placeholder="Adresse Email" required style="margin-bottom:1rem;" />
+                
+                <div class="input-group" style="margin-bottom:1rem;">
+                    <input type="email" class="input-field" id="forgot_email" name="email" placeholder="Adresse Email" required />
+                    <svg class="input-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+
                 <button type="submit" class="btn" style="margin-top:0;">Envoyer le lien</button>
                 <button type="button" id="cancelForgotPwd" style="margin-top:0.7rem; background:none; border:none; color:var(--muted); cursor:pointer;">Annuler</button>
             </form>
@@ -859,6 +935,36 @@
             });
 
         }
+
+        // --- URL Parameter & Hash Mode Auto-routing ---
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode') || urlParams.get('action') || window.location.hash;
+            if (mode === 'register' || mode === '#register' || mode === 'signup') {
+                container.classList.add('sign-up-mode');
+            } else if (mode === 'login' || mode === '#login' || mode === 'signin') {
+                container.classList.remove('sign-up-mode');
+            }
+        } catch(e) {
+            console.error("Auto-routing error: ", e);
+        }
+
+        // --- Password Show/Hide Toggle ---
+        document.querySelectorAll('.password-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const input = btn.parentElement.querySelector('.password-input');
+                if (!input) return;
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+                } else {
+                    input.type = 'password';
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+                }
+            });
+        });
 
     </script>
 

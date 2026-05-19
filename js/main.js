@@ -1,8 +1,18 @@
-﻿/**
+/**
  * IAI Resources - Main JavaScript
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Update auth hrefs immediately to avoid lag
+    document.querySelectorAll('.auth-login-btn').forEach(btn => {
+        const currentHref = btn.getAttribute('href') || 'login.html';
+        btn.setAttribute('href', currentHref.split('?')[0] + '?mode=login');
+    });
+    document.querySelectorAll('.auth-register-btn').forEach(btn => {
+        const currentHref = btn.getAttribute('href') || 'login.html';
+        btn.setAttribute('href', currentHref.split('?')[0] + '?mode=register');
+    });
 
     // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
     // AUTH STATE CHECK ÔÇö Dynamic navbar based on session
@@ -94,9 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         avatarGroup.appendChild(logoutBtn);
                         container.appendChild(avatarGroup);
                     } else {
-                        // Not logged in ÔÇö buttons already visible by default
-                        if (loginBtn) loginBtn.style.display = '';
-                        if (registerBtn) registerBtn.style.display = '';
+                        // Not logged in — buttons already visible by default, append mode query param
+                        if (loginBtn) {
+                            loginBtn.style.display = '';
+                            const currentHref = loginBtn.getAttribute('href') || 'login.html';
+                            loginBtn.setAttribute('href', currentHref.split('?')[0] + '?mode=login');
+                        }
+                        if (registerBtn) {
+                            registerBtn.style.display = '';
+                            const currentHref = registerBtn.getAttribute('href') || 'login.html';
+                            registerBtn.setAttribute('href', currentHref.split('?')[0] + '?mode=register');
+                        }
                     }
                 });
             })
@@ -410,5 +428,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".scroll-reveal").forEach(el => {
         el.classList.add("scroll-reveal-hidden");
         sr12Observer.observe(el);
+    });
+
+    // --- Interactive Mouse Glow Card Effect (Premium Hover Spotlight) ---
+    document.addEventListener('mousemove', (e) => {
+        const card = e.target.closest('.level-card, .exam-card, .timeline-card, .why-card, .podium-card, .contributor-card, .result-card, .subject-card');
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
     });
 });
