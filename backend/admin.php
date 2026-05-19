@@ -4,8 +4,8 @@
 
 session_start();
 if (($_SESSION['user_role'] ?? '') !== 'admin') {
-    header("Location: ../index.html");
-    exit("Accès refusé.");
+    include __DIR__ . '/../403.php';
+    exit;
 }
 require_once __DIR__ . '/db.php';
 

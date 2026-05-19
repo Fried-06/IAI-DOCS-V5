@@ -1,0 +1,10 @@
+# IAI DOCS — Apache Server Configuration
+
+# Custom Error Pages
+# Note: If your site is hosted in a subdirectory (e.g. /iai-resources/),
+# prepend the subdirectory path (e.g. ErrorDocument 404 /iai-resources/404.html)
+ErrorDocument 404 /404.html
+ErrorDocument 403 /403.php
+
+# Prevent directory browsing
+Options -Indexes
