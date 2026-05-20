@@ -1,4 +1,5 @@
 <?php
+require_once 'backend/beta_check.php';
 // proxy.php — Tunnel Premium avec Masquage d'URL (Spécial Sphinx Search)
 error_reporting(0);
 require_once 'backend/config.php';

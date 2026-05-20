@@ -74,6 +74,7 @@ if ($action === 'reject') {
     $logMsg = date('[Y-m-d H:i:s] ') . "REJECTED DOC: {$doc['title']} | ID: $docId\n";
     file_put_contents(__DIR__ . '/admin.log', $logMsg, FILE_APPEND);
 
+    @unlink(__DIR__ . '/cache/document_tree.json');
     header("Location: admin.php?tab=documents&success=" . urlencode("Document rejeté."));
     exit;
 }
@@ -232,6 +233,7 @@ if ($action === 'publish') {
     $logMsg .= "  Route: $outRoute\n  Build: Queued for background worker\n";
     file_put_contents(__DIR__ . '/admin.log', $logMsg, FILE_APPEND);
 
+    @unlink(__DIR__ . '/cache/document_tree.json');
     header("Location: admin.php?tab=documents&success=" . urlencode("Document validé et placé en file d'attente pour publication en arrière-plan."));
     exit;
 }

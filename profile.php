@@ -1,8 +1,8 @@
 <?php
+require_once __DIR__ . '/backend/beta_check.php';
 
-// profile.php â Real Profile Page with session data + database info
+// profile.php â€” Real Profile Page with session data + database info
 
-session_start();
 header('Content-Type: text/html; charset=utf-8');
 
 

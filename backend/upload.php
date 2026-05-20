@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/beta_check.php';
 // backend/upload.php — Document upload with MD5 duplicate detection and instant PDF availability
 // Receives IDs (subject_id, type_id, year_id) from the dynamic form.
 

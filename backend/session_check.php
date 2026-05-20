@@ -48,6 +48,28 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     }
     $initials = substr($initials, 0, 2);
 
+    // Beta authorization check
+    $betaAuthorized = false;
+    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+        $betaAuthorized = true;
+    }
+    if (!$betaAuthorized) {
+        try {
+            $pdo = getDB();
+            $stmt = $pdo->prepare("SELECT is_beta_approved FROM users WHERE id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $isApproved = $stmt->fetchColumn();
+            if ($isApproved) {
+                $betaAuthorized = true;
+            }
+        } catch (\Exception $e) {
+            $betaAuthorized = true;
+        }
+    }
+    if (!$betaAuthorized && isset($_SESSION['beta_authorized']) && $_SESSION['beta_authorized'] === true) {
+        $betaAuthorized = true;
+    }
+
     echo json_encode([
         'logged_in'    => true,
         'user_id'      => $_SESSION['user_id'] ?? '',
@@ -57,11 +79,17 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         'initials'     => $initials,
         'upload_count' => $uploadCount,
         'rank'         => $rank,
-        'rank_label'   => $rankLabel
+        'rank_label'   => $rankLabel,
+        'beta_authorized' => $betaAuthorized
     ]);
 } else {
+    $betaAuthorized = false;
+    if (isset($_SESSION['beta_authorized']) && $_SESSION['beta_authorized'] === true) {
+        $betaAuthorized = true;
+    }
     echo json_encode([
-        'logged_in' => false
+        'logged_in' => false,
+        'beta_authorized' => $betaAuthorized
     ]);
 }
 ?>

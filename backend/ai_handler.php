@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/beta_check.php';
 // backend/ai_handler.php — Traitement des questions par Gemini IA
 require_once 'config.php';
 

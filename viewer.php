@@ -1,4 +1,149 @@
 <?php
+ob_start();
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && (strpos($error['message'], 'Maximum execution time') !== false || strpos($error['message'], 'Fatal error') !== false)) {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        header('HTTP/1.1 504 Gateway Timeout');
+        ?>
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Délai de connexion dépassé - IAI DOCS</title>
+            <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+                :root {
+                    --primary: #00e5c4;
+                    --primary-hover: #00c2a5;
+                    --bg: #040c18;
+                    --card-bg: rgba(13, 27, 45, 0.75);
+                    --border: rgba(255, 255, 255, 0.08);
+                    --text: #ffffff;
+                    --text-secondary: #4a6a8a;
+                }
+                body {
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                    background: var(--bg);
+                    color: var(--text);
+                    font-family: 'Outfit', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    position: relative;
+                }
+                .jetbrains-glow-orb {
+                    position: absolute;
+                    width: 600px;
+                    height: 600px;
+                    background: radial-gradient(circle, rgba(0, 229, 196, 0.08) 0%, rgba(4, 12, 24, 0) 70%);
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 1;
+                    pointer-events: none;
+                    animation: pulseOrb 8s infinite alternate;
+                }
+                @keyframes pulseOrb {
+                    0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
+                    100% { opacity: 1.2; transform: translate(-50%, -50%) scale(1.1); }
+                }
+                .container {
+                    position: relative;
+                    z-index: 2;
+                    background: var(--card-bg);
+                    border: 1px solid var(--border);
+                    border-radius: 20px;
+                    padding: 3rem;
+                    max-width: 480px;
+                    width: 90%;
+                    text-align: center;
+                    backdrop-filter: blur(20px);
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                }
+                .error-icon {
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto 1.5rem auto;
+                    background: rgba(0, 229, 196, 0.1);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid rgba(0, 229, 196, 0.3);
+                }
+                .error-icon svg {
+                    color: var(--primary);
+                }
+                h1 {
+                    font-size: 2rem;
+                    font-weight: 600;
+                    margin: 0 0 1rem 0;
+                    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                p {
+                    color: var(--text-secondary);
+                    font-size: 1.05rem;
+                    line-height: 1.6;
+                    margin: 0 0 2rem 0;
+                }
+                .btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    background: var(--primary);
+                    color: #040c18;
+                    border: none;
+                    padding: 0.8rem 2rem;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(0, 229, 196, 0.3);
+                }
+                .btn:hover {
+                    background: var(--primary-hover);
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(0, 229, 196, 0.4);
+                }
+                .btn:active {
+                    transform: translateY(0);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="jetbrains-glow-orb"></div>
+            <div class="container">
+                <div class="error-icon">
+                    <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h1>Délai de connexion dépassé</h1>
+                <p>La base de données prend du temps à démarrer (veille automatique). Veuillez réessayer dans quelques instants.</p>
+                <button onclick="window.location.reload();" class="btn">
+                    🔄 Réessayer
+                </button>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+});
+@set_time_limit(60);
+require_once __DIR__ . '/backend/beta_check.php';
 // viewer.php — Lecteur de documents Premium avec Sidebar Dynamique SQL & Recherche
 $url = $_GET['url'] ?? '';
 
@@ -28,7 +173,7 @@ $pdo = getDB();
 $activeDoc = null;
 try {
     // Essayer d'abord un match exact très propre
-    $stmt = $pdo->prepare("SELECT * FROM documents WHERE file_path = ? OR pdf_url = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, title FROM documents WHERE file_path = ? OR pdf_url = ? LIMIT 1");
     $stmt->execute([$url, $url]);
     $activeDoc = $stmt->fetch();
 
@@ -40,7 +185,7 @@ try {
         }
         
         if (!empty($pathSegment)) {
-            $stmt = $pdo->prepare("SELECT * FROM documents WHERE file_path LIKE ? OR pdf_url LIKE ? LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id, title FROM documents WHERE file_path LIKE ? OR pdf_url LIKE ? LIMIT 1");
             $stmt->execute(["%" . $pathSegment, "%" . $pathSegment]);
             $activeDoc = $stmt->fetch();
         }
@@ -53,71 +198,97 @@ $activeTitle = $activeDoc ? $activeDoc['title'] : basename($url);
 
 // 2. Récupérer toute la structure hiérarchique des documents approuvés
 $tree = [];
-try {
-    $treeQuery = "
-        SELECT 
-            d.id AS doc_id,
-            d.title AS doc_title,
-            d.file_path AS doc_file_path,
-            d.pdf_url AS doc_pdf_url,
-            d.worker_status AS doc_worker_status,
-            sub.id AS subject_id,
-            sub.name AS subject_name,
-            sem.id AS semester_id,
-            sem.name AS semester_name,
-            l.id AS level_id,
-            l.name AS level_name
-        FROM documents d
-        JOIN subjects sub ON d.subject_id = sub.id
-        JOIN semesters sem ON sub.semester_id = sem.id
-        JOIN levels l ON sem.level_id = l.id
-        WHERE d.status = 'approved'
-        ORDER BY l.name, sem.name, sub.name, d.title
-    ";
-    $allDocs = $pdo->query($treeQuery)->fetchAll();
+$treeFile = __DIR__ . '/backend/cache/document_tree.json';
+$cacheValid = false;
 
-    foreach ($allDocs as $row) {
-        $lId = $row['level_id'];
-        $semId = $row['semester_id'];
-        $subId = $row['subject_id'];
-        
-        if (!isset($tree[$lId])) {
-            $tree[$lId] = [
-                'name' => $row['level_name'],
-                'semesters' => []
+try {
+    // Tenter de lire le cache s'il est frais (moins de 10 minutes)
+    if (file_exists($treeFile) && (time() - filemtime($treeFile) < 600)) {
+        $cachedData = file_get_contents($treeFile);
+        if ($cachedData) {
+            $tree = json_decode($cachedData, true);
+            if (is_array($tree) && !empty($tree)) {
+                $cacheValid = true;
+            }
+        }
+    }
+    
+    if (!$cacheValid) {
+        $treeQuery = "
+            SELECT 
+                d.id AS doc_id,
+                d.title AS doc_title,
+                d.file_path AS doc_file_path,
+                d.pdf_url AS doc_pdf_url,
+                d.worker_status AS doc_worker_status,
+                sub.id AS subject_id,
+                sub.name AS subject_name,
+                sem.id AS semester_id,
+                sem.name AS semester_name,
+                l.id AS level_id,
+                l.name AS level_name
+            FROM documents d
+            JOIN subjects sub ON d.subject_id = sub.id
+            JOIN semesters sem ON sub.semester_id = sem.id
+            JOIN levels l ON sem.level_id = l.id
+            WHERE d.status = 'approved'
+            ORDER BY l.name, sem.name, sub.name, d.title
+        ";
+        $allDocs = $pdo->query($treeQuery)->fetchAll();
+
+        foreach ($allDocs as $row) {
+            $lId = $row['level_id'];
+            $semId = $row['semester_id'];
+            $subId = $row['subject_id'];
+            
+            if (!isset($tree[$lId])) {
+                $tree[$lId] = [
+                    'name' => $row['level_name'],
+                    'semesters' => []
+                ];
+            }
+            
+            if (!isset($tree[$lId]['semesters'][$semId])) {
+                $tree[$lId]['semesters'][$semId] = [
+                    'name' => $row['semester_name'],
+                    'subjects' => []
+                ];
+            }
+            
+            if (!isset($tree[$lId]['semesters'][$semId]['subjects'][$subId])) {
+                $tree[$lId]['semesters'][$semId]['subjects'][$subId] = [
+                    'name' => $row['subject_name'],
+                    'documents' => []
+                ];
+            }
+            
+            $targetUrl = "";
+            if ($row['doc_worker_status'] === 'success' && !empty($row['doc_file_path'])) {
+                $targetUrl = $row['doc_file_path'];
+            } else {
+                $targetUrl = $row['doc_pdf_url'];
+            }
+            
+            $tree[$lId]['semesters'][$semId]['subjects'][$subId]['documents'][] = [
+                'id' => $row['doc_id'],
+                'title' => $row['doc_title'],
+                'url' => $targetUrl,
+                'is_html' => ($row['doc_worker_status'] === 'success' && !empty($row['doc_file_path']))
             ];
         }
-        
-        if (!isset($tree[$lId]['semesters'][$semId])) {
-            $tree[$lId]['semesters'][$semId] = [
-                'name' => $row['semester_name'],
-                'subjects' => []
-            ];
+
+        // Écrire le cache de manière sécurisée
+        $cacheDir = dirname($treeFile);
+        if (!file_exists($cacheDir)) {
+            mkdir($cacheDir, 0777, true);
         }
-        
-        if (!isset($tree[$lId]['semesters'][$semId]['subjects'][$subId])) {
-            $tree[$lId]['semesters'][$semId]['subjects'][$subId] = [
-                'name' => $row['subject_name'],
-                'documents' => []
-            ];
-        }
-        
-        $targetUrl = "";
-        if ($row['doc_worker_status'] === 'success' && !empty($row['doc_file_path'])) {
-            $targetUrl = $row['doc_file_path'];
-        } else {
-            $targetUrl = $row['doc_pdf_url'];
-        }
-        
-        $tree[$lId]['semesters'][$semId]['subjects'][$subId]['documents'][] = [
-            'id' => $row['doc_id'],
-            'title' => $row['doc_title'],
-            'url' => $targetUrl,
-            'is_html' => ($row['doc_worker_status'] === 'success' && !empty($row['doc_file_path']))
-        ];
+        file_put_contents($treeFile, json_encode($tree, JSON_UNESCAPED_UNICODE));
     }
 } catch (Exception $e) {
-    // Si la DB échoue, on continue avec un arbre vide
+    // En cas de panne de base de données, utiliser le cache existant (même expiré) pour la résilience
+    if (file_exists($treeFile)) {
+        $tree = json_decode(@file_get_contents($treeFile), true) ?: [];
+    }
 }
 ?>
 <!DOCTYPE html>

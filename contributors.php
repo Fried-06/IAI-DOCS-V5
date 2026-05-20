@@ -1,10 +1,10 @@
 <?php
+require_once __DIR__ . '/backend/beta_check.php';
 
 // contributors.php à¢€” Enhanced Contributors Page with ranks
 
 // Reads from both database.json AND users.json
 
-session_start();
 header('Content-Type: text/html; charset=utf-8');
 
 

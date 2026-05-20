@@ -87,15 +87,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $role = 'admin';
         }
 
+        // Determine is_beta_approved status
+        $isBetaApproved = 0;
+        if ($role === 'admin' || (isset($_SESSION['beta_authorized']) && $_SESSION['beta_authorized'] === true)) {
+            $isBetaApproved = 1;
+        }
+
         // Create new user in DB
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $insertStmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+        $insertStmt = $pdo->prepare("INSERT INTO users (name, email, password, role, is_beta_approved) VALUES (?, ?, ?, ?, ?)");
         
-        if ($insertStmt->execute([$name, $email, $hash, $role])) {
+        if ($insertStmt->execute([$name, $email, $hash, $role, $isBetaApproved])) {
             $newUserId = $pdo->lastInsertId();
             
             // Set session
             setSession($newUserId, $name, $email, $role);
+            if ($isBetaApproved) {
+                $_SESSION['beta_authorized'] = true;
+            }
+
+            // Consume pending beta code if present
+            if (isset($_SESSION['pending_beta_code'])) {
+                $pendingCode = $_SESSION['pending_beta_code'];
+                $updateCode = $pdo->prepare("UPDATE beta_codes SET is_used = TRUE, used_by_email = ?, used_at = NOW() WHERE code = ?");
+                $updateCode->execute([$email, $pendingCode]);
+                $_SESSION['beta_authorized'] = true;
+                unset($_SESSION['pending_beta_code']);
+            }
 
             header("Location: ../index.html");
             exit();
@@ -113,8 +131,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        // Find user by email (include role)
-        $stmt = $pdo->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
+        // Find user by email (include role and is_beta_approved)
+        $stmt = $pdo->prepare("SELECT id, name, email, password, role, is_beta_approved FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
@@ -130,6 +148,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Set session
         setSession($user['id'], $user['name'], $user['email'], $user['role']);
+
+        // Handle beta authorization
+        if ($user['role'] === 'admin' || $user['is_beta_approved']) {
+            $_SESSION['beta_authorized'] = true;
+        } elseif (isset($_SESSION['pending_beta_code'])) {
+            // Apply pending beta code to this existing user
+            $pendingCode = $_SESSION['pending_beta_code'];
+            try {
+                $updateUser = $pdo->prepare("UPDATE users SET is_beta_approved = TRUE WHERE id = ?");
+                $updateUser->execute([$user['id']]);
+                
+                $updateCode = $pdo->prepare("UPDATE beta_codes SET is_used = TRUE, used_by_email = ?, used_at = NOW() WHERE code = ?");
+                $updateCode->execute([$user['email'], $pendingCode]);
+                
+                $_SESSION['beta_authorized'] = true;
+                unset($_SESSION['pending_beta_code']);
+            } catch (\Exception $e) {
+                // Ignore
+            }
+        }
 
         // Si "Se rappeler de moi" est coché, créer un cookie persistant (30 jours)
         if ($rememberMe) {
