@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/backend/beta_check.php'; ?>
 <!DOCTYPE html>
 
 <html lang="fr">
@@ -163,6 +164,12 @@
 
                 <div class="result-grid" id="resultsGrid"></div>
 
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-outline" id="loadMoreBtn" style="display: none; padding: 0.6rem 2rem; border-color: var(--primary); color: var(--primary); font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        Charger plus de ressources
+                    </button>
+                </div>
+
                 <div class="empty-results" id="emptyResults" style="display:none;">
 
                     <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.3;margin-bottom:1rem;"><circle cx="11" cy="11" r="8" stroke-width="1.5"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="1.5"></line></svg>
@@ -208,104 +215,76 @@
     <script src="js/main.js"></script>
 
     <script>
-
         const searchInput = document.getElementById('searchInput');
-
         const searchBtn = document.getElementById('searchBtn');
-
         const filterLevel = document.getElementById('filterLevel');
-
         const filterSemester = document.getElementById('filterSemester');
-
         const filterType = document.getElementById('filterType');
-
         const resultsGrid = document.getElementById('resultsGrid');
-
         const resultsInfo = document.getElementById('resultsInfo');
-
         const resultsCount = document.getElementById('resultsCount');
-
         const emptyResults = document.getElementById('emptyResults');
-
         const initialState = document.getElementById('initialState');
-
         const loadingSpinner = document.getElementById('loadingSpinner');
-
-
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
 
         let debounceTimer;
+        let currentPage = 1;
+        const itemsPerPage = 12;
+        let isSearchLoading = false;
 
-
-
-        function performSearch() {
+        function performSearch(append = false) {
+            if (isSearchLoading) return;
 
             const q = searchInput.value.trim();
-
             const level = filterLevel.value;
-
             const semester = filterSemester.value;
-
             const type = filterType.value;
 
-
-
             initialState.style.display = 'none';
-
-            loadingSpinner.style.display = 'block';
-
-            resultsGrid.innerHTML = '';
-
             emptyResults.style.display = 'none';
 
-            resultsInfo.style.display = 'none';
+            if (!append) {
+                resultsGrid.innerHTML = '';
+                resultsInfo.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                loadMoreBtn.style.display = 'none';
+                currentPage = 1;
+            } else {
+                loadMoreBtn.disabled = true;
+                loadMoreBtn.textContent = 'Chargement...';
+            }
 
-
+            isSearchLoading = true;
 
             const params = new URLSearchParams();
-
             if (q) params.set('q', q);
-
             if (level) params.set('level', level);
-
             if (semester) params.set('semester', semester);
-
             if (type) params.set('type', type);
-
-
+            params.set('page', currentPage);
+            params.set('limit', itemsPerPage);
 
             fetch('backend/search_api.php?' + params.toString())
-
                 .then(res => res.json())
-
                 .then(data => {
-
+                    isSearchLoading = false;
                     loadingSpinner.style.display = 'none';
-
                     
-
-                    if (data.results.length === 0) {
-
+                    if (!append && (!data.results || data.results.length === 0)) {
                         emptyResults.style.display = 'block';
-
                         resultsInfo.style.display = 'none';
-
+                        loadMoreBtn.style.display = 'none';
                         return;
-
                     }
 
-
-
                     resultsInfo.style.display = 'block';
-
-                    resultsCount.innerHTML = '<strong>' + data.count + '</strong> résultat(s) trouvé(s)';
-
-
+                    resultsCount.innerHTML = '<strong>' + (data.total || 0) + '</strong> résultat(s) trouvé(s)';
 
                     data.results.forEach((item, i) => {
-
                         const card = document.createElement('div');
                         card.className = 'result-card';
-                        card.style.animationDelay = (i * 50) + 'ms';
+                        card.style.animationDelay = (i * 30) + 'ms';
                         
                         // Fix undefined string representations
                         const pdfLink = item.pdfLink || '#';
@@ -327,81 +306,62 @@
                                 </a>
                             </div>
                         `;
-
                         resultsGrid.appendChild(card);
-
                     });
 
+                    if (data.has_more) {
+                        loadMoreBtn.style.display = 'inline-flex';
+                        loadMoreBtn.textContent = 'Charger plus de ressources';
+                        loadMoreBtn.disabled = false;
+                    } else {
+                        loadMoreBtn.style.display = 'none';
+                    }
                 })
-
-                .catch(() => {
-
+                .catch(err => {
+                    console.error(err);
+                    isSearchLoading = false;
                     loadingSpinner.style.display = 'none';
-
-                    emptyResults.style.display = 'block';
-
+                    loadMoreBtn.style.display = 'none';
+                    if (!append) {
+                        emptyResults.style.display = 'block';
+                    }
                 });
-
         }
-
-
 
         function escHtml(str) {
-
             const div = document.createElement('div');
-
             div.textContent = str;
-
             return div.innerHTML;
-
         }
 
-
-
         // Event listeners
-
-        searchBtn.addEventListener('click', performSearch);
-
+        searchBtn.addEventListener('click', () => performSearch(false));
         searchInput.addEventListener('keydown', (e) => {
-
-            if (e.key === 'Enter') performSearch();
-
+            if (e.key === 'Enter') performSearch(false);
         });
 
-
+        loadMoreBtn.addEventListener('click', () => {
+            if (isSearchLoading) return;
+            currentPage++;
+            performSearch(true);
+        });
 
         // Live search with debounce
-
         searchInput.addEventListener('input', () => {
-
             clearTimeout(debounceTimer);
-
             debounceTimer = setTimeout(() => {
-
                 if (searchInput.value.trim().length >= 2) {
-
-                    performSearch();
-
+                    performSearch(false);
                 }
-
             }, 400);
-
         });
-
-
 
         // Filter changes trigger search
-
         [filterLevel, filterSemester, filterType].forEach(el => {
-
             el.addEventListener('change', () => {
-
-                if (searchInput.value.trim() || el.value) performSearch();
-
+                if (searchInput.value.trim() || el.value) performSearch(false);
             });
-
         });
-
     </script>
 
 </body>

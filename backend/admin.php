@@ -87,6 +87,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
+
+    // Approve Waitlist Candidate
+    if ($formAction === 'approve_candidate') {
+        $candidateId = intval($_POST['candidate_id'] ?? 0);
+        if ($candidateId > 0) {
+            try {
+                // Fetch candidate details
+                $stmt = $pdo->prepare("SELECT name, email FROM beta_waitlist WHERE id = ?");
+                $stmt->execute([$candidateId]);
+                $candidate = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($candidate) {
+                    $email = $candidate['email'];
+
+                    // Get an unused beta code
+                    $codeStmt = $pdo->query("SELECT code FROM beta_codes WHERE is_used = FALSE LIMIT 1");
+                    $unusedCode = $codeStmt->fetchColumn();
+
+                    if ($unusedCode) {
+                        // Mark code as used
+                        $updateCode = $pdo->prepare("UPDATE beta_codes SET is_used = TRUE, used_by_email = ?, used_at = NOW() WHERE code = ?");
+                        $updateCode->execute([$email, $unusedCode]);
+
+                        // Auto-approve user if account already exists
+                        $updateUser = $pdo->prepare("UPDATE users SET is_beta_approved = TRUE WHERE email = ?");
+                        $updateUser->execute([$email]);
+
+                        // Delete candidate from waitlist
+                        $deleteCand = $pdo->prepare("DELETE FROM beta_waitlist WHERE id = ?");
+                        $deleteCand->execute([$candidateId]);
+
+                        header("Location: admin.php?tab=beta&success=" . urlencode("Candidat " . $candidate['name'] . " approuvé ! Code attribué : " . $unusedCode));
+                        exit;
+                    } else {
+                        // Generate a brand new code on the fly if all 50 are exhausted!
+                        $newCode = "IAI-BETA-" . strtoupper(bin2hex(random_bytes(3)));
+                        $insertCode = $pdo->prepare("INSERT INTO beta_codes (code, is_used, used_by_email, used_at) VALUES (?, TRUE, ?, NOW())");
+                        $insertCode->execute([$newCode, $email]);
+
+                        $updateUser = $pdo->prepare("UPDATE users SET is_beta_approved = TRUE WHERE email = ?");
+                        $updateUser->execute([$email]);
+
+                        $deleteCand = $pdo->prepare("DELETE FROM beta_waitlist WHERE id = ?");
+                        $deleteCand->execute([$candidateId]);
+
+                        header("Location: admin.php?tab=beta&success=" . urlencode("Candidat " . $candidate['name'] . " approuvé ! Un nouveau code a été généré car tous les autres étaient épuisés : " . $newCode));
+                        exit;
+                    }
+                }
+            } catch (\PDOException $e) {
+                header("Location: admin.php?tab=beta&error=" . urlencode($e->getMessage()));
+                exit;
+            }
+        }
+    }
+
+    // Delete Waitlist Candidate
+    if ($formAction === 'delete_candidate') {
+        $candidateId = intval($_POST['candidate_id'] ?? 0);
+        if ($candidateId > 0) {
+            try {
+                $deleteCand = $pdo->prepare("DELETE FROM beta_waitlist WHERE id = ?");
+                $deleteCand->execute([$candidateId]);
+                header("Location: admin.php?tab=beta&success=Candidature supprimée.");
+                exit;
+            } catch (\PDOException $e) {
+                header("Location: admin.php?tab=beta&error=" . urlencode($e->getMessage()));
+                exit;
+            }
+        }
+    }
+
+    // Generate Custom Beta Code
+    if ($formAction === 'generate_custom_code') {
+        try {
+            $newCode = "IAI-BETA-" . strtoupper(bin2hex(random_bytes(3)));
+            $insertCode = $pdo->prepare("INSERT INTO beta_codes (code, is_used) VALUES (?, FALSE)");
+            $insertCode->execute([$newCode]);
+            header("Location: admin.php?tab=beta&success=" . urlencode("Code d'accès généré avec succès : " . $newCode));
+            exit;
+        } catch (\PDOException $e) {
+            header("Location: admin.php?tab=beta&error=" . urlencode($e->getMessage()));
+            exit;
+        }
+    }
+
+    // Revoke User Beta Access
+    if ($formAction === 'revoke_user_beta') {
+        $userId = intval($_POST['user_id'] ?? 0);
+        if ($userId > 0) {
+            try {
+                $updateUser = $pdo->prepare("UPDATE users SET is_beta_approved = FALSE WHERE id = ?");
+                $updateUser->execute([$userId]);
+                header("Location: admin.php?tab=beta&success=Accès bêta révoqué pour cet utilisateur.");
+                exit;
+            } catch (\PDOException $e) {
+                header("Location: admin.php?tab=beta&error=" . urlencode($e->getMessage()));
+                exit;
+            }
+        }
+    }
 }
 
 // --- Fetch data ---
@@ -128,6 +229,30 @@ $allLevels = $pdo->query("SELECT id, name FROM levels ORDER BY id")->fetchAll(PD
 $allSemesters = $pdo->query(
     "SELECT s.id, s.name, l.name AS level_name FROM semesters s JOIN levels l ON s.level_id = l.id ORDER BY l.name, s.name"
 )->fetchAll(PDO::FETCH_ASSOC);
+
+// Beta tab data
+$waitlist = [];
+$usedCodes = [];
+$unusedCodesCount = 0;
+$approvedUsersCount = 0;
+$betaUsers = [];
+if ($tab === 'beta') {
+    try {
+        $waitlist = $pdo->query("SELECT * FROM beta_waitlist ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+        $usedCodes = $pdo->query("SELECT * FROM beta_codes WHERE is_used = TRUE ORDER BY used_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+        $unusedCodesCount = $pdo->query("SELECT COUNT(*) FROM beta_codes WHERE is_used = FALSE")->fetchColumn();
+        $approvedUsersCount = $pdo->query("SELECT COUNT(*) FROM users WHERE is_beta_approved = TRUE AND role != 'admin'")->fetchColumn();
+        $betaUsers = $pdo->query(
+            "SELECT u.id, u.name, u.email, u.last_active,
+                    (SELECT COUNT(*) FROM documents d WHERE d.user_id = u.id AND d.status = 'approved') AS upload_count
+             FROM users u
+             WHERE u.is_beta_approved = TRUE AND u.role != 'admin'
+             ORDER BY upload_count ASC, u.last_active DESC"
+        )->fetchAll(PDO::FETCH_ASSOC);
+    } catch (\Exception $e) {
+        // Table might not exist yet if migration failed, but it has run.
+    }
+}
 
 ?>
 <!DOCTYPE html>
@@ -226,6 +351,7 @@ $allSemesters = $pdo->query(
             <a href="admin.php?tab=documents" class="tab <?= $tab === 'documents' ? 'active' : '' ?>">📄 Documents en Attente (<?= count($pendingDocs) ?>)</a>
             <a href="admin.php?tab=years" class="tab <?= $tab === 'years' ? 'active' : '' ?>">📅 Gérer Années</a>
             <a href="admin.php?tab=subjects" class="tab <?= $tab === 'subjects' ? 'active' : '' ?>">📚 Gérer Matières</a>
+            <a href="admin.php?tab=beta" class="tab <?= $tab === 'beta' ? 'active' : '' ?>">🔑 Gérer la Bêta</a>
         </div>
 
         <!-- ==================== TAB: DOCUMENTS ==================== -->
@@ -387,6 +513,151 @@ $allSemesters = $pdo->query(
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        <!-- ==================== TAB: BETA ==================== -->
+        <?php elseif ($tab === 'beta'): ?>
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div style="background: #07111f; padding: 20px; border-radius: 12px; border: 1px solid #1e3558; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #00e5c4;"><?= $approvedUsersCount ?></div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #4a6a8a; text-transform: uppercase; margin-top: 5px;">Utilisateurs approuvés</div>
+                </div>
+                <div style="background: #07111f; padding: 20px; border-radius: 12px; border: 1px solid #1e3558; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #a855f7;"><?= $unusedCodesCount ?></div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #4a6a8a; text-transform: uppercase; margin-top: 5px;">Codes restants</div>
+                </div>
+                <div style="background: #07111f; padding: 20px; border-radius: 12px; border: 1px solid #1e3558; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #ffb703;"><?= count($waitlist) ?></div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #4a6a8a; text-transform: uppercase; margin-top: 5px;">Candidatures en attente</div>
+                </div>
+            </div>
+
+            <!-- Waitlist Section -->
+            <div style="margin-bottom: 40px;">
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.05em; color: #fff; margin-bottom: 15px;">⏳ Liste d'Attente (Candidatures)</h2>
+                <?php if (empty($waitlist)): ?>
+                    <div class="empty-state">Aucune candidature en attente d'approbation.</div>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom Complet</th>
+                                <th>Email</th>
+                                <th>Niveau</th>
+                                <th>Appareil</th>
+                                <th>Motivation</th>
+                                <th>Date d'inscription</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($waitlist as $cand): ?>
+                            <tr>
+                                <td><strong><?= htmlspecialchars($cand['name']) ?></strong></td>
+                                <td><a href="mailto:<?= htmlspecialchars($cand['email']) ?>" style="color: #00e5c4; text-decoration: none;"><?= htmlspecialchars($cand['email']) ?></a></td>
+                                <td><span class="badge badge-active"><?= htmlspecialchars($cand['level']) ?></span></td>
+                                <td><?= htmlspecialchars($cand['device']) ?></td>
+                                <td style="max-width: 250px; font-size: 0.85rem; color: #94a3b8;" title="<?= htmlspecialchars($cand['motivation']) ?>">
+                                    <?= htmlspecialchars(mb_strimwidth($cand['motivation'], 0, 80, "...")) ?>
+                                </td>
+                                <td><?= htmlspecialchars($cand['created_at']) ?></td>
+                                <td style="white-space: nowrap;">
+                                    <form method="POST" action="admin.php?tab=beta" style="display:inline;">
+                                        <input type="hidden" name="form_action" value="approve_candidate">
+                                        <input type="hidden" name="candidate_id" value="<?= $cand['id'] ?>">
+                                        <button type="submit" class="btn btn-approve btn-sm">Approuver & Assigner Code</button>
+                                    </form>
+                                    <form method="POST" action="admin.php?tab=beta" style="display:inline;" onsubmit="return confirm('Supprimer cette candidature définitivement ?');">
+                                        <input type="hidden" name="form_action" value="delete_candidate">
+                                        <input type="hidden" name="candidate_id" value="<?= $cand['id'] ?>">
+                                        <button type="submit" class="btn btn-reject btn-sm">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+
+            <!-- Beta Users Section -->
+            <div style="margin-bottom: 40px;">
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.05em; color: #fff; margin-bottom: 15px;">👥 Bêta-testeurs Actifs</h2>
+                <?php if (empty($betaUsers)): ?>
+                    <div class="empty-state">Aucun bêta-testeur inscrit pour le moment.</div>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom Complet</th>
+                                <th>Email</th>
+                                <th>Documents Partagés</th>
+                                <th>Dernière Activité</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($betaUsers as $bu): ?>
+                            <tr>
+                                <td><strong><?= htmlspecialchars($bu['name']) ?></strong></td>
+                                <td><a href="mailto:<?= htmlspecialchars($bu['email']) ?>" style="color: #00e5c4; text-decoration: none;"><?= htmlspecialchars($bu['email']) ?></a></td>
+                                <td>
+                                    <?php if ($bu['upload_count'] === 0): ?>
+                                        <span class="badge badge-inactive" style="background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2);">0 document</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-active" style="background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2);"><?= $bu['upload_count'] ?> <?= $bu['upload_count'] > 1 ? 'documents' : 'document' ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                                    <?= $bu['last_active'] ? htmlspecialchars($bu['last_active']) : 'Jamais connecté' ?>
+                                </td>
+                                <td>
+                                    <form method="POST" action="admin.php?tab=beta" style="display:inline;" onsubmit="return confirm('Révoquer l\'accès de cet utilisateur ? Il sera immédiatement déconnecté et bloqué.');">
+                                        <input type="hidden" name="form_action" value="revoke_user_beta">
+                                        <input type="hidden" name="user_id" value="<?= $bu['id'] ?>">
+                                        <button type="submit" class="btn btn-reject btn-sm">Révoquer l'accès</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+
+            <!-- Codes Section -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.05em; color: #fff;">🔑 Codes d'Accès Bêta Utilisés</h2>
+                    <form method="POST" action="admin.php?tab=beta">
+                        <input type="hidden" name="form_action" value="generate_custom_code">
+                        <button type="submit" class="btn btn-primary">➕ Générer un code supplémentaire</button>
+                    </form>
+                </div>
+                <?php if (empty($usedCodes)): ?>
+                    <div class="empty-state">Aucun code d'accès utilisé pour le moment.</div>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Statut</th>
+                                <th>Attribué / Utilisé par</th>
+                                <th>Utilisé le</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($usedCodes as $uc): ?>
+                            <tr>
+                                <td><code style="font-family: 'JetBrains Mono', monospace; color: #ffb703; font-weight: bold;"><?= htmlspecialchars($uc['code']) ?></code></td>
+                                <td><span class="badge badge-inactive">Utilisé</span></td>
+                                <td><strong><?= htmlspecialchars($uc['used_by_email']) ?></strong></td>
+                                <td><?= htmlspecialchars($uc['used_at']) ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
     </div>
 </body>

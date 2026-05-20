@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/beta_check.php';
 // backend/search_api.php — Search API using relational database
 // Filters by level_id, semester_id, subject_id, type_id, year_id + free text query
 // Returns JSON with relative public URLs for document links
@@ -17,12 +18,74 @@ $levelStr   = trim($_GET['level'] ?? '');
 $semesterStr= trim($_GET['semester'] ?? '');
 $typeStr    = trim($_GET['type'] ?? '');
 
+$limit      = intval($_GET['limit'] ?? 12);
+$page       = intval($_GET['page'] ?? 1);
+if ($limit <= 0 || $limit > 100) $limit = 12;
+if ($page <= 0) $page = 1;
+$offset     = ($page - 1) * $limit;
+
 // Base URL for document links (configurable)
 $docsBaseUrl = '/Docs/_build/html/';
 
 try {
     $pdo = getDB();
 
+    $whereSql = " WHERE d.status = 'approved'";
+    $params = [];
+
+    if ($levelId > 0) {
+        $whereSql .= " AND l.id = ?";
+        $params[] = $levelId;
+    }
+    if ($levelStr !== '') {
+        $whereSql .= " AND l.name = ?";
+        $params[] = str_replace('_', ' ', $levelStr);
+    }
+    if ($semesterId > 0) {
+        $whereSql .= " AND sem.id = ?";
+        $params[] = $semesterId;
+    }
+    if ($semesterStr !== '') {
+        $whereSql .= " AND sem.name = ?";
+        $params[] = $semesterStr;
+    }
+    if ($subjectId > 0) {
+        $whereSql .= " AND s.id = ?";
+        $params[] = $subjectId;
+    }
+    if ($typeId > 0) {
+        $whereSql .= " AND dt.id = ?";
+        $params[] = $typeId;
+    }
+    if ($typeStr !== '') {
+        $whereSql .= " AND dt.name = ?";
+        $params[] = $typeStr;
+    }
+    if ($yearId > 0) {
+        $whereSql .= " AND y.id = ?";
+        $params[] = $yearId;
+    }
+    if (!empty($query)) {
+        $whereSql .= " AND (d.title LIKE ? OR s.name LIKE ?)";
+        $params[] = "%$query%";
+        $params[] = "%$query%";
+    }
+
+    // 1. Get total count for pagination
+    $countSql = "SELECT COUNT(d.id)
+                 FROM documents d
+                 JOIN subjects s ON d.subject_id = s.id
+                 JOIN semesters sem ON s.semester_id = sem.id
+                 JOIN levels l ON sem.level_id = l.id
+                 JOIN document_types dt ON d.type_id = dt.id
+                 JOIN years y ON d.year_id = y.id
+                 " . $whereSql;
+    
+    $countStmt = $pdo->prepare($countSql);
+    $countStmt->execute($params);
+    $totalCount = intval($countStmt->fetchColumn());
+
+    // 2. Get paginated results
     $sql = "SELECT d.id, d.title, d.file_path, d.created_at, d.pdf_url, d.status,
                    s.name AS subject_name,
                    sem.name AS semester_name,
@@ -37,48 +100,9 @@ try {
             JOIN document_types dt ON d.type_id = dt.id
             JOIN years y ON d.year_id = y.id
             LEFT JOIN users u ON d.user_id = u.id
-            WHERE d.status = 'approved'";
-    $params = [];
-
-    if ($levelId > 0) {
-        $sql .= " AND l.id = ?";
-        $params[] = $levelId;
-    }
-    if ($levelStr !== '') {
-        $sql .= " AND l.name = ?";
-        $params[] = str_replace('_', ' ', $levelStr);
-    }
-    if ($semesterId > 0) {
-        $sql .= " AND sem.id = ?";
-        $params[] = $semesterId;
-    }
-    if ($semesterStr !== '') {
-        $sql .= " AND sem.name = ?";
-        $params[] = $semesterStr;
-    }
-    if ($subjectId > 0) {
-        $sql .= " AND s.id = ?";
-        $params[] = $subjectId;
-    }
-    if ($typeId > 0) {
-        $sql .= " AND dt.id = ?";
-        $params[] = $typeId;
-    }
-    if ($typeStr !== '') {
-        $sql .= " AND dt.name = ?";
-        $params[] = $typeStr;
-    }
-    if ($yearId > 0) {
-        $sql .= " AND y.id = ?";
-        $params[] = $yearId;
-    }
-    if (!empty($query)) {
-        $sql .= " AND (d.title LIKE ? OR s.name LIKE ?)";
-        $params[] = "%$query%";
-        $params[] = "%$query%";
-    }
-
-    $sql .= " ORDER BY y.year DESC, l.name, sem.name, s.name";
+            " . $whereSql . "
+            ORDER BY y.year DESC, l.name, sem.name, s.name
+            LIMIT " . intval($limit) . " OFFSET " . intval($offset);
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -126,8 +150,10 @@ try {
     }
 
     echo json_encode([
-        'count'   => count($output),
-        'results' => $output
+        'total'    => $totalCount,
+        'count'    => count($output),
+        'has_more' => (($page * $limit) < $totalCount),
+        'results'  => $output
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (\PDOException $e) {

@@ -153,8 +153,18 @@
         const fileNameDisplay = document.getElementById('fileNameDisplay');
 
         async function loadOptions(url) {
+            const cached = sessionStorage.getItem(url);
+            if (cached) {
+                return JSON.parse(cached);
+            }
             const res = await fetch(url);
-            return res.json();
+            const data = await res.json();
+            try {
+                sessionStorage.setItem(url, JSON.stringify(data));
+            } catch (e) {
+                // Ignore storage limits / private browsing exceptions
+            }
+            return data;
         }
 
         function populateSelect(select, items, valueKey, labelKey, placeholder) {

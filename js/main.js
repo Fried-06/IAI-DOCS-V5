@@ -17,10 +17,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
     // AUTH STATE CHECK ÔÇö Dynamic navbar based on session
     // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // Determine base URL dynamically based on main.js path to support subdirectories
+    const mainScript = document.querySelector('script[src*="main.js"]');
+    const baseAppUrl = mainScript ? mainScript.src.replace('js/main.js', '') : '';
+
     (function checkAuthState() {
-        fetch('backend/session_check.php')
+        fetch(baseAppUrl + 'backend/session_check.php')
             .then(res => res.json())
             .then(data => {
+                // Private Beta redirection gate
+                const isGatePage = window.location.pathname.endsWith('beta_gate.php');
+                const isLoginPage = window.location.pathname.endsWith('login.html');
+                
+                if (!data.beta_authorized && !isGatePage && !isLoginPage) {
+                    window.location.href = baseAppUrl + 'beta_gate.php';
+                    return;
+                }
+                if (data.beta_authorized && isGatePage) {
+                    window.location.href = baseAppUrl + 'index.html';
+                    return;
+                }
                 // Find all nav-actions containers on the page
                 const navActions = document.querySelectorAll('.nav-actions');
                 navActions.forEach(container => {

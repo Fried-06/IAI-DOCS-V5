@@ -253,9 +253,14 @@ sort($allSemesters);
 
             <div class="subject-grid">
 
-                <?php foreach ($items as $exam): ?>
+                <?php 
+                $examIndex = 0;
+                foreach ($items as $exam): 
+                    $isHidden = ($examIndex >= 12);
+                    $examIndex++;
+                ?>
 
-                <div class="subject-card" data-semester="<?= htmlspecialchars($exam['semester']) ?>">
+                <div class="subject-card <?= $isHidden ? 'is-hidden-card' : '' ?>" data-semester="<?= htmlspecialchars($exam['semester']) ?>" <?= $isHidden ? 'style="display: none;"' : '' ?>>
                     <div class="subject-card-title"><?= htmlspecialchars($exam['title']) ?></div>
                     <div class="subject-card-meta">
                         <?= $semesterLabels[$exam['semester']] ?? $exam['semester'] ?>
@@ -276,6 +281,14 @@ sort($allSemesters);
                 <?php endforeach; ?>
 
             </div>
+
+            <?php if (count($items) > 12): ?>
+            <div style="text-align: center; margin-top: 1.5rem;" class="load-more-section">
+                <button class="btn btn-outline load-more-exams-btn" style="padding: 0.5rem 1.5rem; font-size: 0.9rem; border-color: var(--primary); color: var(--primary); font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    Charger plus d'examens
+                </button>
+            </div>
+            <?php endif; ?>
 
         </div>
 
@@ -344,6 +357,52 @@ sort($allSemesters);
                     }
 
                 });
+
+            });
+
+        });
+
+
+
+        // Load more exams button logic
+
+        document.querySelectorAll('.load-more-exams-btn').forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                const section = btn.closest('.level-section');
+
+                const hiddenCards = section.querySelectorAll('.subject-card.is-hidden-card');
+
+                
+
+                // Show the next 12 hidden cards
+
+                let count = 0;
+
+                hiddenCards.forEach(card => {
+
+                    if (count < 12) {
+
+                        card.style.display = 'block';
+
+                        card.classList.remove('is-hidden-card');
+
+                        count++;
+
+                    }
+
+                });
+
+
+
+                // If no more hidden cards, hide the button
+
+                if (section.querySelectorAll('.subject-card.is-hidden-card').length === 0) {
+
+                    btn.parentElement.style.display = 'none';
+
+                }
 
             });
 
