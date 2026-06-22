@@ -8,7 +8,7 @@ $success = '';
 
 // Check if already authorized
 if (isset($_SESSION['beta_authorized']) && $_SESSION['beta_authorized'] === true) {
-    header('Location: index.html');
+    header('Location: index.php');
     exit;
 }
 
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['pending_beta_code'] = $code;
                     }
 
-                    header('Location: index.html');
+                    header('Location: index.php');
                     exit;
                 }
             } catch (\Exception $e) {
