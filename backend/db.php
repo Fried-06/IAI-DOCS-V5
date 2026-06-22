@@ -1,6 +1,7 @@
 <?php
 // backend/db.php - Database connection helper
 
+@set_time_limit(120);
 require_once __DIR__ . '/config.php';
 
 class Database {
@@ -14,7 +15,7 @@ class Database {
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
-            PDO::ATTR_TIMEOUT            => 20,
+            PDO::ATTR_TIMEOUT            => 30,
             PDO::ATTR_PERSISTENT         => true,
         ];
 
@@ -22,7 +23,7 @@ class Database {
             $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (\PDOException $e) {
             error_log("Database Connection Error: " . $e->getMessage());
-            die("Erreur de connexion à Supabase : " . $e->getMessage());
+            throw new \PDOException("Erreur de connexion à Supabase : " . $e->getMessage());
         }
     }
 

@@ -18,25 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // AUTH STATE CHECK ÔÇö Dynamic navbar based on session
     // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
     // Determine base URL dynamically based on main.js path to support subdirectories
+    // Use regex to strip /js/main.js and any query params (e.g. ?v=4) from the resolved URL
     const mainScript = document.querySelector('script[src*="main.js"]');
-    const baseAppUrl = mainScript ? mainScript.src.replace('js/main.js', '') : '';
+    const baseAppUrl = mainScript ? mainScript.src.replace(/js\/main\.js.*$/, '') : '/';
 
     (function checkAuthState() {
-        fetch(baseAppUrl + 'backend/session_check.php')
+        fetch(baseAppUrl + 'backend/session_check.php', { credentials: 'same-origin' })
             .then(res => res.json())
             .then(data => {
-                // Private Beta redirection gate
-                const isGatePage = window.location.pathname.endsWith('beta_gate.php');
-                const isLoginPage = window.location.pathname.endsWith('login.html');
+                // NOTE: Beta access check is handled server-side by beta_check.php
+                // No client-side redirect here — avoids infinite redirect loops
                 
-                if (!data.beta_authorized && !isGatePage && !isLoginPage) {
-                    window.location.href = baseAppUrl + 'beta_gate.php';
-                    return;
-                }
-                if (data.beta_authorized && isGatePage) {
-                    window.location.href = baseAppUrl + 'index.html';
-                    return;
-                }
                 // Find all nav-actions containers on the page
                 const navActions = document.querySelectorAll('.nav-actions');
                 navActions.forEach(container => {
@@ -61,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Prepend Studio link for all logged in users
                         const studioLink = document.createElement('a');
-                        studioLink.href = 'studio/index.php';
+                        studioLink.href = baseAppUrl + 'studio/index.php';
                         studioLink.className = 'nav-item nav-studio-btn';
                         studioLink.innerHTML = 'Ô£¿ Studio AI';
                         studioLink.style.cssText = 'font-size:0.9rem; text-decoration:none; color:var(--primary); font-weight:700; margin-right:1rem;';
@@ -70,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Prepend Admin Dashboard link if user is admin
                         if (data.is_admin) {
                             const adminLink = document.createElement('a');
-                            adminLink.href = 'backend/admin.php';
+                            adminLink.href = baseAppUrl + 'backend/admin.php';
                             adminLink.className = 'nav-item nav-admin-btn';
                             adminLink.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin';
                             adminLink.style.cssText = 'font-size:0.8rem;text-decoration:none;color:var(--text-dim,#94a3b8);display:flex;align-items:center;padding:0.4rem 0.6rem;border-radius:6px;transition:all 0.2s;';
@@ -81,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Avatar link (goes to profile)
                         const avatarLink = document.createElement('a');
-                        avatarLink.href = 'profile.php';
+                        avatarLink.href = baseAppUrl + 'profile.php';
                         avatarLink.className = 'nav-avatar-link';
                         avatarLink.title = data.username;
                         avatarLink.style.cssText = 'display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;';
@@ -103,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Logout button
                         const logoutBtn = document.createElement('a');
-                        logoutBtn.href = 'backend/logout.php';
+                        logoutBtn.href = baseAppUrl + 'backend/logout.php';
                         logoutBtn.className = 'btn btn-outline nav-logout-btn';
                         logoutBtn.style.cssText = 'padding:0.4rem 0.8rem;font-size:0.8rem;border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:6px;text-decoration:none;transition:all 0.3s;';
                         logoutBtn.textContent = 'D├®connexion';

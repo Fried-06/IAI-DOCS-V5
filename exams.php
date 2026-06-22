@@ -3,6 +3,7 @@
 // exams.php â Dynamic Exams Page scanning _build/html/ for real documents
 
 session_start();
+require_once __DIR__ . '/backend/beta_check.php';
 header('Content-Type: text/html; charset=utf-8');
 
 
@@ -26,7 +27,7 @@ $exams = [];
 try {
     $pdo = getDB();
     $stmt = $pdo->query(
-        "SELECT d.title, d.file_path, d.pdf_url, d.status,
+        "SELECT d.id, d.title, d.file_path, d.pdf_url, d.status,
                 s.name AS subject_name,
                 sem.name AS semester_name,
                 l.name AS level_name,
@@ -57,13 +58,10 @@ try {
             $pdfLink = '#';
         }
 
-        // HTML Link: Check if it's already an absolute URL
-        if ($rec['status'] === 'approved' && !empty($rec['file_path'])) {
-            if (strpos($rec['file_path'], 'http') === 0) {
-                $htmlLink = 'viewer.php?url=' . urlencode($rec['file_path']);
-            } else {
-                $htmlLink = $docsBaseUrl . ltrim($rec['file_path'], '/');
-            }
+        // HTML Link: Use the Premium Viewer with the document ID
+        $htmlLink = '#';
+        if ($rec['status'] === 'approved' && (!empty($rec['file_path']) || !empty($rec['pdf_url']))) {
+            $htmlLink = '/viewer/' . $rec['id'];
         }
         $hasHtml = ($htmlLink !== '#');
 
@@ -326,7 +324,7 @@ sort($allSemesters);
 
 
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=3"></script>
 
     <script>
 

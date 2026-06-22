@@ -256,15 +256,15 @@ $role = $_SESSION['user_role'] ?? '';
         </div>
 
         <div class="btn-group">
-            <a href="/index.html" class="btn btn-primary">
+            <a href="index.html" class="btn btn-primary">
                 Retour à l'accueil
             </a>
             <?php if ($isLoggedIn && $role !== 'admin'): ?>
-                <a href="/login.html" class="btn btn-outline">
+                <a href="login.html" class="btn btn-outline">
                     Changer de compte
                 </a>
             <?php elseif (!$isLoggedIn): ?>
-                <a href="/login.html" class="btn btn-outline">
+                <a href="login.html" class="btn btn-outline">
                     Se connecter
                 </a>
             <?php endif; ?>

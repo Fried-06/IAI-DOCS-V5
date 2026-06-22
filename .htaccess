@@ -1,10 +1,46 @@
 # IAI DOCS — Apache Server Configuration
 
 # Custom Error Pages
-# Note: If your site is hosted in a subdirectory (e.g. /iai-resources/),
-# prepend the subdirectory path (e.g. ErrorDocument 404 /iai-resources/404.html)
 ErrorDocument 404 /404.html
 ErrorDocument 403 /403.php
 
 # Prevent directory browsing
 Options -Indexes
+
+# Default document
+DirectoryIndex index.php index.html
+
+# URL Rewriting for Clean URLs
+RewriteEngine On
+
+# ── 1. Main Pages ──────────────────────────────────────────
+RewriteRule ^Accueil/?$    index.php       [L]
+RewriteRule ^Examens/?$    exams.php       [L]
+RewriteRule ^Rechercher/?$ search.php      [L]
+RewriteRule ^Contribuer/?$ contribute.html [L]
+RewriteRule ^Profil/?$     profile.php     [L]
+RewriteRule ^Connexion/?$  login.html      [L]
+RewriteRule ^AccesBeta/?$  beta_gate.php   [L]
+
+# ── 2. Premium Viewer ──────────────────────────────────────
+RewriteRule ^viewer/([0-9]+)/?$ viewer.php?id=$1 [L,QSA]
+
+# ── 3. Level index pages (/L1, /L2, /L3/GLSI, /L3/ASR) ───
+RewriteRule ^L1/?$      pages/L1/index.php      [L]
+RewriteRule ^L2/?$      pages/L2/index.php      [L]
+RewriteRule ^L3/GLSI/?$ pages/L3/GLSI/index.php [L]
+RewriteRule ^L3/ASR/?$  pages/L3/ASR/index.php  [L]
+
+# ── 4. Semester pages (/L2/Semestre3, etc.) ────────────────
+RewriteRule ^L1/(semestre[0-9]+)/?$       pages/L1/$1.php       [L]
+RewriteRule ^L2/(semestre[0-9]+)/?$       pages/L2/$1.php       [L]
+RewriteRule ^L3/GLSI/(semestre[0-9]+)/?$  pages/L3/GLSI/$1.php  [L]
+RewriteRule ^L3/ASR/(semestre[0-9]+)/?$   pages/L3/ASR/$1.php   [L]
+
+# ── 5. Subject (Matiere) pages ─────────────────────────────
+# /Matiere/L1/semestre1/algorithmique  →  subjects/L1/semestre1/algorithmique.php
+# /Matiere/L3/GLSI/semestre5/sig       →  subjects/L3/GLSI/semestre5/sig.php
+RewriteRule ^Matiere/L1/(semestre[0-9]+)/([a-z0-9_-]+)/?$             subjects/L1/$1/$2.php             [L]
+RewriteRule ^Matiere/L2/(semestre[0-9]+)/([a-z0-9_-]+)/?$             subjects/L2/$1/$2.php             [L]
+RewriteRule ^Matiere/L3/GLSI/(semestre[0-9]+)/([a-z0-9_-]+)/?$        subjects/L3/GLSI/$1/$2.php        [L]
+RewriteRule ^Matiere/L3/ASR/(semestre[0-9]+)/([a-z0-9_-]+)/?$         subjects/L3/ASR/$1/$2.php         [L]

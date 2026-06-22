@@ -145,25 +145,14 @@ register_shutdown_function(function() {
 @set_time_limit(60);
 require_once __DIR__ . '/backend/beta_check.php';
 // viewer.php — Lecteur de documents Premium avec Sidebar Dynamique SQL & Recherche
-$url = $_GET['url'] ?? '';
+$id = $_GET['id'] ?? '';
 
-if (empty($url)) {
-    die("Lien du document manquant.");
+if (empty($id)) {
+    die("ID du document manquant.");
 }
 
 // Détection du thème premium
 $theme = $_COOKIE['premium_doc_theme'] ?? $_GET['theme'] ?? 'cosmic';
-
-// LA TRICHE : On transforme :// en / pour que le proxy le lise comme un chemin
-$maskedUrl = str_replace('://', '/', $url);
-$proxyUrl = "proxy.php/" . $maskedUrl;
-
-// Intégration du thème dans l'URL du proxy
-if (!str_contains($proxyUrl, '?')) {
-    $proxyUrl .= "?theme=" . urlencode($theme);
-} else {
-    $proxyUrl .= "&theme=" . urlencode($theme);
-}
 
 // Connexion Base de Données pour la Sidebar Dynamique
 require_once __DIR__ . '/backend/db.php';
@@ -171,30 +160,45 @@ $pdo = getDB();
 
 // 1. Identifier le document actif dans la base de données de manière ultra-précise
 $activeDoc = null;
+$url = '';
+$activeTitle = 'Document non trouvé';
+
 try {
-    // Essayer d'abord un match exact très propre
-    $stmt = $pdo->prepare("SELECT id, title FROM documents WHERE file_path = ? OR pdf_url = ? LIMIT 1");
-    $stmt->execute([$url, $url]);
+    $stmt = $pdo->prepare("SELECT id, title, file_path, pdf_url, worker_status FROM documents WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
     $activeDoc = $stmt->fetch();
 
     if (!$activeDoc) {
-        // Match approximatif de sécurité en extrayant le segment de niveau (ex. L2/Semestre3/...) pour éviter les collisions d'années
-        $pathSegment = "";
-        if (preg_match('/(L\d+.*)/i', $url, $matches)) {
-            $pathSegment = $matches[1];
-        }
-        
-        if (!empty($pathSegment)) {
-            $stmt = $pdo->prepare("SELECT id, title FROM documents WHERE file_path LIKE ? OR pdf_url LIKE ? LIMIT 1");
-            $stmt->execute(["%" . $pathSegment, "%" . $pathSegment]);
-            $activeDoc = $stmt->fetch();
-        }
+        die("Document introuvable ou supprimé.");
     }
+    
+    $activeTitle = $activeDoc['title'];
+    
+    // Déterminer la bonne URL (HTML prioritaire si le worker a réussi, sinon PDF fallback)
+    if ($activeDoc['worker_status'] === 'success' && !empty($activeDoc['file_path'])) {
+        $url = $activeDoc['file_path'];
+    } else {
+        $url = $activeDoc['pdf_url'];
+    }
+
 } catch (Exception $e) {
-    // Ignore error
+    die("Erreur de connexion à la base de données.");
 }
 
-$activeTitle = $activeDoc ? $activeDoc['title'] : basename($url);
+if (empty($url)) {
+    die("Aucun fichier disponible pour ce document.");
+}
+
+// LA TRICHE : On transforme :// en / pour que le proxy le lise comme un chemin
+$maskedUrl = str_replace('://', '/', $url);
+$proxyUrl = "../proxy.php/" . $maskedUrl; // Note the ../ because URL is /viewer/ID
+
+// Intégration du thème dans l'URL du proxy
+if (!str_contains($proxyUrl, '?')) {
+    $proxyUrl .= "?theme=" . urlencode($theme);
+} else {
+    $proxyUrl .= "&theme=" . urlencode($theme);
+}
 
 // 2. Récupérer toute la structure hiérarchique des documents approuvés
 $tree = [];
@@ -263,17 +267,19 @@ try {
             }
             
             $targetUrl = "";
-            if ($row['doc_worker_status'] === 'success' && !empty($row['doc_file_path'])) {
+            if (!empty($row['doc_file_path']) && str_contains($row['doc_file_path'], '.html')) {
                 $targetUrl = $row['doc_file_path'];
+                $is_html = true;
             } else {
                 $targetUrl = $row['doc_pdf_url'];
+                $is_html = false;
             }
             
             $tree[$lId]['semesters'][$semId]['subjects'][$subId]['documents'][] = [
                 'id' => $row['doc_id'],
                 'title' => $row['doc_title'],
                 'url' => $targetUrl,
-                'is_html' => ($row['doc_worker_status'] === 'success' && !empty($row['doc_file_path']))
+                'is_html' => $is_html
             ];
         }
 
@@ -296,7 +302,11 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php
+$base_url = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '/viewer.php'));
+?>
     <title><?= htmlspecialchars($activeTitle) ?> - IAI DOCS</title>
+    <base href="<?= $base_url ?>/">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Bibliothèques de rendu Riche -->
@@ -671,10 +681,11 @@ try {
                                                     <div class="tree-subject-content">
                                                         <?php foreach ($subject['documents'] as $doc): ?>
                                                             <?php 
-                                                            $isActive = ($activeDoc && $doc['id'] == $activeDoc['id']) || ($url === $doc['url']);
+                                                            $isActive = ($activeDoc && $doc['id'] == $activeDoc['id']);
                                                             ?>
                                                             <a href="#" 
                                                                class="tree-doc-link <?= $isActive ? 'active' : '' ?>" 
+                                                               data-id="<?= htmlspecialchars((string)$doc['id']) ?>"
                                                                data-url="<?= htmlspecialchars((string)$doc['url']) ?>" 
                                                                data-title="<?= htmlspecialchars((string)$doc['title']) ?>"
                                                                onclick="loadDocument(this); return false;">
@@ -713,7 +724,7 @@ try {
                         <option value="light">☀️ Light Premium</option>
                     </select>
                     <button class="btn" onclick="document.getElementById('doc-frame').requestFullscreen()" style="margin-right: 0.5rem;">⛶ Plein écran</button>
-                    <a href="exams.php" class="btn">Quitter</a>
+                    <a href="Examens" class="btn">Quitter</a>
                 </div>
             </div>
 
@@ -903,6 +914,7 @@ try {
         // Chargement d'un document en mode Single-Page App (SPA)
         function loadDocument(element) {
             const url = element.getAttribute('data-url');
+            const id = element.getAttribute('data-id');
             const title = element.getAttribute('data-title');
             
             // Mettre en surbrillance
@@ -920,7 +932,7 @@ try {
             // Déterminer s'il s'agit d'un HTML (Sphinx) ou d'un PDF brut
             if (url.includes('.html') || url.includes('/subjects/')) {
                 const masked = url.replace('://', '/');
-                finalUrl = "proxy.php/" + masked + "?theme=" + encodeURIComponent(currentTheme);
+                finalUrl = "../proxy.php/" + masked + "?theme=" + encodeURIComponent(currentTheme);
             } else {
                 finalUrl = url;
             }
@@ -928,20 +940,22 @@ try {
             iframe.src = finalUrl;
             
             // Pousser le nouvel état dans l'historique du navigateur
-            history.pushState(null, '', '?url=' + encodeURIComponent(url));
+            history.pushState(null, '', '/viewer/' + id);
         }
 
         // Écouter les retours arrière/avant du navigateur
         window.onpopstate = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetUrl = urlParams.get('url');
-            if (targetUrl) {
-                const matchingLink = document.querySelector(`.tree-doc-link[data-url="${targetUrl}"]`);
+            const pathParts = window.location.pathname.split('/');
+            const targetId = pathParts[pathParts.length - 1];
+            if (targetId && !isNaN(targetId)) {
+                const matchingLink = document.querySelector(`.tree-doc-link[data-id="${targetId}"]`);
                 if (matchingLink) {
                     loadDocument(matchingLink);
                 } else {
                     window.location.reload();
                 }
+            } else {
+                window.location.href = '/Examens';
             }
         };
 

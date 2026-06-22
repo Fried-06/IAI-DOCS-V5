@@ -13,7 +13,7 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
     $isAuthorized = true;
 }
 
-// 2. If logged in and was approved
+// 2. If logged in and was approved in DB
 if (!$isAuthorized && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     try {
         $pdo = getDB();
@@ -34,30 +34,42 @@ if (!$isAuthorized && isset($_SESSION['beta_authorized']) && $_SESSION['beta_aut
     $isAuthorized = true;
 }
 
-// If not authorized
+// If not authorized — redirect to beta_gate.php
 if (!$isAuthorized) {
-    // Check if this is an API call or AJAX request
-    $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') 
+    // Check if this is an AJAX/API request — return JSON instead of redirect
+    $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
               || (isset($_SERVER['CONTENT_TYPE']) && str_contains($_SERVER['CONTENT_TYPE'], 'application/json'))
-              || str_contains($_SERVER['REQUEST_URI'], '/backend/')
-              || str_contains($_SERVER['REQUEST_URI'], '_api');
+              || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json'));
 
     if ($isAjax) {
         http_response_code(403);
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
-            'error' => 'Accès restreint aux bêta-testeurs.', 
+            'error' => 'Accès restreint aux bêta-testeurs.',
             'logged_in' => isset($_SESSION['logged_in']) ? $_SESSION['logged_in'] : false,
             'beta_authorized' => false
         ]);
         exit();
     } else {
-        // Redirection vers la page de garde
-        $redirectUrl = 'beta_gate.php';
-        if (str_contains($_SERVER['REQUEST_URI'], '/backend/')) {
-            $redirectUrl = '../beta_gate.php';
-        }
-        header('Location: ' . $redirectUrl);
+        // Build absolute URL to beta_gate.php using HTTP_HOST
+        // This works regardless of subdirectory depth
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'];
+
+        // Find the root of the project (one level up from backend/)
+        $projectRoot = realpath(__DIR__ . '/..');
+
+        // Find where the project sits relative to the web root
+        // DOCUMENT_ROOT is typically C:\xampp\htdocs or /var/www/html
+        $docRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+
+        // Calculate the URL path to the project root
+        $projectUrlPath = str_replace($docRoot, '', $projectRoot);
+        $projectUrlPath = str_replace('\\', '/', $projectUrlPath);
+
+        $betaGateUrl = $protocol . '://' . $host . $projectUrlPath . '/beta_gate.php';
+
+        header('Location: ' . $betaGateUrl);
         exit();
     }
 }

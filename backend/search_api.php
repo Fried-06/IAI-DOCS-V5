@@ -122,15 +122,10 @@ try {
             $pdfLink = '#';
         }
 
-        // HTML Link: Check if it's already an absolute URL
+        // HTML Link: Use the Premium Viewer with the document ID
         $htmlLink = '#';
-        if ($row['status'] === 'approved' && !empty($row['file_path'])) {
-            if (strpos($row['file_path'], 'http') === 0) {
-                $htmlLink = 'viewer.php?url=' . urlencode($row['file_path']);
-            } else {
-                $cleanedPath = ltrim($row['file_path'], '/');
-                $htmlLink = $docsBaseUrl . $cleanedPath;
-            }
+        if ($row['status'] === 'approved' && (!empty($row['file_path']) || !empty($row['pdf_url']))) {
+            $htmlLink = '/viewer/' . $row['id'];
         }
         $hasHtml = ($htmlLink !== '#');
 

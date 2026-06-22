@@ -18,7 +18,7 @@ if (!isset($_SESSION['logged_in']) && isset($_COOKIE['remember_me'])) {
         setcookie('remember_me', $token, time() + 60*60*24*30, '/', '', false, true);
         // Rediriger vers la page d'accueil si sur login
         if (basename($_SERVER['PHP_SELF']) === 'auth.php' || basename($_SERVER['PHP_SELF']) === 'login.html') {
-            header('Location: ../index.html');
+            header('Location: ../index.php');
             exit();
         }
     }
@@ -115,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 unset($_SESSION['pending_beta_code']);
             }
 
-            header("Location: ../index.html");
+            header("Location: ../index.php");
             exit();
         } else {
             echo "<script>alert('Erreur lors de la création du compte.'); window.history.back();</script>";
@@ -179,7 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             setcookie('remember_me', $token, time() + 60*60*24*30, '/', '', false, true);
         }
 
-        header("Location: ../index.html");
+        header("Location: ../index.php");
         exit();
     }
     // Traitement du mot de passe oublié
@@ -211,7 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 } 
 else {
-    header("Location: ../login.html");
+    header("Location: ../login.php");
     exit();
 }
 ?>
