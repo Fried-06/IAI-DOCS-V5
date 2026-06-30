@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env
+Dockerfile
+render.yaml
+setup.bat
+setup.sh
+drafts/
+scratch_*.py
+*.md

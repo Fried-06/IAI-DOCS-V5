@@ -6,6 +6,7 @@ $base_url = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../../assets/IAI-DOCS-WHITE.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Licence 2 - Semestre 4 - Ressources IAI</title>
     <base href="<?= $base_url ?>/">
@@ -17,7 +18,7 @@ $base_url = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '
     <nav class="navbar">
         <div class="container nav-container">
             <a href="Accueil" class="logo" style="padding:0;display:flex;align-items:center;">
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height:200px;width:auto;object-fit:contain;">
+                <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI" style="height:200px;width:auto;object-fit:contain;">
             </a>
             <div class="nav-links">
                 <ul class="nav-menu">

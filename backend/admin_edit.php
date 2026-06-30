@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // backend/admin_edit.php — Interface to review and edit AI generated draft Markdown
 session_start();
 if (($_SESSION['user_role'] ?? '') !== 'admin') {
@@ -73,6 +73,7 @@ if (!empty($doc['pdf_url'])) {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../assets/IAI-DOCS-WHITE.png">
     <title>Editer le brouillon - IAI DOCS</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>

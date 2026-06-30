@@ -1689,6 +1689,10 @@ html {
 body {
   padding-top: 0; /* Hero is full-height anyway */
 }
+/* Ensure pages with a main container are pushed down */
+body > main.container {
+  padding-top: 100px !important;
+}
 
 /* ÔöÇÔöÇ Nav links styling ÔöÇÔöÇ */
 .nav-item {

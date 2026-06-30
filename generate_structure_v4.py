@@ -405,7 +405,8 @@ $firstYear = !empty($years) ? $years[0] : date('Y');
                 <span style="background:var(--primary-light);color:#000;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.8rem;font-weight:600;">
                     <?= $totalDocs ?> document<?= $totalDocs > 1 ? 's' : '' ?> disponible<?= $totalDocs > 1 ? 's' : '' ?>
                 </span>
-                <a href="Rechercher" style="color:var(--text-muted);font-size:0.85rem;">&#8592; Rechercher d'autres ressources</a>
+                <a href="javascript:history.back()" style="color:var(--text-muted);font-size:0.85rem;margin-right:1rem;text-decoration:none;">&#8592; Retour</a>
+                <a href="Rechercher" style="color:var(--text-muted);font-size:0.85rem;">&#128269; Rechercher d'autres ressources</a>
             </div>
         </div>
 

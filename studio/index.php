@@ -24,6 +24,7 @@ $privateDocs = $stmtDocs->fetchAll(PDO::FETCH_ASSOC);
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../assets/IAI-DOCS-WHITE.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IAI-DOCS — AI Study Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">

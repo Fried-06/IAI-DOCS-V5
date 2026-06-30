@@ -80,6 +80,7 @@ $firstYear = !empty($years) ? $years[0] : date('Y');
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../../../../assets/IAI-DOCS-WHITE.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audit des Systemes et Reseaux - Ressources IAI</title>
     <meta name="description" content="Ressources de la matiere Audit des Systemes et Reseaux pour Licence 3 ASR - Semestre 6">
@@ -92,7 +93,7 @@ $firstYear = !empty($years) ? $years[0] : date('Y');
     <nav class="navbar">
         <div class="container nav-container">
             <a href="Accueil" class="logo" style="padding:0;display:flex;align-items:center;">
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height:200px;width:auto;object-fit:contain;">
+                <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI" style="height:200px;width:auto;object-fit:contain;">
             </a>
             <div class="nav-links">
                 <ul class="nav-menu">

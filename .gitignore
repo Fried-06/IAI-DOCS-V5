@@ -6,6 +6,10 @@
 vendor/
 composer.lock
 
+#js
+js/
+supabase_auth.js
+
 # Python
 venv/
 __pycache__/

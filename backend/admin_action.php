@@ -17,6 +17,38 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Invalid request");
 }
 
+$userId = intval($_POST['user_id'] ?? 0);
+$action = $_POST['action'] ?? '';
+
+// ============================================
+// USER MANAGEMENT ACTIONS
+// ============================================
+if (in_array($action, ['promote_admin', 'demote_admin', 'delete_user'])) {
+    if ($userId <= 0) {
+        die("Invalid user ID.");
+    }
+    
+    $pdo = getDB();
+    
+    if ($action === 'promote_admin') {
+        $pdo->prepare("UPDATE users SET role = 'admin' WHERE id = ?")->execute([$userId]);
+        header("Location: admin.php?tab=users&success=" . urlencode("L'utilisateur a été promu administrateur."));
+        exit;
+    }
+    
+    if ($action === 'demote_admin') {
+        $pdo->prepare("UPDATE users SET role = 'student' WHERE id = ?")->execute([$userId]);
+        header("Location: admin.php?tab=users&success=" . urlencode("Le rôle administrateur a été retiré."));
+        exit;
+    }
+    
+    if ($action === 'delete_user') {
+        $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$userId]);
+        header("Location: admin.php?tab=users&success=" . urlencode("L'utilisateur a été supprimé."));
+        exit;
+    }
+}
+
 $docId = intval($_POST['id'] ?? 0);
 $action = $_POST['action'] ?? '';
 

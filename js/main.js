@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const studioLink = document.createElement('a');
                         studioLink.href = baseAppUrl + 'studio/index.php';
                         studioLink.className = 'nav-item nav-studio-btn';
-                        studioLink.innerHTML = 'Ô£¿ Studio AI';
+                        studioLink.innerHTML = '\u2728 Studio IA';
                         studioLink.style.cssText = 'font-size:0.9rem; text-decoration:none; color:var(--primary); font-weight:700; margin-right:1rem;';
                         avatarGroup.appendChild(studioLink);
 
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         logoutBtn.href = baseAppUrl + 'backend/logout.php';
                         logoutBtn.className = 'btn btn-outline nav-logout-btn';
                         logoutBtn.style.cssText = 'padding:0.4rem 0.8rem;font-size:0.8rem;border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:6px;text-decoration:none;transition:all 0.3s;';
-                        logoutBtn.textContent = 'D├®connexion';
+                        logoutBtn.textContent = 'Déconnexion';
                         logoutBtn.addEventListener('mouseenter', () => {
                             logoutBtn.style.background = 'rgba(255,100,100,0.15)';
                             logoutBtn.style.borderColor = '#ff6b6b';

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: iai-docs
+    env: docker
+    plan: free
+    region: frankfurt # ou ohio (choisir le plus proche de votre Supabase)
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_PORT
+        value: 5432

@@ -30,6 +30,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">
 
 
 
@@ -485,10 +486,10 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-            <a href="index.html" class="logo">
+            <a href="Accueil" class="logo">
 
 
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI">
+                <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI">
 
 
             </a>
@@ -518,7 +519,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                    <li><a href="index.html" class="nav-item">Accueil</a></li>
+                    <li><a href="Accueil" class="nav-item">Accueil</a></li>
 
 
 
@@ -527,7 +528,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                    <li><a href="exams.php" class="nav-item">Examens</a></li>
+                    <li><a href="Examens" class="nav-item">Examens</a></li>
 
 
 
@@ -536,7 +537,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
+                    <li><a href="Rechercher" class="nav-item">Rechercher</a></li>
 
 
 
@@ -554,7 +555,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+                    <li><a href="Contribuer" class="nav-item">Contribuer</a></li>
 
 
 
@@ -578,13 +579,13 @@ require_once __DIR__ . '/backend/beta_check.php';
                     <button class="theme-toggle" id="theme-toggle" title="Basculer le thème"></button>
 
 
-                    <a href="login.html" class="auth-login-btn">Connexion</a>
+                    <a href="Connexion" class="auth-login-btn">Connexion</a>
 
 
-                    <a href="login.html" class="auth-register-btn">S'inscrire</a>
+                    <a href="Connexion" class="auth-register-btn">S'inscrire</a>
 
 
-                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none;">Profil</a>
+                    <a href="Profil" class="btn btn-outline" id="btn-profil" style="display: none;">Profil</a>
 
 
                 </div>
@@ -781,7 +782,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                    <a href="search.php" class="btn-glass btn-glass-outline hero-float" style="animation-delay:0.15s">
+                    <a href="Rechercher" class="btn-glass btn-glass-outline hero-float" style="animation-delay:0.15s">
 
 
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1846,7 +1847,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                <div class="grid grid-cols-3">
+                <div id="recentExamsGrid" class="grid grid-cols-3">
 
 
 
@@ -3412,7 +3413,7 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
-                    <a href="contribute.html" class="btn-glass btn-glass-primary" style="display:inline-flex">
+                    <a href="Contribuer" class="btn-glass btn-glass-primary" style="display:inline-flex">
 
 
 
@@ -3511,7 +3512,7 @@ require_once __DIR__ . '/backend/beta_check.php';
                         <div class="footer-logo-row">
 
 
-                            <img src="assets/iai_docs_moderne.png" alt="IAI-DOCS Logo">
+                            <img src="assets/IAI-NEW-LOGO.png" alt="IAI-DOCS Logo">
 
 
                             <span class="footer-logo-text">IAI DOCS</span>
@@ -3541,22 +3542,22 @@ require_once __DIR__ . '/backend/beta_check.php';
                         <ul class="footer-link-list">
 
 
-                            <li><a href="index.html">Accueil</a></li>
+                            <li><a href="Accueil">Accueil</a></li>
 
 
-                            <li><a href="search.php">Recherche</a></li>
+                            <li><a href="Rechercher">Recherche</a></li>
 
 
-                            <li><a href="exams.php">Examens</a></li>
+                            <li><a href="Examens">Examens</a></li>
 
 
                             <li><a href="contributors.php">Contributeurs</a></li>
 
 
-                            <li><a href="login.html">Connexion</a></li>
+                            <li><a href="Connexion">Connexion</a></li>
 
 
-                            <li><a href="login.html">Inscription</a></li>
+                            <li><a href="Connexion">Inscription</a></li>
 
 
                         </ul>
@@ -3727,7 +3728,7 @@ require_once __DIR__ . '/backend/beta_check.php';
                         </a>
 
 
-                        <a href="contribute.html" class="footer-contact-link">
+                        <a href="Contribuer" class="footer-contact-link">
 
 
                             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3918,6 +3919,37 @@ require_once __DIR__ . '/backend/beta_check.php';
 
 
 
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const grid = document.getElementById('recentExamsGrid');
+    if (!grid) return;
+    
+    try {
+        const recent = JSON.parse(localStorage.getItem('recentExams') || '[]');
+        if (recent.length > 0) {
+            grid.innerHTML = ''; // Clear static cards
+            recent.forEach((exam, i) => {
+                const tagStr = exam.tag ? `<span class="tag">${exam.tag}</span>` : '';
+                grid.innerHTML += `
+                    <div class="exam-card" style="animation-delay: ${i*0.1}s">
+                        <div class="exam-header">
+                            ${tagStr}
+                            <div class="exam-meta">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                Récemment ouvert
+                            </div>
+                        </div>
+                        <h3 class="exam-title">${exam.title}</h3>
+                        <a href="${exam.link}" class="btn btn-outline" style="margin-top: auto;">Reprendre la lecture</a>
+                    </div>
+                `;
+            });
+        }
+    } catch(e) { console.error(e); }
+});
+</script>
 
 </body>
 

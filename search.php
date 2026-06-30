@@ -6,6 +6,7 @@
 <head>
 
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -26,9 +27,9 @@
 
         <div class="container nav-container">
 
-            <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
+            <a href="Accueil" class="logo" style="padding: 0; display: flex; align-items: center;">
 
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+                <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
 
             </a>
 
@@ -36,13 +37,13 @@
 
                 <ul class="nav-menu">
 
-                    <li><a href="index.html" class="nav-item">Accueil</a></li>
+                    <li><a href="Accueil" class="nav-item">Accueil</a></li>
 
-                    <li><a href="exams.php" class="nav-item">Examens</a></li>
+                    <li><a href="Examens" class="nav-item">Examens</a></li>
 
-                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
+                    <li><a href="Rechercher" class="nav-item">Rechercher</a></li>
 
-                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+                    <li><a href="Contribuer" class="nav-item">Contribuer</a></li>
 
                 </ul>
 
@@ -54,11 +55,11 @@
 
                     </button>
 
-                    <a href="login.html" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+                    <a href="Connexion" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
 
-                    <a href="login.html" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
+                    <a href="Connexion" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
 
-                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none;">Profil</a>
+                    <a href="Profil" class="btn btn-outline" id="btn-profil" style="display: none;">Profil</a>
 
                 </div>
 

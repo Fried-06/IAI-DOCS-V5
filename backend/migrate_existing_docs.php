@@ -164,7 +164,7 @@ function documentExists(PDO $pdo, int $subjectId, int $typeId, int $yearId): boo
 
 // ── Main scan ─────────────────────────────────────────────
 if (!$isCli) {
-    echo "<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'>";
+    echo "<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'>\n    <link rel='icon' type='image/png' href='../assets/IAI-DOCS-WHITE.png'>";
     echo "<title>Migration — IAI Docs</title>";
     echo "<style>body{background:#0f172a;color:#e2e8f0;font-family:monospace;padding:2rem;}
           h1{color:#818cf8;} h2{color:#a5b4fc;font-size:1rem;margin-top:1.5rem;}

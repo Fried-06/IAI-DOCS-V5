@@ -115,6 +115,7 @@ sort($allSemesters);
 <head>
 
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -135,9 +136,9 @@ sort($allSemesters);
 
         <div class="container nav-container">
 
-            <a href="index.html" class="logo" style="padding: 0; display: flex; align-items: center;">
+            <a href="Accueil" class="logo" style="padding: 0; display: flex; align-items: center;">
 
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
+                <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI" style="height: 200px; width: auto; object-fit: contain;">
 
             </a>
 
@@ -145,13 +146,13 @@ sort($allSemesters);
 
                 <ul class="nav-menu">
 
-                    <li><a href="index.html" class="nav-item">Accueil</a></li>
+                    <li><a href="Accueil" class="nav-item">Accueil</a></li>
 
-                    <li><a href="exams.php" class="nav-item">Examens</a></li>
+                    <li><a href="Examens" class="nav-item">Examens</a></li>
 
-                    <li><a href="search.php" class="nav-item">Rechercher</a></li>
+                    <li><a href="Rechercher" class="nav-item">Rechercher</a></li>
 
-                    <li><a href="contribute.html" class="nav-item">Contribuer</a></li>
+                    <li><a href="Contribuer" class="nav-item">Contribuer</a></li>
 
                 </ul>
 
@@ -163,11 +164,11 @@ sort($allSemesters);
 
                     </button>
 
-                    <a href="login.html" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
+                    <a href="Connexion" class="btn btn-outline auth-login-btn" style="padding: 0.5rem 1rem; border: none;">Connexion</a>
 
-                    <a href="login.html" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
+                    <a href="Connexion" class="btn btn-primary auth-register-btn" style="padding: 0.5rem 1rem;">S'inscrire</a>
 
-                    <a href="profile.php" class="btn btn-outline" id="btn-profil" style="display: none;">Profil</a>
+                    <a href="Profil" class="btn btn-outline" id="btn-profil" style="display: none;">Profil</a>
 
                 </div>
 
@@ -362,48 +363,55 @@ sort($allSemesters);
 
 
 
-        // Load more exams button logic
+        // Infinite Scroll logic using IntersectionObserver
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
 
-        document.querySelectorAll('.load-more-exams-btn').forEach(btn => {
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const btn = entry.target;
+                    const section = btn.closest('.level-section');
+                    const hiddenCards = section.querySelectorAll('.subject-card.is-hidden-card');
+                    
+                    if (hiddenCards.length > 0) {
+                        // Change button text to show loading state temporarily
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '<span style="display:inline-block; animation: spin 1s linear infinite;">&#8982;</span> Chargement...';
+                        
+                        setTimeout(() => {
+                            let count = 0;
+                            hiddenCards.forEach(card => {
+                                if (count < 12) {
+                                    card.style.display = 'block';
+                                    card.classList.remove('is-hidden-card');
+                                    count++;
+                                }
+                            });
 
-            btn.addEventListener('click', () => {
+                            btn.innerHTML = originalText;
 
-                const section = btn.closest('.level-section');
-
-                const hiddenCards = section.querySelectorAll('.subject-card.is-hidden-card');
-
-                
-
-                // Show the next 12 hidden cards
-
-                let count = 0;
-
-                hiddenCards.forEach(card => {
-
-                    if (count < 12) {
-
-                        card.style.display = 'block';
-
-                        card.classList.remove('is-hidden-card');
-
-                        count++;
-
+                            if (section.querySelectorAll('.subject-card.is-hidden-card').length === 0) {
+                                btn.parentElement.style.display = 'none';
+                                observer.unobserve(btn);
+                            }
+                        }, 500); // 500ms artificial delay for smooth UI feedback
                     }
-
-                });
-
-
-
-                // If no more hidden cards, hide the button
-
-                if (section.querySelectorAll('.subject-card.is-hidden-card').length === 0) {
-
-                    btn.parentElement.style.display = 'none';
-
                 }
-
             });
+        }, observerOptions);
 
+        // Add keyframes for spinner
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+        document.head.appendChild(style);
+
+        // Observe all load more buttons
+        document.querySelectorAll('.load-more-exams-btn').forEach(btn => {
+            observer.observe(btn);
         });
 
     </script>
