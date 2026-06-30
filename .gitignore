@@ -6,9 +6,8 @@
 vendor/
 composer.lock
 
-#js
-js/
-supabase_auth.js
+# js/ (décommenté pour inclure supabase_auth.js dans le déploiement)
+# js/
 
 # Python
 venv/
