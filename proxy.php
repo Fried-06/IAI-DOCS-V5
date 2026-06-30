@@ -306,7 +306,26 @@ if ($ext === 'html') {
             --content-width: 100% !important;
             --compact-width: 100% !important;
         }
-        .sidebar-drawer, .sidebar-toggle, .mobile-header, .prev-next-area { display: none !important; }
+        /* Masquer TOUS les éléments de navigation Sphinx/Furo */
+        .sidebar-drawer,
+        .sidebar-toggle,
+        .sidebar-container,
+        .mobile-header,
+        .prev-next-area,
+        nav.bd-sidebar,
+        .bd-sidebar,
+        #pst-primary-sidebar,
+        #pst-secondary-sidebar,
+        .sphinx-sidebar,
+        [class*='sidebar-'],
+        .sphinxsidebar,
+        #sidebar,
+        .related {
+            display: none !important;
+            width: 0 !important;
+            max-width: 0 !important;
+            overflow: hidden !important;
+        }
         
         /* Forcer l'affichage de la sidebar de droite (TOC) sur ordinateur même si l'iframe est rétrécie par notre sidebar */
         @media (min-width: 48rem) {
@@ -322,7 +341,8 @@ if ($ext === 'html') {
         }
         
         /* Étendre tous les conteneurs à 100% et enlever le centrage restrictif */
-        .page, .main, .page-content, .content, .content-container, .document, .main-content {
+        .page, .main, .page-content, .content, .content-container, .document, .main-content,
+        .bd-content, .bd-article-container, body.pydata-sphinx-theme .bd-page-width {
             max-width: 100% !important;
             width: 100% !important;
             margin: 0 !important;
@@ -336,8 +356,16 @@ if ($ext === 'html') {
 
     $injectedHead = $fontImport . "\n<style>\n" . $themeCss . "\n" . $furoOverrideCss . "\n</style>\n";
 
-    $content = str_replace('<head>
-    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">', '<head>' . $baseTag . $injectedHead, $content);
+    // Injection robuste : cherche </head> ou <head> peu importe le format exact
+    // 1. Injecter les styles avant </head>
+    if (str_contains($content, '</head>')) {
+        $content = str_replace('</head>', $baseTag . $injectedHead . '</head>', $content);
+    } else {
+        // Fallback : injecter après <head> s'il n'y a pas de </head>
+        $content = preg_replace('/<head[^>]*>/', '$0' . $baseTag . $injectedHead, $content, 1);
+    }
+    
+    // 2. Injecter le script d'interception avant </body>
     $content = str_contains($content, '</body>') ? str_replace('</body>', $interceptScript . '</body>', $content) : $content . $interceptScript;
 }
 
