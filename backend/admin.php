@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // backend/admin.php — Admin Dashboard with tabs
 // Tabs: Documents en Attente | Gérer Années | Gérer Matières
 
