@@ -97,6 +97,24 @@ try {
     $_SESSION['user_role'] = $localUser['role'] ?? $role;
     $_SESSION['logged_in'] = true;
     
+    // Associer un code bêta en attente s'il existe
+    if (isset($_SESSION['pending_beta_code'])) {
+        $pendingCode = $_SESSION['pending_beta_code'];
+        
+        // Mettre à jour l'utilisateur
+        $pdo->prepare("UPDATE users SET is_beta_approved = TRUE WHERE id = ?")->execute([$userId]);
+        
+        // Mettre à jour le code
+        $pdo->prepare("UPDATE beta_codes SET is_used = TRUE, used_by_email = ?, used_at = NOW() WHERE code = ?")->execute([$email, $pendingCode]);
+        
+        // Si l'utilisateur local existait déjà, on force sa valeur en mémoire
+        if ($localUser) {
+            $localUser['is_beta_approved'] = 1;
+        }
+        
+        unset($_SESSION['pending_beta_code']);
+    }
+
     // Beta authorization logic
     if (($_SESSION['user_role'] === 'admin') || (isset($localUser['is_beta_approved']) && $localUser['is_beta_approved'])) {
         $_SESSION['beta_authorized'] = true;
