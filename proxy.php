@@ -28,7 +28,7 @@ $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
 $mimeTypes = [
     'html' => 'text/html', 'css' => 'text/css', 'js' => 'application/javascript',
     'json' => 'application/json', 'png' => 'image/png', 'jpg' => 'image/jpeg',
-    'gif' => 'image/gif', 'svg' => 'image/svg+xml'
+    'gif' => 'image/gif', 'svg' => 'image/svg+xml', 'pdf' => 'application/pdf'
 ];
 $contentType = $mimeTypes[$ext] ?? 'text/plain';
 
@@ -306,7 +306,7 @@ if ($ext === 'html') {
             --content-width: 100% !important;
             --compact-width: 100% !important;
         }
-        .sidebar-drawer, .sidebar-toggle, .mobile-header { display: none !important; }
+        .sidebar-drawer, .sidebar-toggle, .mobile-header, .prev-next-area { display: none !important; }
         
         /* Forcer l'affichage de la sidebar de droite (TOC) sur ordinateur même si l'iframe est rétrécie par notre sidebar */
         @media (min-width: 48rem) {
@@ -336,7 +336,8 @@ if ($ext === 'html') {
 
     $injectedHead = $fontImport . "\n<style>\n" . $themeCss . "\n" . $furoOverrideCss . "\n</style>\n";
 
-    $content = str_replace('<head>', '<head>' . $baseTag . $injectedHead, $content);
+    $content = str_replace('<head>
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">', '<head>' . $baseTag . $injectedHead, $content);
     $content = str_contains($content, '</body>') ? str_replace('</body>', $interceptScript . '</body>', $content) : $content . $interceptScript;
 }
 

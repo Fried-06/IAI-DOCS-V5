@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accès Restreint - Bêta Privée | IAI-DOCS</title>
     <link rel="stylesheet" href="css/style.css?v=2">
@@ -480,7 +481,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Action Buttons Container -->
             <div style="display: flex; gap: 12px; margin-top: 5px;">
                 <button class="waitlist-trigger" id="waitlistTrigger" style="flex: 1;">Rejoindre la liste d'attente</button>
-                <a href="login.html" class="login-trigger" style="flex: 1;">Se connecter</a>
+                <a href="Connexion" class="login-trigger" style="flex: 1;">Se connecter</a>
             </div>
 
             <!-- Waitlist Expandable Section -->

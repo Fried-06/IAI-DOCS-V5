@@ -66,9 +66,16 @@ try {
         $params[] = $yearId;
     }
     if (!empty($query)) {
-        $whereSql .= " AND (d.title LIKE ? OR s.name LIKE ?)";
-        $params[] = "%$query%";
-        $params[] = "%$query%";
+        $keywords = preg_split('/\s+/', $query);
+        foreach ($keywords as $kw) {
+            $kw = trim($kw);
+            if (!empty($kw)) {
+                $whereSql .= " AND (d.title LIKE ? OR s.name LIKE ? OR y.year LIKE ?)";
+                $params[] = "%$kw%";
+                $params[] = "%$kw%";
+                $params[] = "%$kw%";
+            }
+        }
     }
 
     // 1. Get total count for pagination

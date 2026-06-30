@@ -81,6 +81,7 @@ $firstYear = !empty($years) ? $years[0] : date('Y');
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../../../../assets/IAI-DOCS-WHITE.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anglais Professionnel - Ressources IAI</title>
     <meta name="description" content="Ressources de la matiere Anglais Professionnel pour Licence 3 ASR - Semestre 5">
@@ -93,7 +94,7 @@ $firstYear = !empty($years) ? $years[0] : date('Y');
     <nav class="navbar">
         <div class="container nav-container">
             <a href="Accueil" class="logo" style="padding:0;display:flex;align-items:center;">
-                <img src="assets/iai_docs_moderne.png" alt="Logo IAI" style="height:200px;width:auto;object-fit:contain;">
+                <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI" style="height:200px;width:auto;object-fit:contain;">
             </a>
             <div class="nav-links">
                 <ul class="nav-menu">
@@ -125,7 +126,8 @@ $firstYear = !empty($years) ? $years[0] : date('Y');
                 <span style="background:var(--primary-light);color:#000;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.8rem;font-weight:600;">
                     <?= $totalDocs ?> document<?= $totalDocs > 1 ? 's' : '' ?> disponible<?= $totalDocs > 1 ? 's' : '' ?>
                 </span>
-                <a href="Rechercher" style="color:var(--text-muted);font-size:0.85rem;">&#8592; Rechercher d'autres ressources</a>
+                <a href="javascript:history.back()" style="color:var(--text-muted);font-size:0.85rem;margin-right:1rem;text-decoration:none;">&#8592; Retour</a>
+                <a href="Rechercher" style="color:var(--text-muted);font-size:0.85rem;">&#128269; Rechercher d'autres ressources</a>
             </div>
         </div>
 

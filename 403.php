@@ -12,6 +12,7 @@ $role = $_SESSION['user_role'] ?? '';
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accès Interdit - 403</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -256,15 +257,15 @@ $role = $_SESSION['user_role'] ?? '';
         </div>
 
         <div class="btn-group">
-            <a href="index.html" class="btn btn-primary">
+            <a href="Accueil" class="btn btn-primary">
                 Retour à l'accueil
             </a>
             <?php if ($isLoggedIn && $role !== 'admin'): ?>
-                <a href="login.html" class="btn btn-outline">
+                <a href="Connexion" class="btn btn-outline">
                     Changer de compte
                 </a>
             <?php elseif (!$isLoggedIn): ?>
-                <a href="login.html" class="btn btn-outline">
+                <a href="Connexion" class="btn btn-outline">
                     Se connecter
                 </a>
             <?php endif; ?>

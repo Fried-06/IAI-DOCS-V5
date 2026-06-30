@@ -12,6 +12,7 @@ register_shutdown_function(function() {
         <html lang="fr">
         <head>
             <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/IAI-DOCS-WHITE.png">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Délai de connexion dépassé - IAI DOCS</title>
             <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -136,7 +137,42 @@ register_shutdown_function(function() {
                     🔄 Réessayer
                 </button>
             </div>
-        </body>
+        
+<script>
+    // Track recent exams
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const docId = <?= json_encode($activeDoc['id'] ?? '') ?>;
+            const docTitle = <?= json_encode($activeTitle ?? '') ?>;
+            
+            if (docId && docTitle) {
+                // Determine tag from UI
+                const activeLink = document.querySelector('.sidebar-doc-link.active');
+                let tag = '';
+                if (activeLink) {
+                    const semGroup = activeLink.closest('.semester-group');
+                    const levelGroup = activeLink.closest('.level-group');
+                    const semName = semGroup ? semGroup.querySelector('.semester-title').textContent.trim() : '';
+                    const levelName = levelGroup ? levelGroup.querySelector('.level-title').textContent.trim() : '';
+                    tag = (levelName + ' - ' + semName).replace('Licence ', 'L');
+                }
+                
+                let recent = JSON.parse(localStorage.getItem('recentExams') || '[]');
+                recent = recent.filter(e => e.id != docId); // Remove existing
+                recent.unshift({
+                    id: docId,
+                    title: docTitle,
+                    tag: tag || 'Document',
+                    link: 'viewer.php?id=' + docId
+                });
+                recent = recent.slice(0, 3);
+                localStorage.setItem('recentExams', JSON.stringify(recent));
+            }
+        } catch(e) {}
+    });
+</script>
+
+</body>
         </html>
         <?php
         exit;
@@ -646,7 +682,7 @@ $base_url = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '
         <aside class="viewer-sidebar" id="viewer-sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <img src="assets/iai_docs_moderne.png" alt="Logo IAI-TOGO">
+                    <img src="assets/IAI-NEW-LOGO.png" alt="Logo IAI-TOGO">
                 </div>
                 <div class="sidebar-search-box">
                     <svg class="sidebar-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -1068,5 +1104,40 @@ $base_url = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '
             }
         });
     </script>
+
+<script>
+    // Track recent exams
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const docId = <?= json_encode($activeDoc['id'] ?? '') ?>;
+            const docTitle = <?= json_encode($activeTitle ?? '') ?>;
+            
+            if (docId && docTitle) {
+                // Determine tag from UI
+                const activeLink = document.querySelector('.sidebar-doc-link.active');
+                let tag = '';
+                if (activeLink) {
+                    const semGroup = activeLink.closest('.semester-group');
+                    const levelGroup = activeLink.closest('.level-group');
+                    const semName = semGroup ? semGroup.querySelector('.semester-title').textContent.trim() : '';
+                    const levelName = levelGroup ? levelGroup.querySelector('.level-title').textContent.trim() : '';
+                    tag = (levelName + ' - ' + semName).replace('Licence ', 'L');
+                }
+                
+                let recent = JSON.parse(localStorage.getItem('recentExams') || '[]');
+                recent = recent.filter(e => e.id != docId); // Remove existing
+                recent.unshift({
+                    id: docId,
+                    title: docTitle,
+                    tag: tag || 'Document',
+                    link: 'viewer.php?id=' + docId
+                });
+                recent = recent.slice(0, 3);
+                localStorage.setItem('recentExams', JSON.stringify(recent));
+            }
+        } catch(e) {}
+    });
+</script>
+
 </body>
 </html>
