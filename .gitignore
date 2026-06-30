@@ -52,10 +52,8 @@ test3.docx
 dummy.pdf
 test_input.md
 
-# Secrets
-.env
-.env.example
-backend/config.php
+# Secrets (config.php is now safe to commit — reads from env vars)
+# backend/config.php  ← décommenté intentionnellement pour le déploiement
 supabase_dump.json
 migrate_to_supabase.php
 push_to_supabase.py
